@@ -48,7 +48,6 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway {
 		$this->description		= $this->get_option( 'description' );
 		$this->merchant_id 		= $this->get_option( 'merchant_id' );
 		$this->application_id 	= $this->get_option( 'application_id' );
-		// $this->receive_currency = $this->get_option( 'receive_currency' );
 		$this->order_status     = $this->get_option( 'order_status' );
 
 		$this->private_key      = $this->read_private_key();
