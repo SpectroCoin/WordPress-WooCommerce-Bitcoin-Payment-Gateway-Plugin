@@ -48,27 +48,5 @@ return array(
 			'completed'  => __( 'completed', 'woocommerce' )
 		)
 	)
-	// ,
-	// 'receive_currency' => array(
-	// 	'title'       => __( 'Receive currency', 'woocommerce' ),
-	// 	'type'        => 'select',
-	// 	'class'       => 'wc-enhanced-select',
-	// 	'options' 	  => array(
-	// 		'BTC' => __( 'BTC', 'woocommerce' ),
-	// 		'EUR' => __( 'EUR', 'woocommerce' ),
-	// 		'USD' => __( 'USD', 'woocommerce' ),
-	// 		'GBP' => __( 'GBP', 'woocommerce' ),
-	// 		'SEK' => __( 'SEK', 'woocommerce' ),
-	// 		'NOK' => __( 'NOK', 'woocommerce' ),
-	// 		'DKK' => __( 'DKK', 'woocommerce' ),
-	// 		'PLN' => __( 'PLN', 'woocommerce' ),
-	// 		'CZK' => __( 'CZK', 'woocommerce' ),
-	// 		'BGN' => __( 'BGN', 'woocommerce' ),
-	// 		'GEL' => __( 'GEL', 'woocommerce' ),
-	// 		'RON' => __( 'RON', 'woocommerce' ),
-	// 		'HRK' => __( 'HRK', 'woocommerce' ),
-	// 		'TRY' => __( 'TRY', 'woocommerce' ),
-	// 		'CHF' => __( 'CHF', 'woocommerce' )
-	// 	)
-	// )
+	
 );
