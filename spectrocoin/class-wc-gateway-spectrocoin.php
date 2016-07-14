@@ -184,7 +184,7 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway {
 
 		return new CreateOrderRequest(
 			$order->id . '-' . $this->random_str( 5 ), 
-			self::$pay_currency
+			self::$pay_currency,
 			null, 
 			$receive_currency,
 			$total,
