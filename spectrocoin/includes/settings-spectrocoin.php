@@ -18,7 +18,7 @@ return array(
 		'title'       => __( 'Title', 'woocommerce' ),
 		'type'        => 'text',
 		'description' => __( 'This controls the title which the user sees during checkout.', 'woocommerce' ),
-		'default'     => __( 'SpectroCoin', 'woocommerce' ),
+		'default'     => __( 'Bitcoin', 'woocommerce' ),
 		'desc_tip'    => true,
 	),
 	'description' => array(
@@ -26,7 +26,7 @@ return array(
 		'type'        => 'text',
 		'desc_tip'    => true,
 		'description' => __( 'This controls the description which the user sees during checkout.', 'woocommerce' ),
-		'default'     => __( 'Pay via SpectroCoin.', 'woocommerce' )
+		'default'     => __( 'Pay via Bitcoin.', 'woocommerce' )
 	),
 	'merchant_id' => array(
 		'title'       => __( 'Merchant Id', 'woocommerce' ),
