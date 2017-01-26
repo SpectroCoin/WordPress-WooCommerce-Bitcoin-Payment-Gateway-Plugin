@@ -31,7 +31,7 @@ To succesfully use this plugin, you have to have a SpectroCoin Bitcoin wallet. Y
 
 	Do not forget to add new Public key to your project by pasting it into Public key field under "Edit project" section. 
   
-3. Save private key to wp-content\plugins\spectrocoin\keys as "private_key"
+3. Save/change private key to wp-content\plugins\spectrocoin\keys as "private_key"
 
 **CONFIGURATION**
 
