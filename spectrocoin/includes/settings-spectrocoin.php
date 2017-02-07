@@ -16,7 +16,7 @@ return array(
 	),
 	'title' => array(
 		'title'       => __( 'Title', 'woocommerce' ),
-		'type'        => 'text',
+		'type'        => 'Text',
 		'description' => __( 'This controls the title which the user sees during checkout.', 'woocommerce' ),
 		'default'     => __( 'Bitcoin', 'woocommerce' ),
 		'desc_tip'    => true,
@@ -32,10 +32,16 @@ return array(
 		'title'       => __( 'Merchant Id', 'woocommerce' ),
 		'type'        => 'text'
 	),
-	'application_id' => array(
-		'title'       => __( 'Application Id', 'woocommerce' ),
+	'project_id' => array(
+		'title'       => __( 'Project Id', 'woocommerce' ),
 		'type'        => 'text'
 	),
+/*
+	'private_key' => array(
+		'title'       => __( 'Private key', 'woocommerce' ),
+		'type'        => 'Text Area'
+	),
+	*/
 	'order_status'  => array(
 		'title'       => __('Order status'),
 		'desc_tip'    => true,
@@ -48,5 +54,5 @@ return array(
 			'completed'  => __( 'completed', 'woocommerce' )
 		)
 	)
-	
+
 );
