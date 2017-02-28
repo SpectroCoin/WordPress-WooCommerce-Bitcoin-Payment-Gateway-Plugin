@@ -1,8 +1,8 @@
 SpectroCoin Bitcoin Merchant plugin for WordPress WooCommerce
 ---------------
-This is [SpectroCoin](https://spectrocoin.com/) Bitcoin Payment Module for [WordPress](https://wordpress.org/). This extenstion allows to easily accept bitcoins (and other cryptocurrencies such as DASH) at your WordPress or WooCommerce website. You can view [a how to integrate bitcoin payments for WordPress tutorial](https://www.youtube.com/watch?v=OTbLlI7sF8U).
+This is [SpectroCoin Bitcoin Payment Module for WordPress](https://spectrocoin.com/en/plugins/accept-bitcoin-wordpress-woocommerce.html). This extenstion allows to easily accept bitcoins (and other cryptocurrencies such as DASH) at your WordPress or WooCommerce website. You can view [a how to integrate bitcoin payments for WordPress tutorial](https://www.youtube.com/watch?v=OTbLlI7sF8U).
 
-To succesfully use this plugin, you have to have a SpectroCoin Bitcoin wallet. You can get it [here](https://spectrocoin.com/en/bitcoin-wallet.html). Also you have to create a merchant project to get merchant and project IDs, to do so create a new merchant project [here](https://spectrocoin.com/en/merchant/api/create.html).
+To succesfully use this plugin, you have to have a SpectroCoin Bitcoin wallet. You can get it [here](https://spectrocoin.com/en/bitcoin-wallet.html). Also you have to create a merchant project to get Merchant and Project IDs, to do so create a new merchant project [here](https://spectrocoin.com/en/merchant/api/create.html).
 
 **INSTALLATION**
 
@@ -36,7 +36,7 @@ To succesfully use this plugin, you have to have a SpectroCoin Bitcoin wallet. Y
 **CONFIGURATION**
 
 1. Activate the plugin through the WooCommerce -> Settings -> Checkout -> SpectroCoin
-2. Enter your Merchant Id, Application Id
+2. Enter your Merchant ID and Project ID
 
 **INFORMATION** 
 
