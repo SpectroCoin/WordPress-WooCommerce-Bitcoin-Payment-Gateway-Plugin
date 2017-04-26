@@ -16,7 +16,7 @@ return array(
 	),
 	'title' => array(
 		'title'       => __( 'Title', 'woocommerce' ),
-		'type'        => 'text',
+		'type'        => 'Text',
 		'description' => __( 'This controls the title which the user sees during checkout.', 'woocommerce' ),
 		'default'     => __( 'Bitcoin', 'woocommerce' ),
 		'desc_tip'    => true,

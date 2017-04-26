@@ -36,7 +36,6 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway {
 		$this->description		= $this->get_option( 'description' );
 		$this->merchant_id 		= $this->get_option( 'merchant_id' );
 		$this->project_id 	= $this->get_option( 'project_id' );
-		//$this->private_key 		= $this->get_option( 'private_key' );
 		$this->order_status     = $this->get_option( 'order_status' );
 		
 		$this->private_key      = $this->read_private_key();
@@ -83,6 +82,18 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway {
 	/**
 	 * Initialise Gateway Settings Form Fields.
 	 */
+	 
+	     public function admin_options()
+    {
+      ?>
+      <p><?php _e('Accept Bitcoin through the SpectroCoin and receive payments in your chosen currency.<br>
+       Still have questions? Contact us via <a href="skype:spectrocoin_merchant?chat">skype: spectrocoin_merchant</a> &middot; <a href="mailto:merchant@spectrocoin.com">email: merchant@spectrocoin.com</a>', 'woothemes'); ?></p>
+      <table class="form-table">
+        <?php $this->generate_settings_html(); ?>
+      </table>
+      <?php
+    }
+	
 	public function init_form_fields() {
 		$this->form_fields = include( 'includes/settings-spectrocoin.php' );
 	}
