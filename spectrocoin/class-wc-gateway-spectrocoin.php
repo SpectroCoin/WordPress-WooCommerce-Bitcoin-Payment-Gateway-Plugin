@@ -1,7 +1,17 @@
 <?php
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
+
+defined( 'ABSPATH' ) or exit;
+
+if ( ! in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ) ) ) {
+	return;
 }
+
+add_action( 'plugins_loaded', 'spectrocoin_init');
+
+	if (!class_exists('WC_Payment_Gateway')) {
+		return;
+	};
+
 require_once __DIR__ . '/SCMerchantClient/SCMerchantClient.php';
 /**
  * WC_Gateway_Spectrocoin Class.
@@ -38,6 +48,9 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway {
 		$this->project_id 	= $this->get_option( 'project_id' );
 		$this->order_status     = $this->get_option( 'order_status' );
 		
+		add_action('woocommerce_update_options_payment_gateways_' . $this->id, array($this, 'process_admin_options'));
+		add_action('woocommerce_thankyou_' . $this->id, array($this, 'thankyou_page'));
+			
 		$this->private_key      = $this->read_private_key();
 
 		if ( !$this->private_key ) {
@@ -94,9 +107,58 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway {
       <?php
     }
 	
-	public function init_form_fields() {
-		$this->form_fields = include( 'includes/settings-spectrocoin.php' );
-	}
+			public function init_form_fields() {
+			$this->form_fields = array(
+				'enabled' => array(
+					'title' => __('Enable/Disable', 'woocommerce'),
+					'type' => 'checkbox',
+					'label' => __('Enable SpectroCoin', 'woocommerce'),
+					'default' => 'yes'
+				),
+				'title' => array(
+					'title' => __('Title', 'woocommerce'),
+					'type' => 'Text',
+					'description' => __('This controls the title which the user sees during checkout.', 'woocommerce'),
+					'default' => __('Bitcoin', 'woocommerce'),
+					'desc_tip' => true,
+				),
+				'description' => array(
+					'title' => __('Description', 'woocommerce'),
+					'type' => 'text',
+					'desc_tip' => true,
+					'description' => __('This controls the description which the user sees during checkout.', 'woocommerce'),
+					'default' => __('Pay via Bitcoin.', 'woocommerce')
+				),
+				'merchant_id' => array(
+					'title' => __('Merchant Id', 'woocommerce'),
+					'type' => 'text'
+				),
+				'project_id' => array(
+					'title' => __('Project Id', 'woocommerce'),
+					'type' => 'text'
+				),
+				'order_status' => array(
+					'title' => __('Order status'),
+					'desc_tip' => true,
+					'description' => __('Order status after payment has been received.', 'woocommerce'),
+					'type' => 'select',
+					'default' => 'completed',
+					'options' => array(
+						'pending' => __('pending', 'woocommerce'),
+						'processing' => __('processing', 'woocommerce'),
+						'completed' => __('completed', 'woocommerce'),
+					),
+				),
+
+			);
+		}
+		
+		public function thankyou_page() {
+			if ($this->instructions) {
+				echo wpautop(wptexturize($this->instructions));
+			}
+		}
+		
 	/**
 	 * Process the payment and return the result.
 	 * @param  int $order_id
