@@ -99,8 +99,8 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway {
 	     public function admin_options()
     {
       ?>
-      <p><?php _e('Accept Bitcoin through the SpectroCoin and receive payments in your chosen currency.<br>
-       Still have questions? Contact us via <a href="skype:spectrocoin_merchant?chat">skype: spectrocoin_merchant</a> &middot; <a href="mailto:merchant@spectrocoin.com">email: merchant@spectrocoin.com</a>', 'woothemes'); ?></p>
+      <p><?php _e('<b><h3>SpectroCoin</h3></b><br>Accept Bitcoin through the SpectroCoin and receive payments in your chosen currency.<br>
+       Still have questions? Contact us via <a href="skype:spectrocoin_merchant?chat">skype: spectrocoin_merchant</a> &middot; <a href="mailto:merchant@spectrocoin.com">email: merchant@spectrocoin.com</a><br> <br> <b><u>Do not to forget to add your private key into:  <i>wp-content\plugins\spectrocoin\keys as "private_key" </u></i></b>', 'woothemes'); ?></p>
       <table class="form-table">
         <?php $this->generate_settings_html(); ?>
       </table>
