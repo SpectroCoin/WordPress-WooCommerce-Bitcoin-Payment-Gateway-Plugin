@@ -24,8 +24,6 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway {
 	/** @var String pay currency */
 	private static $pay_currency = 'BTC';
 	/** @var String */
-	private static $private_key_path = '/keys/private_key';
-	/** @var String */
 	private static $callback_name = 'spectrocoin_callback';
 	/** @var SCMerchantClient */
 	private $scClient;
@@ -45,17 +43,16 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway {
 		$this->title			= $this->get_option( 'title' );
 		$this->description		= $this->get_option( 'description' );
 		$this->merchant_id 		= $this->get_option( 'merchant_id' );
-		$this->project_id 	= $this->get_option( 'project_id' );
+		$this->project_id 		= $this->get_option( 'project_id' );
+		$this->private_key		= $this->get_option( 'private_key' );
 		$this->order_status     = $this->get_option( 'order_status' );
 		
 		add_action('woocommerce_update_options_payment_gateways_' . $this->id, array($this, 'process_admin_options'));
 		add_action('woocommerce_thankyou_' . $this->id, array($this, 'thankyou_page'));
-			
-		$this->private_key      = $this->read_private_key();
-
+		
 		if ( !$this->private_key ) {
-			self::log( "Please generate and put your private_key into spectrocoin/keys folder!" );
-			$this->enabled = 'no';
+			self::log( "Please generate and enter your private_key!" );
+
 		} else if ( !$this->merchant_id ) {
 			self::log( "Please enter merchant id!" );
 		} else if ( !$this->project_id ) {
@@ -100,7 +97,7 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway {
     {
       ?>
       <p><?php _e('<b><h3>SpectroCoin</h3></b><br>Accept Bitcoin through the SpectroCoin and receive payments in your chosen currency.<br>
-       Still have questions? Contact us via <a href="skype:spectrocoin_merchant?chat">skype: spectrocoin_merchant</a> &middot; <a href="mailto:merchant@spectrocoin.com">email: merchant@spectrocoin.com</a><br> <br> <b><u>Do not to forget to add your private key into:  <i>wp-content\plugins\spectrocoin\keys as "private_key" </u></i></b>', 'woothemes'); ?></p>
+       Still have questions? Contact us via <a href="skype:spectrocoin_merchant?chat">skype: spectrocoin_merchant</a> &middot; <a href="mailto:merchant@spectrocoin.com">email: merchant@spectrocoin.com</a><br>', 'woothemes'); ?></p>
       <table class="form-table">
         <?php $this->generate_settings_html(); ?>
       </table>
@@ -137,6 +134,13 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway {
 					'title' => __('Project Id', 'woocommerce'),
 					'type' => 'text'
 				),
+				'private_key' => array(
+					'title' => __('Private key', 'woocommerce'),
+					'type' => 'textarea',
+					'description' => __('private key.', 'woocommerce'),
+					'default' => __('Please add your private key with (-----BEGIN PRIVATE KEY-----  -----END PRIVATE KEY-----) ', 'woocommerce'),
+					'desc_tip' => true,
+				),
 				'order_status' => array(
 					'title' => __('Order status'),
 					'desc_tip' => true,
@@ -152,7 +156,7 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway {
 
 			);
 		}
-		
+
 		public function thankyou_page() {
 			if ($this->instructions) {
 				echo wpautop(wptexturize($this->instructions));
@@ -185,6 +189,7 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway {
 			'result'   => 'success',
 			'redirect' => $response->getRedirectUrl()
 		);
+
 	}
 	/**
 	 * Used to process callbacks from SpectroCoin
@@ -240,13 +245,7 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway {
 			$failureCallback
 		);
 	}
-	private function read_private_key() {
-		$file = __DIR__ . self::$private_key_path;
-		if ( !file_exists( $file ) ) {
-			return false;
-		}
-		return file_get_contents( $file );
-	}
+
 	private function parse_order_id($order_id) {
 		return explode('-', $order_id)[0];
 	}
