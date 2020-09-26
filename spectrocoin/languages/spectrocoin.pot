@@ -1,0 +1,112 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: SpectroCoin\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-09-26 06:58+0000\n"
+"PO-Revision-Date: 2020-09-26 09:04+0200\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 2.4.1\n"
+"X-Loco-Version: 2.4.3; wp-5.4.2\n"
+
+#: class-wc-gateway-spectrocoin.php:123
+msgid "Bitcoin"
+msgstr ""
+
+#: class-wc-gateway-spectrocoin.php:157
+msgid "completed"
+msgstr ""
+
+#: class-wc-gateway-spectrocoin.php:127
+msgid "Description"
+msgstr ""
+
+#: class-wc-gateway-spectrocoin.php:116
+msgid "Enable SpectroCoin"
+msgstr ""
+
+#: class-wc-gateway-spectrocoin.php:114
+msgid "Enable/Disable"
+msgstr ""
+
+#. URI of the plugin
+msgid ""
+"https://github.com/SpectroFinance/SpectroCoin-Merchant-WordPress-"
+"WooCommerce"
+msgstr ""
+
+#: class-wc-gateway-spectrocoin.php:134
+msgid "Merchant Id"
+msgstr ""
+
+#: class-wc-gateway-spectrocoin.php:151
+msgid "Order status after payment has been received."
+msgstr ""
+
+#: class-wc-gateway-spectrocoin.php:131
+msgid "Pay via Bitcoin."
+msgstr ""
+
+#: class-wc-gateway-spectrocoin.php:38
+msgid "Pay with SpectroCoin"
+msgstr ""
+
+#: class-wc-gateway-spectrocoin.php:155
+msgid "pending"
+msgstr ""
+
+#: class-wc-gateway-spectrocoin.php:145
+msgid ""
+"Please add your private key with (-----BEGIN PRIVATE KEY-----  -----END "
+"PRIVATE KEY-----) "
+msgstr ""
+
+#: class-wc-gateway-spectrocoin.php:142
+msgid "Private key"
+msgstr ""
+
+#: class-wc-gateway-spectrocoin.php:144
+msgid "private key."
+msgstr ""
+
+#: class-wc-gateway-spectrocoin.php:156
+msgid "processing"
+msgstr ""
+
+#: class-wc-gateway-spectrocoin.php:138
+msgid "Project Id"
+msgstr ""
+
+#. Name of the plugin
+#. Author of the plugin
+#: class-wc-gateway-spectrocoin.php:39
+msgid "SpectroCoin"
+msgstr ""
+
+#: class-wc-gateway-spectrocoin.php:92
+msgid "SpectroCoin logo"
+msgstr ""
+
+#: class-wc-gateway-spectrocoin.php:130
+msgid "This controls the description which the user sees during checkout."
+msgstr ""
+
+#: class-wc-gateway-spectrocoin.php:122
+msgid "This controls the title which the user sees during checkout."
+msgstr ""
+
+#. Description of the plugin
+msgid ""
+"This module integrates SpectroCoin Payments with Wordpress's Woocommerce "
+"aplugin to accept Bitcoin payments."
+msgstr ""
+
+#: class-wc-gateway-spectrocoin.php:120
+msgid "Title"
+msgstr ""
+
+#: class-wc-gateway-spectrocoin.php:191
+msgid "Waiting for SpectroCoin payment"
+msgstr ""
