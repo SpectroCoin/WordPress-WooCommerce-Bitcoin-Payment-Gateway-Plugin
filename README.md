@@ -6,7 +6,7 @@ To succesfully use this plugin, you have to have a SpectroCoin Bitcoin wallet. Y
 
 **INSTALLATION**
 
-1. Upload plugin directory to the `/wp-content/plugins/` directory <br />
+1. Upload plugin directory to the `/wp-content/plugins/spectrocoin` directory <br />
 	OR <br />
   Navigate to WordPress directory and run: <br />
       <br />
