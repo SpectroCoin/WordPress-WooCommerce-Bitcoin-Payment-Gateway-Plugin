@@ -9,4 +9,4 @@ class OrderStatusEnum {
 	public static $Expired = 5;
 	public static $Test = 6;
 
-} 
+}
