@@ -74,7 +74,7 @@ class SCMerchantClient
 				if ($body != null) {
 					if (is_array($body) && count($body) > 0 && isset($body[0]->code)) {
 						return new ApiError($body[0]->code, $body[0]->message);
-					} else if (isset($body->orderRequestId)) {
+					} else {
 						return new CreateOrderResponse($body->orderRequestId, $body->orderId, $body->depositAddress, $body->payAmount, $body->payCurrency, $body->receiveAmount, $body->receiveCurrency, $body->validUntil, $body->redirectUrl);
 					}
 				}
