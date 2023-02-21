@@ -224,9 +224,21 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway {
 					}
 					echo "*ok*";
 					exit;
-				} else self::log( "Order '{$order_id}' not found!" );
-			} else self::log( "Sent callback is invalid" );
-		} else self::log( "Sent callback is invalid" );
+				} else {
+                    self::log( "Order '{$order_id}' not found!" );
+                    echo "order not found";
+                    exit;
+                }
+			} else {
+                self::log( "Sent callback is invalid" );
+                echo "invalid callback data";
+                exit;
+            }
+		} else {
+            self::log( "Sent callback is invalid" );
+            echo "invalid callback format";
+            exit;
+        }
 	}
 	private function new_request( $order, $total, $receive_currency ) {
 		$callback = get_site_url( null, '?wc-api=' . self::$callback_name );
