@@ -148,7 +148,7 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway {
 			</div>
 		</div>
 	<?php
-}
+	}
 	
 	
 	public function init_form_fields() {
