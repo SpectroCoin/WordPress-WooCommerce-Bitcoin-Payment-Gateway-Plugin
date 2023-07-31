@@ -12,6 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 define( 'SC_REQUIRED_PHP_VERSION', '5.3' );
+
 /**
  * Checks if the system requirements are met
  *
@@ -22,25 +23,54 @@ function spectrocoin_requirements_met() {
 	if ( version_compare( PHP_VERSION, SC_REQUIRED_PHP_VERSION, '<' ) ) {
 		return false;
 	}
+
+	if ( ! function_exists( 'is_plugin_active' ) ) {
+		require_once ABSPATH . '/wp-admin/includes/plugin.php';
+	}
+
+	if ( ! is_plugin_active( 'woocommerce/woocommerce.php' ) ) {
+		return false;
+	}
+
 	return true;
 }
 
+// Function to display admin notice
+function spectrocoin_admin_notice( $message ) {
+	?>
+	<div class="notice notice-error">
+		<p><?php echo esc_html( $message ); ?></p>
+	</div>
+	<?php
+}
 
+// Function to handle plugin deactivation
+function spectrocoin_deactivate_plugin() {
+	deactivate_plugins( plugin_basename( __FILE__ ) );
+}
 
 add_action( 'plugins_loaded', 'init_spectrocoin_plugin' );
 
 function init_spectrocoin_plugin() {
-	if ( spectrocoin_requirements_met() ) {
-		require_once( __DIR__ . '/class-wc-gateway-spectrocoin.php' );
-
-		if ( class_exists( 'WC_Gateway_Spectrocoin' ) ) {
-			add_filter( 'woocommerce_payment_gateways', 'spectrocoin_gateway_class' );
-			// Add custom link to the plugin list
-			add_filter( 'plugin_action_links', 'spectrocoin_add_custom_link', 10, 2 );
+	if ( !spectrocoin_requirements_met() ) {
+		if ( version_compare( PHP_VERSION, SC_REQUIRED_PHP_VERSION, '<' ) ) {
+			spectrocoin_admin_notice( 'SpectroCoin plugin requires PHP version ' . SC_REQUIRED_PHP_VERSION . ' or greater.' );
+		} else {
+			spectrocoin_admin_notice( 'SpectroCoin plugin requires WooCommerce to be installed and activated.' );
 		}
-	} else {
-		// TODO make message more informative
-		trigger_error('Spectrocoin plugin\'s requirements not met. Update you Wordpress or PHP');
+
+		// Deactivate the plugin if requirements are not met
+		spectrocoin_deactivate_plugin();
+
+		return;
+	}
+
+	require_once( __DIR__ . '/class-wc-gateway-spectrocoin.php' );
+
+	if ( class_exists( 'WC_Gateway_Spectrocoin' ) ) {
+		add_filter( 'woocommerce_payment_gateways', 'spectrocoin_gateway_class' );
+		// Add custom link to the plugin list
+		add_filter( 'plugin_action_links', 'spectrocoin_add_custom_link', 10, 2 );
 	}
 }
 
