@@ -116,76 +116,77 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway {
 	 * Initialise Gateway Settings Form Fields.
 	 */
 	 
-	     public function admin_options()
-    {
-      ?>
-      <p><?php _e('<b><h3>SpectroCoin</h3></b><br>Accept Bitcoin through the SpectroCoin and receive payments in your chosen currency.<br>
-       Still have questions? Contact us via <a href="skype:spectrocoin_merchant?chat">skype: spectrocoin_merchant</a> &middot; <a href="mailto:merchant@spectrocoin.com">email: merchant@spectrocoin.com</a><br>', 'woothemes'); ?></p>
-      <table class="form-table">
-        <?php $this->generate_settings_html(); ?>
-      </table>
-      <?php
-    }
+	 public function admin_options() {
+		?>
+		<div class="spectrocoin-plugin-settings">
+			<p><?php _e('<b><h3>SpectroCoin</h3></b><br>Accept Bitcoin through the SpectroCoin and receive payments in your chosen currency.<br>
+			Still have questions? Contact us via <a href="skype:spectrocoin_merchant?chat">skype: spectrocoin_merchant</a> &middot; <a href="mailto:merchant@spectrocoin.com">email: merchant@spectrocoin.com</a><br>', 'woothemes'); ?></p>
+			<table class="form-table">
+				<?php $this->generate_settings_html(); ?>
+			</table>
+		</div>
+		<?php
+	}
 	
-			public function init_form_fields() {
-			$this->form_fields = array(
-				'enabled' => array(
-					'title' => __('Enable/Disable', 'woocommerce'),
-					'type' => 'checkbox',
-					'label' => __('Enable SpectroCoin', 'woocommerce'),
-					'default' => 'yes'
+	public function init_form_fields() {
+		$this->form_fields = array(
+			'enabled' => array(
+				'title' => __('Enable/Disable', 'woocommerce'),
+				'type' => 'checkbox',
+				'label' => __('Enable SpectroCoin', 'woocommerce'),
+				'default' => 'yes'
+			),
+			'title' => array(
+				'title' => __('Title', 'woocommerce'),
+				'type' => 'Text',
+				'description' => __('This controls the title which the user sees during checkout.', 'woocommerce'),
+				'default' => __('Bitcoin', 'woocommerce'),
+				'desc_tip' => true,
+			),
+			'description' => array(
+				'title' => __('Description', 'woocommerce'),
+				'type' => 'text',
+				'desc_tip' => true,
+				'description' => __('This controls the description which the user sees during checkout.', 'woocommerce'),
+				'default' => __('Pay via Bitcoin.', 'woocommerce')
+			),
+			'merchant_id' => array(
+				'title' => __('Merchant Id', 'woocommerce'),
+				'type' => 'text'
+			),
+			'project_id' => array(
+				'title' => __('Project Id', 'woocommerce'),
+				'type' => 'text'
+			),
+			'private_key' => array(
+				'title' => __('Private key', 'woocommerce'),
+				'type' => 'textarea',
+				'description' => __('private key.', 'woocommerce'),
+				'default' => __('Please add your private key with (-----BEGIN PRIVATE KEY-----  -----END PRIVATE KEY-----) ', 'woocommerce'),
+				'desc_tip' => true,
+			),
+			'order_status' => array(
+				'title' => __('Order status'),
+				'desc_tip' => true,
+				'description' => __('Order status after payment has been received.', 'woocommerce'),
+				'type' => 'select',
+				'default' => 'completed',
+				'options' => array(
+					'pending' => __('pending', 'woocommerce'),
+					'processing' => __('processing', 'woocommerce'),
+					'completed' => __('completed', 'woocommerce'),
 				),
-				'title' => array(
-					'title' => __('Title', 'woocommerce'),
-					'type' => 'Text',
-					'description' => __('This controls the title which the user sees during checkout.', 'woocommerce'),
-					'default' => __('Bitcoin', 'woocommerce'),
-					'desc_tip' => true,
-				),
-				'description' => array(
-					'title' => __('Description', 'woocommerce'),
-					'type' => 'text',
-					'desc_tip' => true,
-					'description' => __('This controls the description which the user sees during checkout.', 'woocommerce'),
-					'default' => __('Pay via Bitcoin.', 'woocommerce')
-				),
-				'merchant_id' => array(
-					'title' => __('Merchant Id', 'woocommerce'),
-					'type' => 'text'
-				),
-				'project_id' => array(
-					'title' => __('Project Id', 'woocommerce'),
-					'type' => 'text'
-				),
-				'private_key' => array(
-					'title' => __('Private key', 'woocommerce'),
-					'type' => 'textarea',
-					'description' => __('private key.', 'woocommerce'),
-					'default' => __('Please add your private key with (-----BEGIN PRIVATE KEY-----  -----END PRIVATE KEY-----) ', 'woocommerce'),
-					'desc_tip' => true,
-				),
-				'order_status' => array(
-					'title' => __('Order status'),
-					'desc_tip' => true,
-					'description' => __('Order status after payment has been received.', 'woocommerce'),
-					'type' => 'select',
-					'default' => 'completed',
-					'options' => array(
-						'pending' => __('pending', 'woocommerce'),
-						'processing' => __('processing', 'woocommerce'),
-						'completed' => __('completed', 'woocommerce'),
-					),
-				),
+			),
 
-			);
-		}
+		);
+	}
 
-		public function thankyou_page() {
-			if ($this->instructions) {
-				echo wpautop(wptexturize($this->instructions));
-			}
+	public function thankyou_page() {
+		if ($this->instructions) {
+			echo wpautop(wptexturize($this->instructions));
 		}
-		
+	}
+	
 	/**
 	 * Process the payment and return the result.
 	 * @param  int $order_id
