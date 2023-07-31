@@ -2,7 +2,7 @@
 /*
 Plugin Name: SpectroCoin
 Plugin URI:  https://github.com/SpectroFinance/SpectroCoin-Merchant-WordPress-WooCommerce
-Description: This module integrates SpectroCoin Payments with Wordpress's Woocommerce aplugin to accept Bitcoin payments.
+Description: This module integrates SpectroCoin Payments with Wordpress's Woocommerce a plugin to accept Bitcoin payments.
 Version:     0.2
 Author:      SpectroCoin
 */
@@ -25,6 +25,8 @@ function spectrocoin_requirements_met() {
 	return true;
 }
 
+
+
 add_action( 'plugins_loaded', 'init_spectrocoin_plugin' );
 
 function init_spectrocoin_plugin() {
@@ -33,6 +35,8 @@ function init_spectrocoin_plugin() {
 
 		if ( class_exists( 'WC_Gateway_Spectrocoin' ) ) {
 			add_filter( 'woocommerce_payment_gateways', 'spectrocoin_gateway_class' );
+			// Add custom link to the plugin list
+			add_filter( 'plugin_action_links', 'spectrocoin_add_custom_link', 10, 2 );
 		}
 	} else {
 		// TODO make message more informative
@@ -43,4 +47,25 @@ function init_spectrocoin_plugin() {
 function spectrocoin_gateway_class( $methods ) {
 	$methods[] = 'WC_Gateway_Spectrocoin'; 
 	return $methods;
+}
+
+function get_sc_payment_settings_url() {
+	$checkout_url = get_admin_url( null, 'admin.php?page=wc-settings&tab=checkout&section=spectrocoin' );
+	return esc_url( $checkout_url );
+}
+
+// Function to add custom link
+function spectrocoin_add_custom_link( $links, $file ) {
+	if ( strpos( $file, 'spectrocoin' ) !== false ) {
+		// Get the URL for the payment settings
+		$settings_url = get_sc_payment_settings_url();
+
+		// Create the custom link HTML
+		$custom_link = '<a href="' . esc_url( $settings_url ) . '">Settings</a>';
+
+		// Add the custom link to the $links array
+		array_push( $links, $custom_link );
+	}
+
+	return $links;
 }
