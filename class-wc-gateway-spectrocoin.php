@@ -118,13 +118,35 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway {
 	 
 	 public function admin_options() {
 		?>
-		<div class="spectrocoin-plugin-settings">
-			<p><?php _e('<b><h3>SpectroCoin</h3></b><br>Accept Bitcoin through the SpectroCoin and receive payments in your chosen currency.<br>
-			Still have questions? Contact us via <a href="skype:spectrocoin_merchant?chat">skype: spectrocoin_merchant</a> &middot; <a href="mailto:merchant@spectrocoin.com">email: merchant@spectrocoin.com</a><br>', 'woothemes'); ?></p>
-			<table class="form-table">
-				<?php $this->generate_settings_html(); ?>
-			</table>
+		<div class = "spectrocoin-plugin-settings">
+			<div class="flex-col flex-col-1">
+				<p><?php _e('<h3>SpectroCoin</h3><div class = "contact-information">Accept Bitcoin through the SpectroCoin and receive payments in your chosen currency.
+				Still have questions? Contact us via <a href="skype:spectrocoin_merchant?chat">skype: spectrocoin_merchant</a> &middot; <a href="mailto:merchant@spectrocoin.com">email: merchant@spectrocoin.com</a></div>', 'woothemes'); ?></p>
+				<table class="form-table">
+					<?php $this->generate_settings_html(); ?>
+				</table>
+			</div>
+			<div class="flex-col flex-col-2">
+				<div class = "white-card">
+				<p><h4>Introduction</h4></p>
+					
+					<p>The Spectroin plugin allows seamless integration of payment gateways into your WordPress website. To get started, you'll need to obtain the essential credentials: Merchant ID, Project ID, and Private Key. These credentials are required to enable secure transactions between your website and the payment gateway. Follow the step-by-step tutorial below to acquire these credentials:</p> 
+						<ul>
+							<li>1. <a href="https://auth.spectrocoin.com/signup">Sign up</a> for a Spectroin Account.</li>
+							<li>2. <a href="https://auth.spectrocoin.com/login">Log in</a> to your Spectroin account.</li>
+							<li>3. On the dashboard, locate the <b>"Business"</b> tab and click on it.</li>
+							<li>4. Click on <b>"New project."</b></li>
+							<li>5. Fill in the project details and select desired settings (settings can be changed).</li>
+							<li>6. The <b>Private Key</b> can be obtained by switching on the Public key radio button (Private key won't be visible in the settings window, and it will have to be regenerated in settings). Copy or download the newly generated private key. </li>
+							<li>7. Click <b>"Submit"</b>.</li>
+							<li>8. Copy and paste the Merchant ID and Project ID.</li>
+							<li>9. Generate a test product. Create a test page on your WordPress website with a payment form connected to the Spectroin payment gateway. Perform a trial transaction using the test payment gateway (Test mode can be activated in project settings) to validate the integration's functionality. Verify the transaction details on the Spectroin dashboard to ensure it was successfully processed.</li>
+							<li><b>Note:</b> Keep in mind that if you want to use the business services of SpectroCoin, your account has to be verified.</li>
+						</ul>
+				</div>
+			</div>
 		</div>
+		
 		<?php
 	}
 	
