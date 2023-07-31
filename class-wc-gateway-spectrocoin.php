@@ -27,6 +27,29 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway {
 	private static $callback_name = 'spectrocoin_callback';
 	/** @var SCMerchantClient */
 	private $scClient;
+    protected $merchant_id;
+    protected $project_id;
+    protected $private_key;
+    protected $order_status;
+	public function get_merchant_id()
+    {
+        return $this->merchant_id;
+    }
+
+    public function get_project_id()
+    {
+        return $this->project_id;
+    }
+
+    public function get_private_key()
+    {
+        return $this->private_key;
+    }
+
+    public function get_order_status()
+    {
+        return $this->order_status;
+    }
 	/**
 	 * Constructor for the gateway.
 	 */
