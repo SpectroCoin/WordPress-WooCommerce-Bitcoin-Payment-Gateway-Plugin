@@ -162,7 +162,9 @@ class SCMerchantClient
 		$publicKey = file_get_contents($this->publicSpectroCoinCertLocation);
 		$public_key_pem = openssl_pkey_get_public($publicKey);
 		$r = openssl_verify($data, $sig, $public_key_pem, OPENSSL_ALGO_SHA1);
-		openssl_free_key($public_key_pem);
+		if (PHP_VERSION_ID > 80000){
+			openssl_free_key($public_key_pem); //maintaining the deprecated function for older php versions > 8.0
+		}
 
 		return $r;
 	}
