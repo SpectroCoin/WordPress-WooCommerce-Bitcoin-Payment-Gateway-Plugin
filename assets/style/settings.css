@@ -1,0 +1,123 @@
+.spectrocoin-plugin-settings {
+  display: flex;
+  gap: 15px;
+}
+
+.spectrocoin-plugin-settings .flex-col {
+  flex-basis: 50%;
+}
+
+.spectrocoin-plugin-settings .flex-col-2 {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.spectrocoin-plugin-settings h3 {
+  font-family: Red Hat Text, sans-serif;
+  color: #102d6f;
+  font-size: 1.8rem;
+}
+
+.spectrocoin-plugin-settings h4 {
+  font-family: Red Hat Text, sans-serif;
+  color: #102d6f;
+  font-size: 1.4rem;
+}
+
+.spectrocoin-plugin-settings .contact-information {
+  color: #102d6f;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 22px;
+  font-family: Red Hat Text, sans-serif;
+}
+
+/* Save button style */
+.wp-core-ui .button-primary {
+  align-items: center;
+  background: #4972f4;
+  border-radius: 4px;
+  border: 2px solid #4972f4;
+  color: #fff;
+  cursor: pointer;
+  display: inline-flex;
+  font-size: 16px;
+  font-weight: 500;
+  justify-content: center;
+  outline: none;
+  padding: 3px 23px;
+  text-decoration: none;
+  transition: all 0.1s, visibility 0s;
+}
+
+.button-primary:hover {
+  background: #6c8bf5 !important;
+  border-color: #6c8bf5 !important;
+  color: #fff;
+}
+
+.spectrocoin-plugin-settings .input-text,
+.spectrocoin-plugin-settings .select {
+  border: 1px solid #e6e8f0 !important;
+  font-size: 14px;
+  border-radius: 4px;
+  outline: none;
+  width: 80% !important;
+  transition: all 0.1s, visibility 0s;
+}
+
+.white-card {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 6px 10px #4972f40d;
+  padding: 20px 15px;
+}
+
+.form-table tr {
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.form-table label {
+  width: 80% !important;
+}
+
+.form-table th,
+.form-table td {
+  padding: 0px !important;
+  flex-basis: 100%;
+}
+
+.woocommerce-help-tip::after,
+.woocommerce-product-type-tip::after {
+  position: static !important;
+}
+
+.woocommerce table.form-table th label .woocommerce-help-tip {
+  position: static !important;
+}
+
+@media only screen and (max-width: 960px) {
+  .spectrocoin-plugin-settings {
+    flex-wrap: wrap;
+  }
+  .spectrocoin-plugin-settings .flex-col {
+    flex-basis: 100% !important;
+  }
+  .spectrocoin-plugin-settings .input-text,
+  .spectrocoin-plugin-settings .select {
+    width: 100% !important;
+  }
+}
+
+.spectrocoin-logo {
+  width: 270px;
+  height: 100%;
+}
+
+.logo-link {
+  height: 100%;
+  display: block;
+}

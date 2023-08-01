@@ -27,6 +27,29 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway {
 	private static $callback_name = 'spectrocoin_callback';
 	/** @var SCMerchantClient */
 	private $scClient;
+    protected $merchant_id;
+    protected $project_id;
+    protected $private_key;
+    protected $order_status;
+	public function get_merchant_id()
+    {
+        return $this->merchant_id;
+    }
+
+    public function get_project_id()
+    {
+        return $this->project_id;
+    }
+
+    public function get_private_key()
+    {
+        return $this->private_key;
+    }
+
+    public function get_order_status()
+    {
+        return $this->order_status;
+    }
 	/**
 	 * Constructor for the gateway.
 	 */
@@ -93,76 +116,100 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway {
 	 * Initialise Gateway Settings Form Fields.
 	 */
 	 
-	     public function admin_options()
-    {
-      ?>
-      <p><?php _e('<b><h3>SpectroCoin</h3></b><br>Accept Bitcoin through the SpectroCoin and receive payments in your chosen currency.<br>
-       Still have questions? Contact us via <a href="skype:spectrocoin_merchant?chat">skype: spectrocoin_merchant</a> &middot; <a href="mailto:merchant@spectrocoin.com">email: merchant@spectrocoin.com</a><br>', 'woothemes'); ?></p>
-      <table class="form-table">
-        <?php $this->generate_settings_html(); ?>
-      </table>
-      <?php
-    }
+	public function admin_options() {
+	?>
+		<div class="spectrocoin-plugin-settings">
+			<div class="flex-col flex-col-1">
+				<p><?php _e('<a class ="logo-link" href="https://spectrocoin.com/" target="_blank"><img class = "spectrocoin-logo" src="' . esc_url( plugins_url( '/assets/images/spectrocoin-logo.svg', __FILE__ ) ) . '"></a><div class="contact-information">Accept Bitcoin through the SpectroCoin and receive payments in your chosen currency.
+				Still have questions? Contact us via <a href="skype:spectrocoin_merchant?chat">skype: spectrocoin_merchant</a> &middot; <a href="mailto:merchant@spectrocoin.com">email: merchant@spectrocoin.com</a></div>', 'woothemes' ); ?></p>
+				<table class="form-table">
+					<?php $this->generate_settings_html(); ?>
+				</table>
+			</div>
+			<div class="flex-col flex-col-2">
+				<div class="white-card">
+					<p><h4>Introduction</h4></p>
+
+					<p>The Spectroin plugin allows seamless integration of payment gateways into your WordPress website. To get started, you'll need to obtain the essential credentials: Merchant ID, Project ID, and Private Key. These credentials are required to enable secure transactions between your website and the payment gateway. Follow the step-by-step tutorial below to acquire these credentials:</p>
+					<ul>
+						<li>1. <a href="https://auth.spectrocoin.com/signup" target="_blank">Sign up</a> for a Spectroin Account.</li>
+						<li>2. <a href="https://auth.spectrocoin.com/login" target="_blank">Log in</a> to your Spectroin account.</li>
+						<li>3. On the dashboard, locate the <b>"<a href = "https://spectrocoin.com/en/merchants/projects" target="_blank">Business<a></a>"</b> tab and click on it.</li>
+						<li>4. Click on <b>"<a href = "https://spectrocoin.com/en/merchants/projects/new" target="_blank">New project</a>."</b></li>
+						<li>5. Fill in the project details and select desired settings (settings can be changed).</li>
+						<li>6. The <b>Private Key</b> can be obtained by switching on the Public key radio button (Private key won't be visible in the settings window, and it will have to be regenerated in settings). Copy or download the newly generated private key. </li>
+						<li>7. Click <b>"Submit"</b>.</li>
+						<li>8. Copy and paste the Merchant ID and Project ID.</li>
+						<li>9. Generate a test product. Create a test page on your WordPress website with a payment form connected to the Spectroin payment gateway. Perform a trial transaction using the test payment gateway (Test mode can be activated in project settings) to validate the integration's functionality. Verify the transaction details on the Spectroin dashboard to ensure it was successfully processed.</li>
+						<br>
+						<li><b>Note:</b> Keep in mind that if you want to use the business services of SpectroCoin, your account has to be verified.</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	<?php
+	}
 	
-			public function init_form_fields() {
-			$this->form_fields = array(
-				'enabled' => array(
-					'title' => __('Enable/Disable', 'woocommerce'),
-					'type' => 'checkbox',
-					'label' => __('Enable SpectroCoin', 'woocommerce'),
-					'default' => 'yes'
+	
+	public function init_form_fields() {
+		$this->form_fields = array(
+			'enabled' => array(
+				'title' => __('Enable/Disable', 'woocommerce'),
+				'type' => 'checkbox',
+				'label' => __('Enable SpectroCoin', 'woocommerce'),
+				'default' => 'yes'
+			),
+			'title' => array(
+				'title' => __('Title', 'woocommerce'),
+				'type' => 'Text',
+				'description' => __('This controls the title which the user sees during checkout.', 'woocommerce'),
+				'default' => __('Bitcoin', 'woocommerce'),
+				'desc_tip' => true,
+			),
+			'description' => array(
+				'title' => __('Description', 'woocommerce'),
+				'type' => 'text',
+				'desc_tip' => true,
+				'description' => __('This controls the description which the user sees during checkout.', 'woocommerce'),
+				'default' => __('Pay via Bitcoin.', 'woocommerce')
+			),
+			'merchant_id' => array(
+				'title' => __('Merchant Id', 'woocommerce'),
+				'type' => 'text'
+			),
+			'project_id' => array(
+				'title' => __('Project Id', 'woocommerce'),
+				'type' => 'text'
+			),
+			'private_key' => array(
+				'title' => __('Private key', 'woocommerce'),
+				'type' => 'textarea',
+				'description' => __('private key.', 'woocommerce'),
+				'default' => __('Please add your private key with (-----BEGIN PRIVATE KEY-----  -----END PRIVATE KEY-----) ', 'woocommerce'),
+				'desc_tip' => true,
+			),
+			'order_status' => array(
+				'title' => __('Order status'),
+				'desc_tip' => true,
+				'description' => __('Order status after payment has been received.', 'woocommerce'),
+				'type' => 'select',
+				'default' => 'completed',
+				'options' => array(
+					'pending' => __('pending', 'woocommerce'),
+					'processing' => __('processing', 'woocommerce'),
+					'completed' => __('completed', 'woocommerce'),
 				),
-				'title' => array(
-					'title' => __('Title', 'woocommerce'),
-					'type' => 'Text',
-					'description' => __('This controls the title which the user sees during checkout.', 'woocommerce'),
-					'default' => __('Bitcoin', 'woocommerce'),
-					'desc_tip' => true,
-				),
-				'description' => array(
-					'title' => __('Description', 'woocommerce'),
-					'type' => 'text',
-					'desc_tip' => true,
-					'description' => __('This controls the description which the user sees during checkout.', 'woocommerce'),
-					'default' => __('Pay via Bitcoin.', 'woocommerce')
-				),
-				'merchant_id' => array(
-					'title' => __('Merchant Id', 'woocommerce'),
-					'type' => 'text'
-				),
-				'project_id' => array(
-					'title' => __('Project Id', 'woocommerce'),
-					'type' => 'text'
-				),
-				'private_key' => array(
-					'title' => __('Private key', 'woocommerce'),
-					'type' => 'textarea',
-					'description' => __('private key.', 'woocommerce'),
-					'default' => __('Please add your private key with (-----BEGIN PRIVATE KEY-----  -----END PRIVATE KEY-----) ', 'woocommerce'),
-					'desc_tip' => true,
-				),
-				'order_status' => array(
-					'title' => __('Order status'),
-					'desc_tip' => true,
-					'description' => __('Order status after payment has been received.', 'woocommerce'),
-					'type' => 'select',
-					'default' => 'completed',
-					'options' => array(
-						'pending' => __('pending', 'woocommerce'),
-						'processing' => __('processing', 'woocommerce'),
-						'completed' => __('completed', 'woocommerce'),
-					),
-				),
+			),
 
-			);
-		}
+		);
+	}
 
-		public function thankyou_page() {
-			if ($this->instructions) {
-				echo wpautop(wptexturize($this->instructions));
-			}
+	public function thankyou_page() {
+		if ($this->instructions) {
+			echo wpautop(wptexturize($this->instructions));
 		}
-		
+	}
+	
 	/**
 	 * Process the payment and return the result.
 	 * @param  int $order_id
