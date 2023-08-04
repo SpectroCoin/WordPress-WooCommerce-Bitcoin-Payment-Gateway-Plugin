@@ -94,7 +94,7 @@ class CreateOrderRequest
 	{
 		return $this->culture == null ? '' : $this->culture;
 	}
-	
+
 	/**
 	 * @return string
 	 */
