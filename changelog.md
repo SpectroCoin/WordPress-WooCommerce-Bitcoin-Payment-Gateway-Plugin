@@ -1,4 +1,4 @@
-## Version 1.0.0 (07/31/2023):
+## Version 1.0.0 MAJOR (07/31/2023):
 
 _Fixed:_ Corrected a typo in the plugin's description. Changed "aplugin" to "a plugin" for better clarity.
 
@@ -14,3 +14,7 @@ _Added:_ Specified a dependency on the WooCommerce plugin for the SpectroCoin pl
 _Added:_ Enhanced the style of the admin's payment settings window to match the design of SpectroCoin.com, providing a more cohesive user experience.
 
 _Added:_ Introduced an informative message on the admin page, guiding users on how to obtain the mandatory credentials required for using the SpectroCoin plugin effectively. This addition helps users easily find the necessary information for setup and configuration.
+
+## Version 1.1.0 MINOR (07/31/2023):
+
+_Added_: Included a link to access SpectroCoin plugin settings directly from the plugin page. This enhancement provides users with easier access to the configuration options.

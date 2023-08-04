@@ -1,5 +1,6 @@
 <?php
-class FormattingUtil {
+class FormattingUtil
+{
 
 	/**
 	 * Formats currency amount with '0.0#######' format
@@ -12,4 +13,4 @@ class FormattingUtil {
 		$decimals = $decimals < 1 ? 1 : $decimals;
 		return number_format($amount, $decimals, '.', '');
 	}
-} 
+}
