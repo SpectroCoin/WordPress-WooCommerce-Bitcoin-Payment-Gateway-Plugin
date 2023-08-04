@@ -107,15 +107,29 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 			self::$log->add('spectrocoin', $message);
 		}
 	}
+
+	public function is_display_logo_enabled()
+	{
+		$display_logo = $this->get_option('display_logo');
+		return $display_logo === 'yes';
+	}
+
 	/**
 	 * Get gateway icon.
 	 * @return string
 	 */
 	public function get_icon()
 	{
-		$icon = plugins_url('assets/images/spectrocoin.png', __FILE__);
-		$icon_html = '<img src="' . esc_attr($icon) . '" alt="' . esc_attr__('SpectroCoin logo', 'woocommerce') . '" />';
-		return apply_filters('woocommerce_gateway_icon', $icon_html, $this->id);
+		$display_logo = $this->is_display_logo_enabled();
+
+		if ($display_logo) {
+			$icon = plugins_url('assets/images/spectrocoin.png', __FILE__);
+			$icon_html = '<img src="' . esc_attr($icon) . '" alt="' . esc_attr__('SpectroCoin logo', 'woocommerce') . '" />';
+			return apply_filters('woocommerce_gateway_icon', $icon_html, $this->id);
+		} else {
+			// If display_logo is not enabled, return an empty string (no logo will be displayed)
+			return '';
+		}
 	}
 	/**
 	 * Initialise Gateway Settings Form Fields.
@@ -225,7 +239,14 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 					'completed' => __('completed', 'woocommerce'),
 				),
 			),
-
+			'display_logo' => array(
+				'title' => __('Display logo', 'woocommerce'),
+				'description' => __('This controls the display of SpectroCoin logo in checkout page', 'woocommerce'),
+				'desc_tip' => true,
+				'type' => 'checkbox',
+				'label' => __('Enable', 'woocommerce'),
+				'default' => 'yes'
+			),
 		);
 	}
 
