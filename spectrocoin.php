@@ -5,7 +5,7 @@ Author:      SpectroCoin
 Text Domain: spectrocoin
 Plugin URI:  https://github.com/SpectroFinance/SpectroCoin-Merchant-WordPress-WooCommerce
 Description: This module integrates SpectroCoin Payments with Wordpress's Woocommerce a plugin to accept Bitcoin payments.
-Version:     1.0.1
+Version:     1.1.0
 Requires at least: 6.1
 Requires PHP: 7.4
 */
