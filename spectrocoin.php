@@ -87,7 +87,9 @@ function init_spectrocoin_plugin()
 
 		if (class_exists('WC_Gateway_Spectrocoin')) {
 			add_filter('woocommerce_payment_gateways', 'spectrocoin_gateway_class');
-			add_filter('plugin_action_links', 'spectrocoin_add_custom_link', 10, 2);
+			add_filter('plugin_action_links', 'spectrocoin_add_custom_links_left', 10, 2);
+			add_filter('plugin_row_meta', 'spectrocoin_add_custom_links_right', 10, 2);
+
 		}
 	}
 }
@@ -104,7 +106,7 @@ function get_sc_payment_settings_url()
 	return esc_url($checkout_url);
 }
 
-function spectrocoin_add_custom_link($links, $file)
+function spectrocoin_add_custom_links_left($links, $file)
 {
 	if (strpos($file, 'spectrocoin') !== false) {
 		$settings_url = get_sc_payment_settings_url();
@@ -112,6 +114,18 @@ function spectrocoin_add_custom_link($links, $file)
 		array_push($links, $custom_link);
 	}
 	return $links;
+}
+
+function spectrocoin_add_custom_links_right($plugin_meta, $file)
+{
+	if (strpos($file, 'spectrocoin') !== false) {
+		$custom_links = array(
+			'community-support' => '<a target = "_blank" href="https://wordpress.org/support/plugin/spectrocoin-accepting-bitcoin/">' . __('Community support', 'spectrocoin-accepting-bitcoin') . '</a>',
+			'rate-us' => '<a target = "_blank" href="https://wordpress.org/support/plugin/spectrocoin-accepting-bitcoin/reviews/#new-post">' . __('Rate us', 'spectrocoin-accepting-bitcoin') . '</a>',
+		);
+		$plugin_meta = array_merge($plugin_meta, $custom_links);
+	}
+	return $plugin_meta;
 }
 
 function spectrocoin_enqueue_admin_styles()
