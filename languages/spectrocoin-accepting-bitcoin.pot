@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SpectroCoin Bitcoin Payment Gateway\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-07 11:39+0000\n"
+"POT-Creation-Date: 2023-08-07 12:37+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: \n"
@@ -38,12 +38,12 @@ msgid ""
 "in settings). Copy or download the newly generated private key."
 msgstr ""
 
-#: class-wc-gateway-spectrocoin.php:192
-msgid "Click"
-msgstr ""
-
 #: class-wc-gateway-spectrocoin.php:183
 msgid "Click on"
+msgstr ""
+
+#: class-wc-gateway-spectrocoin.php:192
+msgid "Click Submit."
 msgstr ""
 
 #: class-wc-gateway-spectrocoin.php:261

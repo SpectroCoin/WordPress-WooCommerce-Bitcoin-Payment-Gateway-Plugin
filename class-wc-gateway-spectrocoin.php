@@ -177,10 +177,10 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 							<?php printf('<a href="%s" target="_blank">%s</a> %s', esc_url('https://auth.spectrocoin.com/login'), __('Log in', 'spectrocoin-accepting-bitcoin'), __('to your Spectroin account.', 'spectrocoin-accepting-bitcoin')); ?>
 						</li>
 						<li>
-							<?php printf('%s <b>"<a href="%s" target="_blank">%s</a>"</b> %s', __('On the dashboard, locate the', 'spectrocoin-accepting-bitcoin'), esc_url('https://spectrocoin.com/en/merchants/projects'), __('Business', 'spectrocoin-accepting-bitcoin'), __('tab and click on it.', 'spectrocoin-accepting-bitcoin')); ?>
+							<?php printf('%s <b><a href="%s" target="_blank">%s</a></b> %s', __('On the dashboard, locate the', 'spectrocoin-accepting-bitcoin'), esc_url('https://spectrocoin.com/en/merchants/projects'), __('Business', 'spectrocoin-accepting-bitcoin'), __('tab and click on it.', 'spectrocoin-accepting-bitcoin')); ?>
 						</li>
 						<li>
-							<?php printf('%s <b>"<a href="%s" target="_blank">%s</a>".</b>', __('Click on', 'spectrocoin-accepting-bitcoin'), esc_url('https://spectrocoin.com/en/merchants/projects/new'), __('New project', 'spectrocoin-accepting-bitcoin')); ?>
+							<?php printf('%s <b><a href="%s" target="_blank">%s</a>.</b>', __('Click on', 'spectrocoin-accepting-bitcoin'), esc_url('https://spectrocoin.com/en/merchants/projects/new'), __('New project', 'spectrocoin-accepting-bitcoin')); ?>
 						</li>
 						<li>
 							<?php _e('Fill in the project details and select desired settings (settings can be changed).', 'spectrocoin-accepting-bitcoin'); ?>
@@ -189,7 +189,7 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 							<?php printf('%s <b>%s</b> %s', __('The', 'spectrocoin-accepting-bitcoin'), __('Private Key', 'spectrocoin-accepting-bitcoin'), __('can be obtained by switching on the Public key radio button (Private key won\'t be visible in the settings window, and it will have to be regenerated in settings). Copy or download the newly generated private key.', 'spectrocoin-accepting-bitcoin')); ?>
 						</li>
 						<li>
-							<?php _e('Click "<b>Submit</b>".', 'spectrocoin-accepting-bitcoin'); ?>
+							<?php _e('Click Submit.', 'spectrocoin-accepting-bitcoin'); ?>
 						</li>
 						<li>
 							<?php _e('Copy and paste the Merchant ID and Project ID.', 'spectrocoin-accepting-bitcoin'); ?>
