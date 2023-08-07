@@ -141,8 +141,17 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 		<div class="spectrocoin-plugin-settings">
 			<div class="flex-col flex-col-1">
 				<p>
-					<?php _e('<a class="logo-link" href="https://spectrocoin.com/" target="_blank"><img class="spectrocoin-logo" src="' . esc_url(plugins_url('/assets/images/spectrocoin-logo.svg', __FILE__)) . '"></a><div class="contact-information">' . __('Accept Bitcoin through the SpectroCoin and receive payments in your chosen currency.', 'spectrocoin-accepting-bitcoin') . '<br>' .
-						__('Still have questions? Contact us via', 'spectrocoin-accepting-bitcoin') . ' <a href="skype:spectrocoin_merchant?chat">' . __('skype: spectrocoin_merchant', 'spectrocoin-accepting-bitcoin') . '</a> &middot; <a href="mailto:merchant@spectrocoin.com">' . __('email: merchant@spectrocoin.com', 'spectrocoin-accepting-bitcoin') . '</a></div>', 'woothemes'); ?>
+					<?php
+					printf(
+						'<a class="logo-link" href="%1$s" target="_blank"><img class="spectrocoin-logo" src="%2$s"></a><div class="contact-information">%3$s<br>%4$s <a href="skype:spectrocoin_merchant?chat">%5$s</a> &middot; <a href="mailto:merchant@spectrocoin.com">%6$s</a></div>',
+						esc_url('https://spectrocoin.com/'),
+						esc_url(plugins_url('/assets/images/spectrocoin-logo.svg', __FILE__)),
+						__('Accept Bitcoin through the SpectroCoin and receive payments in your chosen currency.', 'spectrocoin-accepting-bitcoin'),
+						__('Still have questions? Contact us via', 'spectrocoin-accepting-bitcoin'),
+						__('skype: spectrocoin_merchant', 'spectrocoin-accepting-bitcoin'),
+						__('email: merchant@spectrocoin.com', 'spectrocoin-accepting-bitcoin')
+					);
+					?>
 				</p>
 				<table class="form-table">
 					<?php $this->generate_settings_html(); ?>
@@ -161,45 +170,31 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 						?>
 					</p>
 					<ul>
-						<li>1. <a href="https://auth.spectrocoin.com/signup" target="_blank">
-								<?php _e('Sign up', 'spectrocoin-accepting-bitcoin'); ?>
-							</a>
-							<?php _e('for a Spectroin Account.', 'spectrocoin-accepting-bitcoin'); ?>
+						<li>
+							<?php printf('<a href="%s" target="_blank">%s</a> %s', esc_url('https://auth.spectrocoin.com/signup'), __('Sign up', 'spectrocoin-accepting-bitcoin'), __('for a Spectroin Account.', 'spectrocoin-accepting-bitcoin')); ?>
 						</li>
-						<li>2. <a href="https://auth.spectrocoin.com/login" target="_blank">
-								<?php _e('Log in', 'spectrocoin-accepting-bitcoin'); ?>
-							</a>
-							<?php _e('to your Spectroin account.', 'spectrocoin-accepting-bitcoin'); ?>
+						<li>
+							<?php printf('<a href="%s" target="_blank">%s</a> %s', esc_url('https://auth.spectrocoin.com/login'), __('Log in', 'spectrocoin-accepting-bitcoin'), __('to your Spectroin account.', 'spectrocoin-accepting-bitcoin')); ?>
 						</li>
-						<li>3.
-							<?php _e('On the dashboard, locate the', 'spectrocoin-accepting-bitcoin'); ?> <b>"<a
-									href="https://spectrocoin.com/en/merchants/projects" target="_blank">
-									<?php _e('Business', 'spectrocoin-accepting-bitcoin'); ?>
-								</a>"</b>
-							<?php _e('tab and click on it.', 'spectrocoin-accepting-bitcoin'); ?>
+						<li>
+							<?php printf('%s <b>"<a href="%s" target="_blank">%s</a>"</b> %s', __('On the dashboard, locate the', 'spectrocoin-accepting-bitcoin'), esc_url('https://spectrocoin.com/en/merchants/projects'), __('Business', 'spectrocoin-accepting-bitcoin'), __('tab and click on it.', 'spectrocoin-accepting-bitcoin')); ?>
 						</li>
-						<li>4.
-							<?php _e('Click on', 'spectrocoin-accepting-bitcoin'); ?> <b>"<a
-									href="https://spectrocoin.com/en/merchants/projects/new" target="_blank">
-									<?php _e('New project', 'spectrocoin-accepting-bitcoin'); ?>
-								</a>".</b>
+						<li>
+							<?php printf('%s <b>"<a href="%s" target="_blank">%s</a>".</b>', __('Click on', 'spectrocoin-accepting-bitcoin'), esc_url('https://spectrocoin.com/en/merchants/projects/new'), __('New project', 'spectrocoin-accepting-bitcoin')); ?>
 						</li>
-						<li>5.
-							<?php _e('Fill in the project details and select desired settings (settings can be changed).', 'spectrocoin-accepting-bitcoin'); ?>
+						<li>
+							<?php __('Fill in the project details and select desired settings (settings can be changed).', 'spectrocoin-accepting-bitcoin'); ?>
 						</li>
-						<li>6.
-							<?php _e('The', 'spectrocoin-accepting-bitcoin'); ?> <b>
-								<?php _e('Private Key', 'spectrocoin-accepting-bitcoin'); ?>
-							</b>
-							<?php _e('can be obtained by switching on the Public key radio button (Private key won\'t be visible in the settings window, and it will have to be regenerated in settings). Copy or download the newly generated private key.', 'spectrocoin-accepting-bitcoin'); ?>
+						<li>
+							<?php printf('%s <b>%s</b> %s', __('The', 'spectrocoin-accepting-bitcoin'), __('Private Key', 'spectrocoin-accepting-bitcoin'), __('can be obtained by switching on the Public key radio button (Private key won\'t be visible in the settings window, and it will have to be regenerated in settings). Copy or download the newly generated private key.', 'spectrocoin-accepting-bitcoin')); ?>
 						</li>
-						<li>7.
+						<li>
 							<?php _e('Click', 'spectrocoin-accepting-bitcoin'); ?> <b>"Submit".</b>
 						</li>
-						<li>8.
+						<li>
 							<?php _e('Copy and paste the Merchant ID and Project ID.', 'spectrocoin-accepting-bitcoin'); ?>
 						</li>
-						<li>9.
+						<li>
 							<?php _e('Generate a test product. Create a test page on your WordPress website with a payment form connected to the Spectroin payment gateway. Perform a trial transaction using the test payment gateway (Test mode can be activated in project settings) to validate the integration\'s functionality. Verify the transaction details on the Spectroin dashboard to ensure it was successfully processed.', 'spectrocoin-accepting-bitcoin'); ?>
 						</li>
 						<br>
