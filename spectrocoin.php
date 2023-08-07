@@ -2,7 +2,7 @@
 /*
 Plugin Name: SpectroCoin Bitcoin Payment Gateway
 Author:      SpectroCoin
-Text Domain: spectrocoin
+Text Domain: spectrocoin-accepting-bitcoin
 Plugin URI:  https://github.com/SpectroFinance/SpectroCoin-Merchant-WordPress-WooCommerce
 Description: This module integrates SpectroCoin Payments with Wordpress's Woocommerce a plugin to accept Bitcoin payments.
 Version:     1.1.0
@@ -28,7 +28,11 @@ function spectrocoin_requirements_met()
 	$message = '';
 	if (version_compare(PHP_VERSION, SC_REQUIRED_PHP_VERSION, '<')) {
 		$requirements_met = false;
-		$message .= 'SpectroCoin plugin requires PHP version ' . SC_REQUIRED_PHP_VERSION . ' or greater. ';
+		$message .= sprintf(
+			/*translators: %s is a placeholder for required PHP version */
+			__('Spectrocoin plugin requires PHP version %s or greater.', 'spectrocoin-accepting-bitcoin'),
+			SC_REQUIRED_PHP_VERSION
+		);
 	}
 
 	if (!function_exists('is_plugin_active')) {
@@ -37,12 +41,16 @@ function spectrocoin_requirements_met()
 
 	if (version_compare($GLOBALS['wp_version'], SC_WP_VERSION, '<')) {
 		$requirements_met = false;
-		$message .= 'SpectroCoin plugin requires WordPress version ' . SC_WP_VERSION . ' or greater. ';
+		$message .= sprintf(
+			/*translators: %s is a placeholder for required Wordpress version */
+			__('SpectroCoin plugin requires WordPress version %s or greater.', 'spectrocoin-accepting-bitcoin'),
+			SC_WP_VERSION
+		);
 	}
 
 	if (!is_plugin_active('woocommerce/woocommerce.php')) {
 		$requirements_met = false;
-		$message .= 'SpectroCoin plugin requires WooCommerce to be installed and activated. ';
+		$message .= __('SpectroCoin plugin requires WooCommerce to be installed and activated.', 'spectrocoin-accepting-bitcoin');
 	}
 
 	if (!$requirements_met) {
@@ -100,7 +108,7 @@ function spectrocoin_add_custom_link($links, $file)
 {
 	if (strpos($file, 'spectrocoin') !== false) {
 		$settings_url = get_sc_payment_settings_url();
-		$custom_link = '<a href="' . esc_url($settings_url) . '">Settings</a>';
+		$custom_link = '<a href="' . esc_url($settings_url) . '">' . __('Settings', 'spectrocoin-accepting-bitcoin') . '</a>';
 		array_push($links, $custom_link);
 	}
 	return $links;

@@ -59,8 +59,8 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 	{
 		$this->id = 'spectrocoin';
 		$this->has_fields = false;
-		$this->order_button_text = __('Pay with SpectroCoin', 'woocommerce');
-		$this->method_title = __('SpectroCoin', 'woocommerce');
+		$this->order_button_text = __('Pay with SpectroCoin', 'spectrocoin-accepting-bitcoin');
+		$this->method_title = __('SpectroCoin', 'spectrocoin-accepting-bitcoin');
 		$this->supports = array('products');
 		// Load the settings.
 		$this->init_form_fields();
@@ -124,7 +124,7 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 
 		if ($display_logo) {
 			$icon = plugins_url('assets/images/spectrocoin.png', __FILE__);
-			$icon_html = '<img src="' . esc_attr($icon) . '" alt="' . esc_attr__('SpectroCoin logo', 'woocommerce') . '" />';
+			$icon_html = '<img src="' . esc_attr($icon) . '" alt="' . esc_attr__('SpectroCoin logo', 'spectrocoin-accepting-bitcoin') . '" />';
 			return apply_filters('woocommerce_gateway_icon', $icon_html, $this->id);
 		} else {
 			// If display_logo is not enabled, return an empty string (no logo will be displayed)
@@ -141,8 +141,8 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 		<div class="spectrocoin-plugin-settings">
 			<div class="flex-col flex-col-1">
 				<p>
-					<?php _e('<a class ="logo-link" href="https://spectrocoin.com/" target="_blank"><img class = "spectrocoin-logo" src="' . esc_url(plugins_url('/assets/images/spectrocoin-logo.svg', __FILE__)) . '"></a><div class="contact-information">Accept Bitcoin through the SpectroCoin and receive payments in your chosen currency.
-				Still have questions? Contact us via <a href="skype:spectrocoin_merchant?chat">skype: spectrocoin_merchant</a> &middot; <a href="mailto:merchant@spectrocoin.com">email: merchant@spectrocoin.com</a></div>', 'woothemes'); ?>
+					<?php _e('<a class="logo-link" href="https://spectrocoin.com/" target="_blank"><img class="spectrocoin-logo" src="' . esc_url(plugins_url('/assets/images/spectrocoin-logo.svg', __FILE__)) . '"></a><div class="contact-information">' . __('Accept Bitcoin through the SpectroCoin and receive payments in your chosen currency.', 'spectrocoin-accepting-bitcoin') . '<br>' .
+						__('Still have questions? Contact us via', 'spectrocoin-accepting-bitcoin') . ' <a href="skype:spectrocoin_merchant?chat">' . __('skype: spectrocoin_merchant', 'spectrocoin-accepting-bitcoin') . '</a> &middot; <a href="mailto:merchant@spectrocoin.com">' . __('email: merchant@spectrocoin.com', 'spectrocoin-accepting-bitcoin') . '</a></div>', 'woothemes'); ?>
 				</p>
 				<table class="form-table">
 					<?php $this->generate_settings_html(); ?>
@@ -151,36 +151,63 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 			<div class="flex-col flex-col-2">
 				<div class="white-card">
 					<p>
-					<h4>Introduction</h4>
+					<h4>
+						<?php _e('Introduction', 'spectrocoin-accepting-bitcoin'); ?>
+					</h4>
 					</p>
-
-					<p>The Spectroin plugin allows seamless integration of payment gateways into your WordPress website. To get
-						started, you'll need to obtain the essential credentials: Merchant ID, Project ID, and Private Key.
-						These credentials are required to enable secure transactions between your website and the payment
-						gateway. Follow the step-by-step tutorial below to acquire these credentials:</p>
+					<p>
+						<?php
+						_e('The Spectroin plugin allows seamless integration of payment gateways into your WordPress website. To get started, you\'ll need to obtain the essential credentials: Merchant ID, Project ID, and Private Key. These credentials are required to enable secure transactions between your website and the payment gateway. Follow the step-by-step tutorial below to acquire these credentials:', 'spectrocoin-accepting-bitcoin');
+						?>
+					</p>
 					<ul>
-						<li>1. <a href="https://auth.spectrocoin.com/signup" target="_blank">Sign up</a> for a Spectroin
-							Account.</li>
-						<li>2. <a href="https://auth.spectrocoin.com/login" target="_blank">Log in</a> to your Spectroin
-							account.</li>
-						<li>3. On the dashboard, locate the <b>"<a href="https://spectrocoin.com/en/merchants/projects"
-									target="_blank">Business<a></a>"</b> tab and click on it.</li>
-						<li>4. Click on <b>"<a href="https://spectrocoin.com/en/merchants/projects/new" target="_blank">New
-									project</a>."</b></li>
-						<li>5. Fill in the project details and select desired settings (settings can be changed).</li>
-						<li>6. The <b>Private Key</b> can be obtained by switching on the Public key radio button (Private key
-							won't be visible in the settings window, and it will have to be regenerated in settings). Copy or
-							download the newly generated private key. </li>
-						<li>7. Click <b>"Submit"</b>.</li>
-						<li>8. Copy and paste the Merchant ID and Project ID.</li>
-						<li>9. Generate a test product. Create a test page on your WordPress website with a payment form
-							connected to the Spectroin payment gateway. Perform a trial transaction using the test payment
-							gateway (Test mode can be activated in project settings) to validate the integration's
-							functionality. Verify the transaction details on the Spectroin dashboard to ensure it was
-							successfully processed.</li>
+						<li>1. <a href="https://auth.spectrocoin.com/signup" target="_blank">
+								<?php _e('Sign up', 'spectrocoin-accepting-bitcoin'); ?>
+							</a>
+							<?php _e('for a Spectroin Account.', 'spectrocoin-accepting-bitcoin'); ?>
+						</li>
+						<li>2. <a href="https://auth.spectrocoin.com/login" target="_blank">
+								<?php _e('Log in', 'spectrocoin-accepting-bitcoin'); ?>
+							</a>
+							<?php _e('to your Spectroin account.', 'spectrocoin-accepting-bitcoin'); ?>
+						</li>
+						<li>3.
+							<?php _e('On the dashboard, locate the', 'spectrocoin-accepting-bitcoin'); ?> <b>"<a
+									href="https://spectrocoin.com/en/merchants/projects" target="_blank">
+									<?php _e('Business', 'spectrocoin-accepting-bitcoin'); ?>
+								</a>"</b>
+							<?php _e('tab and click on it.', 'spectrocoin-accepting-bitcoin'); ?>
+						</li>
+						<li>4.
+							<?php _e('Click on', 'spectrocoin-accepting-bitcoin'); ?> <b>"<a
+									href="https://spectrocoin.com/en/merchants/projects/new" target="_blank">
+									<?php _e('New project', 'spectrocoin-accepting-bitcoin'); ?>
+								</a>".</b>
+						</li>
+						<li>5.
+							<?php _e('Fill in the project details and select desired settings (settings can be changed).', 'spectrocoin-accepting-bitcoin'); ?>
+						</li>
+						<li>6.
+							<?php _e('The', 'spectrocoin-accepting-bitcoin'); ?> <b>
+								<?php _e('Private Key', 'spectrocoin-accepting-bitcoin'); ?>
+							</b>
+							<?php _e('can be obtained by switching on the Public key radio button (Private key won\'t be visible in the settings window, and it will have to be regenerated in settings). Copy or download the newly generated private key.', 'spectrocoin-accepting-bitcoin'); ?>
+						</li>
+						<li>7.
+							<?php _e('Click', 'spectrocoin-accepting-bitcoin'); ?> <b>"Submit".</b>
+						</li>
+						<li>8.
+							<?php _e('Copy and paste the Merchant ID and Project ID.', 'spectrocoin-accepting-bitcoin'); ?>
+						</li>
+						<li>9.
+							<?php _e('Generate a test product. Create a test page on your WordPress website with a payment form connected to the Spectroin payment gateway. Perform a trial transaction using the test payment gateway (Test mode can be activated in project settings) to validate the integration\'s functionality. Verify the transaction details on the Spectroin dashboard to ensure it was successfully processed.', 'spectrocoin-accepting-bitcoin'); ?>
+						</li>
 						<br>
-						<li><b>Note:</b> Keep in mind that if you want to use the business services of SpectroCoin, your account
-							has to be verified.</li>
+						<li><b>
+								<?php _e('Note:', 'spectrocoin-accepting-bitcoin'); ?>
+							</b>
+							<?php _e('Keep in mind that if you want to use the business services of SpectroCoin, your account has to be verified.', 'spectrocoin-accepting-bitcoin'); ?>
+						</li>
 					</ul>
 				</div>
 			</div>
@@ -193,58 +220,58 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 	{
 		$this->form_fields = array(
 			'enabled' => array(
-				'title' => __('Enable/Disable', 'woocommerce'),
+				'title' => __('Enable/Disable', 'spectrocoin-accepting-bitcoin'),
 				'type' => 'checkbox',
-				'label' => __('Enable SpectroCoin', 'woocommerce'),
+				'label' => __('Enable SpectroCoin', 'spectrocoin-accepting-bitcoin'),
 				'default' => 'yes'
 			),
 			'title' => array(
-				'title' => __('Title', 'woocommerce'),
+				'title' => __('Title', 'spectrocoin-accepting-bitcoin'),
 				'type' => 'Text',
-				'description' => __('This controls the title which the user sees during checkout.', 'woocommerce'),
-				'default' => __('Bitcoin', 'woocommerce'),
+				'description' => __('This controls the title which the user sees during checkout.', 'spectrocoin-accepting-bitcoin'),
+				'default' => __('Bitcoin', 'spectrocoin-accepting-bitcoin'),
 				'desc_tip' => true,
 			),
 			'description' => array(
-				'title' => __('Description', 'woocommerce'),
+				'title' => __('Description', 'spectrocoin-accepting-bitcoin'),
 				'type' => 'text',
 				'desc_tip' => true,
-				'description' => __('This controls the description which the user sees during checkout.', 'woocommerce'),
-				'default' => __('Pay via Bitcoin.', 'woocommerce')
+				'description' => __('This controls the description which the user sees during checkout.', 'spectrocoin-accepting-bitcoin'),
+				'default' => __('Pay via Bitcoin.', 'spectrocoin-accepting-bitcoin')
 			),
 			'merchant_id' => array(
-				'title' => __('Merchant Id', 'woocommerce'),
+				'title' => __('Merchant Id', 'spectrocoin-accepting-bitcoin'),
 				'type' => 'text'
 			),
 			'project_id' => array(
-				'title' => __('Project Id', 'woocommerce'),
+				'title' => __('Project Id', 'spectrocoin-accepting-bitcoin'),
 				'type' => 'text'
 			),
 			'private_key' => array(
-				'title' => __('Private key', 'woocommerce'),
+				'title' => __('Private key', 'spectrocoin-accepting-bitcoin'),
 				'type' => 'textarea',
-				'description' => __('private key.', 'woocommerce'),
-				'default' => __('Please add your private key with (-----BEGIN PRIVATE KEY-----  -----END PRIVATE KEY-----) ', 'woocommerce'),
+				'description' => __('private key.', 'spectrocoin-accepting-bitcoin'),
+				'default' => __('Please add your private key with (-----BEGIN PRIVATE KEY-----  -----END PRIVATE KEY-----) ', 'spectrocoin-accepting-bitcoin'),
 				'desc_tip' => true,
 			),
 			'order_status' => array(
-				'title' => __('Order status'),
+				'title' => __('Order status', 'spectrocoin-accepting-bitcoin'),
 				'desc_tip' => true,
-				'description' => __('Order status after payment has been received.', 'woocommerce'),
+				'description' => __('Order status after payment has been received.', 'spectrocoin-accepting-bitcoin'),
 				'type' => 'select',
 				'default' => 'completed',
 				'options' => array(
-					'pending' => __('pending', 'woocommerce'),
-					'processing' => __('processing', 'woocommerce'),
-					'completed' => __('completed', 'woocommerce'),
+					'pending' => __('pending', 'spectrocoin-accepting-bitcoin'),
+					'processing' => __('processing', 'spectrocoin-accepting-bitcoin'),
+					'completed' => __('completed', 'spectrocoin-accepting-bitcoin'),
 				),
 			),
 			'display_logo' => array(
-				'title' => __('Display logo', 'woocommerce'),
-				'description' => __('This controls the display of SpectroCoin logo in checkout page', 'woocommerce'),
+				'title' => __('Display logo', 'spectrocoin-accepting-bitcoin'),
+				'description' => __('This controls the display of SpectroCoin logo in the checkout page', 'spectrocoin-accepting-bitcoin'),
 				'desc_tip' => true,
 				'type' => 'checkbox',
-				'label' => __('Enable', 'woocommerce'),
+				'label' => __('Enable', 'spectrocoin-accepting-bitcoin'),
 				'default' => 'yes'
 			),
 		);
@@ -277,7 +304,7 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 				'messages' => $response->getMessage()
 			);
 		}
-		$order->update_status('on-hold', __('Waiting for SpectroCoin payment', 'woocommerce'));
+		$order->update_status('on-hold', __('Waiting for SpectroCoin payment', 'spectrocoin-accepting-bitcoin'));
 		$order->reduce_order_stock();
 		$woocommerce->cart->empty_cart();
 		return array(
@@ -318,24 +345,25 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 							// $order->update_status( $this->order_status );
 							break;
 					}
-					echo "*ok*";
+					echo esc_html__('*ok*', 'spectrocoin-accepting-bitcoin');
 					exit;
 				} else {
 					self::log("Order '{$order_id}' not found!");
-					echo "order not found";
+					echo esc_html__('order not found', 'spectrocoin-accepting-bitcoin');
 					exit;
 				}
 			} else {
 				self::log("Sent callback is invalid");
-				echo "invalid callback data";
+				echo esc_html__('invalid callback data', 'spectrocoin-accepting-bitcoin');
 				exit;
 			}
 		} else {
 			self::log("Sent callback is invalid");
-			echo "invalid callback format";
+			echo esc_html__('invalid callback format', 'spectrocoin-accepting-bitcoin');
 			exit;
 		}
 	}
+
 	private function new_request($order, $total, $receive_currency)
 	{
 		$callback = get_site_url(null, '?wc-api=' . self::$callback_name);
