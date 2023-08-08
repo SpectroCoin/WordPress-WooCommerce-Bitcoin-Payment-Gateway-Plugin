@@ -17,7 +17,7 @@ _Added:_ Introduced an informative message on the admin page, guiding users on h
 
 ## Version 1.1.0 MINOR (07/31/2023):
 
-_Added_: Included a link to access SpectroCoin plugin settings directly from the plugin page. This enhancement provides users with easier access to the configuration options.
+_Added_: Included a new option in admin menu, to display or not the SpectroCoin logo during checkout.
 
 ## Version 1.2.0 MINOR (07/31/2023):
 
