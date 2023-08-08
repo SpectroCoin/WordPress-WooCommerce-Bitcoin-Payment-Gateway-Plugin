@@ -84,6 +84,7 @@ function init_spectrocoin_plugin()
 {
 	if (spectrocoin_requirements_met()) {
 		require_once(__DIR__ . '/class-wc-gateway-spectrocoin.php');
+		load_plugin_textdomain('spectrocoin-accepting-bitcoin', false, dirname(plugin_basename(__FILE__)) . '/languages');
 
 		if (class_exists('WC_Gateway_Spectrocoin')) {
 			add_filter('woocommerce_payment_gateways', 'spectrocoin_gateway_class');
