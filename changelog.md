@@ -18,3 +18,9 @@ _Added:_ Introduced an informative message on the admin page, guiding users on h
 ## Version 1.1.0 MINOR (07/31/2023):
 
 _Added_: Included a link to access SpectroCoin plugin settings directly from the plugin page. This enhancement provides users with easier access to the configuration options.
+
+## Version 1.2.0 MINOR (07/31/2023):
+
+_Added_: Implemented plugin string internationalization, for plugin translation to various languages.
+
+_Added_: Included two additional links within admin window connecting to official wordpress.org website to easily rate, leave feedback and report bugs.
