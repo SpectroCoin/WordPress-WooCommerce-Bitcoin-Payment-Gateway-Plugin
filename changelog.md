@@ -24,3 +24,5 @@ _Added_: Included a new option in admin menu, to display or not the SpectroCoin 
 _Added_: Implemented plugin string internationalization, for plugin translation to various languages.
 
 _Added_: Included two additional links within admin window connecting to official wordpress.org website to easily rate, leave feedback and report bugs.
+
+_Tested_: Tested and checked compatibility with Wordpress 6.3 and WooCommerce 8.0.1
