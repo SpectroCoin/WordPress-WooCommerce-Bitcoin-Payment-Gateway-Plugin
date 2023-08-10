@@ -138,14 +138,34 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 	public function admin_options()
 	{
 		?>
+		<div class="header">
+			<div class="header-flex header-flex-1">
+				<?php
+				printf(
+					'<a class="logo-link" href="%1$s" target="_blank"><img class="spectrocoin-logo" src="%2$s"></a>',
+					esc_url('https://spectrocoin.com/'),
+					esc_url(plugins_url('/assets/images/spectrocoin-logo.svg', __FILE__))
+				);
+				?>
+			</div>
+			<!-- Closing div tag moved to the correct place -->
+			<div class="header-flex header-flex-2">
+				<?php
+				printf(
+					'<img class="header-image" src="%1$s">',
+					esc_url(plugins_url('/assets/images/card_phone_top.svg', __FILE__))
+				);
+				?>
+			</div>
+		</div>
+
+
 		<div class="spectrocoin-plugin-settings">
 			<div class="flex-col flex-col-1">
 				<p>
 					<?php
 					printf(
-						'<a class="logo-link" href="%1$s" target="_blank"><img class="spectrocoin-logo" src="%2$s"></a><div class="contact-information">%3$s<br>%4$s <a href="skype:spectrocoin_merchant?chat">%5$s</a> &middot; <a href="mailto:merchant@spectrocoin.com">%6$s</a></div>',
-						esc_url('https://spectrocoin.com/'),
-						esc_url(plugins_url('/assets/images/spectrocoin-logo.svg', __FILE__)),
+						'<div class="contact-information">%1$s<br>%2$s <a href="skype:spectrocoin_merchant?chat">%3$s</a> &middot; <a href="mailto:merchant@spectrocoin.com">%4$s</a></div>',
 						__('Accept Bitcoin through the SpectroCoin and receive payments in your chosen currency.', 'spectrocoin-accepting-bitcoin'),
 						__('Still have questions? Contact us via', 'spectrocoin-accepting-bitcoin'),
 						__('skype: spectrocoin_merchant', 'spectrocoin-accepting-bitcoin'),
