@@ -26,3 +26,5 @@ _Added_: Implemented plugin string internationalization, for plugin translation 
 _Added_: Included two additional links within admin window connecting to official wordpress.org website to easily rate, leave feedback and report bugs.
 
 _Tested_: Tested and checked compatibility with Wordpress 6.3 and WooCommerce 8.0.1
+
+_Modified_: Added style changes in settings window
