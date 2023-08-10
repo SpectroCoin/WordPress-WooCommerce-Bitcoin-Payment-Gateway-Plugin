@@ -162,17 +162,6 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 
 		<div class="spectrocoin-plugin-settings">
 			<div class="flex-col flex-col-1">
-				<p>
-					<?php
-					printf(
-						'<div class="contact-information">%1$s<br>%2$s <a href="skype:spectrocoin_merchant?chat">%3$s</a> &middot; <a href="mailto:merchant@spectrocoin.com">%4$s</a></div>',
-						__('Accept Bitcoin through the SpectroCoin and receive payments in your chosen currency.', 'spectrocoin-accepting-bitcoin'),
-						__('Still have questions? Contact us via', 'spectrocoin-accepting-bitcoin'),
-						__('skype: spectrocoin_merchant', 'spectrocoin-accepting-bitcoin'),
-						__('email: merchant@spectrocoin.com', 'spectrocoin-accepting-bitcoin')
-					);
-					?>
-				</p>
 				<table class="form-table">
 					<?php $this->generate_settings_html(); ?>
 				</table>
@@ -225,6 +214,15 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 						</li>
 					</ul>
 				</div>
+				<?php
+				printf(
+					'<div class="contact-information">%1$s<br>%2$s <a href="skype:spectrocoin_merchant?chat">%3$s</a> &middot; <a href="mailto:merchant@spectrocoin.com">%4$s</a></div>',
+					__('Accept Bitcoin through the SpectroCoin and receive payments in your chosen currency.', 'spectrocoin-accepting-bitcoin'),
+					__('Still have questions? Contact us via', 'spectrocoin-accepting-bitcoin'),
+					__('skype: spectrocoin_merchant', 'spectrocoin-accepting-bitcoin'),
+					__('email: merchant@spectrocoin.com', 'spectrocoin-accepting-bitcoin')
+				);
+				?>
 			</div>
 		</div>
 		<?php
