@@ -60,7 +60,9 @@ function spectrocoin_requirements_met()
 
 	return $requirements_met;
 }
-
+/**
+ * Display error message to admin
+ */
 function spectrocoin_admin_notice($message)
 {
 	?>
@@ -72,6 +74,9 @@ function spectrocoin_admin_notice($message)
 	<?php
 }
 
+/**
+ * Handle plugin deactivation
+ */
 function spectrocoin_deactivate_plugin()
 {
 	deactivate_plugins(plugin_basename(__FILE__));
@@ -94,19 +99,25 @@ function init_spectrocoin_plugin()
 		}
 	}
 }
-
+/**
+ * Gateway class initialization
+ *  */
 function spectrocoin_gateway_class($methods)
 {
 	$methods[] = 'WC_Gateway_Spectrocoin';
 	return $methods;
 }
-
+/**
+ * 
+ */
 function get_sc_payment_settings_url()
 {
 	$checkout_url = get_admin_url(null, 'admin.php?page=wc-settings&tab=checkout&section=spectrocoin');
 	return esc_url($checkout_url);
 }
-
+/**
+ * Add custom links to plugin page
+ */
 function spectrocoin_add_custom_links_left($links, $file)
 {
 	if (strpos($file, 'spectrocoin') !== false) {
@@ -116,7 +127,9 @@ function spectrocoin_add_custom_links_left($links, $file)
 	}
 	return $links;
 }
-
+/**
+ * Add custom links to plugin page
+ */
 function spectrocoin_add_custom_links_right($plugin_meta, $file)
 {
 	if (strpos($file, 'spectrocoin') !== false) {
@@ -128,7 +141,9 @@ function spectrocoin_add_custom_links_right($plugin_meta, $file)
 	}
 	return $plugin_meta;
 }
-
+/**
+ * Enqueue admin styles
+ */
 function spectrocoin_enqueue_admin_styles()
 {
 	$current_screen = get_current_screen();
