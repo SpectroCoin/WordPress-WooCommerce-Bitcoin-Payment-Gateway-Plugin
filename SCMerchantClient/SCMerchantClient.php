@@ -1,10 +1,5 @@
 <?php
 
-/**
- * Created by UAB Spectro Fincance.
- * This is a sample SpectroCoin Merchant v1.1 API PHP client
- */
-
 include_once('httpful.phar');
 include_once('components/FormattingUtil.php');
 include_once('data/ApiError.php');

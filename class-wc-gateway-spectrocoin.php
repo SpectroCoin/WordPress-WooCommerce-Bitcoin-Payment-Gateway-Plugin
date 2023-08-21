@@ -28,30 +28,13 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 	/** @var String */
 	private static $callback_name = 'spectrocoin_callback';
 	/** @var SCMerchantClient */
+	public $form_fields;
 	private $scClient;
 	protected $merchant_id;
 	protected $project_id;
 	protected $private_key;
 	protected $order_status;
-	public function get_merchant_id()
-	{
-		return $this->merchant_id;
-	}
 
-	public function get_project_id()
-	{
-		return $this->project_id;
-	}
-
-	public function get_private_key()
-	{
-		return $this->private_key;
-	}
-
-	public function get_order_status()
-	{
-		return $this->order_status;
-	}
 	/**
 	 * Constructor for the gateway.
 	 */
@@ -62,9 +45,6 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 		$this->order_button_text = __('Pay with SpectroCoin', 'spectrocoin-accepting-bitcoin');
 		$this->method_title = __('SpectroCoin', 'spectrocoin-accepting-bitcoin');
 		$this->supports = array('products');
-		// Load the settings.
-		$this->init_form_fields();
-		$this->init_settings();
 		// Define user set variables.
 		$this->title = $this->get_option('title');
 		$this->description = $this->get_option('description');
@@ -73,15 +53,28 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 		$this->private_key = $this->get_option('private_key');
 		$this->order_status = $this->get_option('order_status');
 
+		// Set up action hooks
 		add_action('woocommerce_update_options_payment_gateways_' . $this->id, array($this, 'process_admin_options'));
 		add_action('woocommerce_thankyou_' . $this->id, array($this, 'thankyou_page'));
 
+		// Check and initialize if necessary
+		$this->initialize_spectrocoin_client();
+
+		// Load the settings.
+		$this->form_fields = $this->generate_form_fields();
+		$this->init_settings();
+	}
+
+	/**
+	 * Initializes the SpectroCoin API client if credentials are valid.
+	 */
+	private function initialize_spectrocoin_client()
+	{
 		if (!$this->private_key) {
 			self::log("Please generate and enter your private_key!");
-
-		} else if (!$this->merchant_id) {
+		} elseif (!$this->merchant_id) {
 			self::log("Please enter merchant id!");
-		} else if (!$this->project_id) {
+		} elseif (!$this->project_id) {
 			self::log("Please enter application id!");
 		} else {
 			$this->scClient = new SCMerchantClient(
@@ -90,10 +83,10 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 				$this->project_id,
 				$this->private_key
 			);
-			add_action('woocommerce_api_' . self::$callback_name, array(&$this, 'callback'));
+			add_action('woocommerce_api_' . self::$callback_name, array($this, 'callback'));
 		}
-		add_action('woocommerce_update_options_payment_gateways_' . $this->id, array(&$this, 'process_admin_options'));
 	}
+
 	/**
 	 * Logging method.
 	 * @param string $message
@@ -163,7 +156,7 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 		<div class="spectrocoin-plugin-settings">
 			<div class="flex-col flex-col-1">
 				<table class="form-table">
-					<?php $this->generate_settings_html(); ?>
+					<?php $this->generate_settings_html($this->form_fields); ?>
 				</table>
 			</div>
 			<div class="flex-col flex-col-2">
@@ -238,11 +231,11 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 	}
 
 	/**
-	 * Initialise Gateway Settings Form Fields.
+	 * Initialize Gateway Settings Form Fields.
 	 */
-	public function init_form_fields()
+	public function generate_form_fields()
 	{
-		$this->form_fields = array(
+		return array(
 			'enabled' => array(
 				'title' => __('Enable/Disable', 'spectrocoin-accepting-bitcoin'),
 				'type' => 'checkbox',
