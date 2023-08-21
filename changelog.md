@@ -28,3 +28,5 @@ _Added_: Included two additional links within admin window connecting to officia
 _Tested_: Tested and checked compatibility with Wordpress 6.3 and WooCommerce 8.0.1
 
 _Modified_: Added style changes in settings window
+
+_For Developers_: Added documentation with parameters and return variables before every function
