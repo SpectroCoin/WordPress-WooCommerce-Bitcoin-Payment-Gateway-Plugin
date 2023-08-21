@@ -84,7 +84,11 @@ class SCMerchantClient
 			exit('<pre>' . print_r($response, true) . '</pre>');
 		}
 	}
-
+	/**
+	 * function to generate signature
+	 * @param $data
+	 * @return string $encodedSignature 
+	 */
 	private function generateSignature($data)
 	{
 		$pkeyid = openssl_pkey_get_private($this->privateMerchantCert);

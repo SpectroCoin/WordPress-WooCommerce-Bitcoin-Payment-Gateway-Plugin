@@ -19,7 +19,6 @@ define('SC_WP_VERSION', '6.1');
 
 /**
  * Checks if the system requirements are met
- *
  * @return bool True if system requirements are met, false if not
  */
 function spectrocoin_requirements_met()
@@ -85,6 +84,9 @@ function spectrocoin_deactivate_plugin()
 add_action('plugins_loaded', 'init_spectrocoin_plugin');
 add_action('admin_enqueue_scripts', 'spectrocoin_enqueue_admin_styles');
 
+/**
+ * Initialize plugin
+ */
 function init_spectrocoin_plugin()
 {
 	if (spectrocoin_requirements_met()) {
@@ -108,7 +110,7 @@ function spectrocoin_gateway_class($methods)
 	return $methods;
 }
 /**
- * 
+ * Get payment settings url
  */
 function get_sc_payment_settings_url()
 {

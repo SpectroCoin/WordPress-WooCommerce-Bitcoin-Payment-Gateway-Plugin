@@ -131,10 +131,10 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 			return '';
 		}
 	}
-	/**
-	 * Initialise Gateway Settings Form Fields.
-	 */
 
+	/**
+	 * Generate admin settings form.
+	 */
 	public function admin_options()
 	{
 		?>
@@ -237,7 +237,9 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 		<?php
 	}
 
-
+	/**
+	 * Initialise Gateway Settings Form Fields.
+	 */
 	public function init_form_fields()
 	{
 		$this->form_fields = array(
@@ -298,7 +300,9 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 			),
 		);
 	}
-
+	/**
+	 * Output for the order received page.
+	 */
 	public function thankyou_page()
 	{
 		if ($this->instructions) {
@@ -335,6 +339,7 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 		);
 
 	}
+
 	/**
 	 * Used to process callbacks from SpectroCoin
 	 */
@@ -386,6 +391,12 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 		}
 	}
 
+	/**
+	 *	Create new request for SpectroCoin API
+	 *	@param WC_Order $order
+	 *	@param float $total
+	 *	@param string $receive_currency
+	 */
 	private function new_request($order, $total, $receive_currency)
 	{
 		$callback = get_site_url(null, '?wc-api=' . self::$callback_name);
@@ -405,10 +416,21 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 		);
 	}
 
+	/**
+	 * Parse order id from SpectroCoin callback
+	 * @param string $order_id
+	 * @return string
+	 */
 	private function parse_order_id($order_id)
 	{
 		return explode('-', $order_id)[0];
 	}
+
+	/**
+	 * Generate random string
+	 * @param int $length
+	 * @return string
+	 */
 	private function random_str($length)
 	{
 		return substr(md5(rand(1, pow(2, 16))), 0, $length);
