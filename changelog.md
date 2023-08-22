@@ -17,4 +17,16 @@ _Added:_ Introduced an informative message on the admin page, guiding users on h
 
 ## Version 1.1.0 MINOR (07/31/2023):
 
-_Added_: Included a link to access SpectroCoin plugin settings directly from the plugin page. This enhancement provides users with easier access to the configuration options.
+_Added_: Included a new option in admin menu, to display or not the SpectroCoin logo during checkout.
+
+## Version 1.2.0 MINOR (07/31/2023):
+
+_Added_: Implemented plugin string internationalization, for plugin translation to various languages.
+
+_Added_: Included two additional links within admin window connecting to official wordpress.org website to easily rate, leave feedback and report bugs.
+
+_Tested_: Tested and checked compatibility with Wordpress 6.3 and WooCommerce 8.0.1
+
+_Modified_: Added style changes in settings window
+
+_For Developers_: Added documentation with parameters and return variables before every function

@@ -3,6 +3,19 @@
   gap: 15px;
 }
 
+.header {
+  display: flex;
+  max-height: 130px;
+}
+
+.header-flex {
+  flex-basis: 50%;
+}
+
+.header-flex .header-image {
+  float: right;
+}
+
 .spectrocoin-plugin-settings .flex-col {
   flex-basis: 50%;
 }
@@ -11,6 +24,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-wrap: wrap;
 }
 
 .spectrocoin-plugin-settings h3 {
@@ -72,6 +86,7 @@
   border-radius: 8px;
   box-shadow: 0 6px 10px #4972f40d;
   padding: 20px 15px;
+  flex-basis: 100%;
 }
 
 .form-table tr {
@@ -110,14 +125,23 @@
   .spectrocoin-plugin-settings .select {
     width: 100% !important;
   }
+  .white-card {
+    margin-top: 0px;
+  }
 }
 
 .spectrocoin-logo {
-  width: 270px;
   height: 100%;
+  width: 230px;
 }
 
 .logo-link {
   height: 100%;
   display: block;
+}
+
+.contact-information {
+  padding-top: 30px;
+  padding-bottom: 20px;
+  width: 100%;
 }

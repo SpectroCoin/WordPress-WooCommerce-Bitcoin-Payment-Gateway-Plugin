@@ -1,10 +1,5 @@
 <?php
 
-/**
- * Created by UAB Spectro Fincance.
- * This is a sample SpectroCoin Merchant v1.1 API PHP client
- */
-
 include_once('httpful.phar');
 include_once('components/FormattingUtil.php');
 include_once('data/ApiError.php');
@@ -84,16 +79,20 @@ class SCMerchantClient
 			exit('<pre>' . print_r($response, true) . '</pre>');
 		}
 	}
-
+	/**
+	 * function to generate signature
+	 * @param $data
+	 * @return string $encodedSignature 
+	 */
 	private function generateSignature($data)
 	{
 		$pkeyid = openssl_pkey_get_private($this->privateMerchantCert);
 
-		// compute signature
 		$s = openssl_sign($data, $signature, $pkeyid, OPENSSL_ALGO_SHA1);
 		$encodedSignature = base64_encode($signature);
-		// free the key from memory
-		openssl_free_key($pkeyid);
+		if (PHP_VERSION_ID < 80000) {
+			openssl_free_key($pkeyid); //maintaining the deprecated function for older php versions < 8.0
+		}
 
 		return $encodedSignature;
 	}
