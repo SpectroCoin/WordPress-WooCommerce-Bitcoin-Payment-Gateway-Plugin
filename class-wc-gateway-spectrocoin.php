@@ -28,7 +28,7 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 	/** @var String */
 	private static $callback_name = 'spectrocoin_callback';
 	/** @var SCMerchantClient */
-	public $form_fields;
+	// public $form_fields;
 	private $scClient;
 	protected $merchant_id;
 	protected $project_id;
@@ -71,7 +71,7 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 	private function initialize_spectrocoin_client()
 	{
 		if (!$this->private_key) {
-			self::log("Please generate and enter your private_key!");
+			self::log("Please generate and enter your private key!");
 		} elseif (!$this->merchant_id) {
 			self::log("Please enter merchant id!");
 		} elseif (!$this->project_id) {
@@ -86,7 +86,6 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 			add_action('woocommerce_api_' . self::$callback_name, array($this, 'callback'));
 		}
 	}
-
 	/**
 	 * Logging method.
 	 * @param string $message
