@@ -276,11 +276,7 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 				'description' => __('Order status after payment has been received.', 'spectrocoin-accepting-bitcoin'),
 				'type' => 'select',
 				'default' => 'completed',
-				'options' => array(
-					'pending' => __('pending', 'spectrocoin-accepting-bitcoin'),
-					'processing' => __('processing', 'spectrocoin-accepting-bitcoin'),
-					'completed' => __('completed', 'spectrocoin-accepting-bitcoin'),
-				),
+				'options' => $this->all_order_statuses
 			),
 			'display_logo' => array(
 				'title' => __('Display logo', 'spectrocoin-accepting-bitcoin'),
