@@ -30,3 +30,9 @@ _Tested_: Tested and checked compatibility with Wordpress 6.3 and WooCommerce 8.
 _Modified_: Added style changes in settings window
 
 _For Developers_: Added documentation with parameters and return variables before every function
+
+## Version 1.3.0 MINOR (07/31/2023):
+
+_Fixed_: Replaced hardcoded order statuses in plugin settings.
+
+_Added_: Custom order statuses created manually or using plugins will appear in SpectroCoin settings menu.

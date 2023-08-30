@@ -122,6 +122,12 @@ Modified: Added style changes in settings window
 
 For Developers: Added documentation with parameters and return variables before every function
 
+Version 1.3.0 MINOR (07/31/2023):
+
+Fixed: Replaced hardcoded order statuses in plugin settings.
+
+Added: Custom order statuses created manually or using plugins will appear in SpectroCoin settings menu.
+
 == Frequently Asked Questions ==
 
 Can I use this plug-in on more than one sites?
