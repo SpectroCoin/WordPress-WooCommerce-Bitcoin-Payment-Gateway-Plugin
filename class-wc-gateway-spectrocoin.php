@@ -312,7 +312,7 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 		$request = $this->new_request($order, $total, $currency);
 		$response = $this->scClient->createOrder($request);
 		if ($response instanceof ApiError) {
-			self::log("Failed to create SpectroCoin payment for order {$order_id}. Response message {$response->getMessage()}. Response code: {$response->getCode()}");
+			self::log("Failed to create SpectroCoin payment for order {$order_id}. Response message: {$response->getMessage()}. Response code: {$response->getCode()}");
 			return array(
 				'result' => 'failure',
 				'messages' => $response->getMessage()
