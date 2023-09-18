@@ -128,6 +128,8 @@ Fixed: Replaced hardcoded order statuses in plugin settings.
 
 Added: Custom order statuses created manually or using plugins will appear in SpectroCoin settings menu.
 
+Fixed: Httpful.phar warning and fatal error
+
 == Frequently Asked Questions ==
 
 Can I use this plug-in on more than one sites?
