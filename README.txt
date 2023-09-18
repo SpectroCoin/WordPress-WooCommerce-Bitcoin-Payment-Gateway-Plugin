@@ -122,7 +122,7 @@ Modified: Added style changes in settings window
 
 For Developers: Added documentation with parameters and return variables before every function
 
-Version 1.3.0 MINOR (07/31/2023):
+Version 1.2.1 PATCH (07/31/2023):
 
 Fixed: Replaced hardcoded order statuses in plugin settings.
 
