@@ -65,7 +65,7 @@ class SCMerchantClient
 		if (!$this->debug) {
 			$response = \Httpful\Request::post($this->merchantApiUrl . '/createOrder', $payload, \Httpful\Mime::FORM)->expects(\Httpful\Mime::JSON)->send();
 			if ($response != null) {
-				$body = $response->body ?? null;
+				$body = $response->body ?? null; // ?? null - still testing
 				if ($body != null) {
 					if (is_array($body) && count($body) > 0 && isset($body[0]->code)) {
 						return new ApiError($body[0]->code, $body[0]->message);
