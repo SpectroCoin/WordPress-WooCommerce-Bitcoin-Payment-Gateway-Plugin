@@ -65,9 +65,15 @@ class SCMerchantClient
 		if (!$this->debug) {
 			$response = \Httpful\Request::post($this->merchantApiUrl . '/createOrder', $payload, \Httpful\Mime::FORM)->expects(\Httpful\Mime::JSON)->send();
 			if ($response != null) {
-				$body = $response->body; //  ?? null - still testing
+				$body = $response->body ?? null; //  ?? null - still testing
 				if ($body != null) {
 					if (is_array($body) && count($body) > 0 && isset($body[0]->code)) {
+						// API error detected, display custom message with error code and message
+						$errorCode = $body[0]->code;
+						$errorMessage = $body[0]->message;
+						$customErrorMessage = "Error occurred: {$errorCode}, {$errorMessage}";
+						
+						wc_add_notice($customErrorMessage, 'error');
 						return new ApiError($body[0]->code, $body[0]->message);
 					} else {
 						return new CreateOrderResponse($body->orderRequestId, $body->orderId, $body->depositAddress, $body->payAmount, $body->payCurrency, $body->receiveAmount, $body->receiveCurrency, $body->validUntil, $body->redirectUrl);
