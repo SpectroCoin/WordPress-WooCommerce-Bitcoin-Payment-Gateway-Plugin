@@ -52,9 +52,9 @@ class SCMerchantClient
 			'receiveAmount' => $request->getReceiveAmount(),
 			'description' => $request->getDescription(),
 			'culture' => $request->getCulture(),
-			'callbackUrl' => $request->getCallbackUrl(),
-			'successUrl' => $request->getSuccessUrl(),
-			'failureUrl' => $request->getFailureUrl()
+			'callbackUrl' => 'http://localhost.com',
+			'successUrl' => 'http://localhost.com',
+			'failureUrl' => 'http://localhost.com'
 		);
 
 		$formHandler = new \Httpful\Handlers\FormHandler();
@@ -65,7 +65,7 @@ class SCMerchantClient
 		if (!$this->debug) {
 			$response = \Httpful\Request::post($this->merchantApiUrl . '/createOrder', $payload, \Httpful\Mime::FORM)->expects(\Httpful\Mime::JSON)->send();
 			if ($response != null) {
-				$body = $response->body ?? null; // ?? null - still testing
+				$body = $response->body; //  ?? null - still testing
 				if ($body != null) {
 					if (is_array($body) && count($body) > 0 && isset($body[0]->code)) {
 						return new ApiError($body[0]->code, $body[0]->message);
