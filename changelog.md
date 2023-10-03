@@ -38,3 +38,5 @@ _Fixed_: Replaced hardcoded order statuses in plugin settings.
 _Added_: Custom order statuses created manually or using plugins will appear in SpectroCoin settings menu.
 
 _Added_: During checkout, if error is occured, now client will see the error code and message instead of generic error message.
+
+_Added:_ Now plugin checks the FIAT currency, if it is not supported by SpectroCoin, payment will not be available.

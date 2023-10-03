@@ -83,7 +83,6 @@ function spectrocoin_deactivate_plugin()
 
 add_action('plugins_loaded', 'init_spectrocoin_plugin');
 add_action('admin_enqueue_scripts', 'spectrocoin_enqueue_admin_styles');
-
 /**
  * Initialize plugin
  */

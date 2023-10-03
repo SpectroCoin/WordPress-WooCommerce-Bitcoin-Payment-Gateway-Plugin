@@ -6,8 +6,6 @@ if (!in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
 	return;
 }
 
-add_action('plugins_loaded', 'spectrocoin_init');
-
 if (!class_exists('WC_Payment_Gateway')) {
 	return;
 }
@@ -40,6 +38,7 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 	 */
 	public function __construct()
 	{
+		
 		$this->id = 'spectrocoin';
 		$this->has_fields = false;
 		$this->order_button_text = __('Pay with SpectroCoin', 'spectrocoin-accepting-bitcoin');
@@ -56,7 +55,6 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 		// Set up action hooks
 		add_action('woocommerce_update_options_payment_gateways_' . $this->id, array($this, 'process_admin_options'));
 		add_action('woocommerce_thankyou_' . $this->id, array($this, 'thankyou_page'));
-
 		// Check and initialize if necessary
 		$this->initialize_spectrocoin_client();
 
@@ -99,6 +97,18 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 			self::$log->add('spectrocoin', $message);
 		}
 	}
+	/**
+	 * Function to toggle the display of the SpectroCoin payment option
+	 */
+	public function is_available()
+	{
+		if($this->checkCurrency()){
+			return true;
+		}
+		else{
+			return false;
+		}
+	}
 
 	public function is_display_logo_enabled()
 	{
@@ -115,7 +125,7 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 		$display_logo = $this->is_display_logo_enabled();
 
 		if ($display_logo) {
-			$icon = plugins_url('assets/images/spectrocoin.png', __FILE__);
+			$icon = plugins_url('assets/images/spectrocoin-logo.svg', __FILE__);
 			$icon_html = '<img src="' . esc_attr($icon) . '" alt="' . esc_attr__('SpectroCoin logo', 'spectrocoin-accepting-bitcoin') . '" />';
 			return apply_filters('woocommerce_gateway_icon', $icon_html, $this->id);
 		} else {
@@ -414,6 +424,19 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 		return explode('-', $order_id)[0];
 	}
 
+	private function checkCurrency()
+  	{	
+		$jsonFile = file_get_contents(plugin_dir_path( __FILE__ ) . 'SCMerchantClient/data/acceptedCurrencies.JSON'); 
+		$acceptedCurrencies = json_decode($jsonFile, true);
+		$currentCurrencyIsoCode = get_woocommerce_currency();
+		if (in_array($currentCurrencyIsoCode, $acceptedCurrencies)) {
+		    return true;
+		} 
+		else {
+		    return false;
+		}
+
+	}
 	/**
 	 * Generate random string
 	 * @param int $length
