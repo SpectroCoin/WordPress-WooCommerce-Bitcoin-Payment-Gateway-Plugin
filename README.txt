@@ -110,7 +110,7 @@ Version 1.1.0 (07/31/2023):
 
 Added: Included a link to access SpectroCoin plugin settings directly from the plugin page. This enhancement provides users with easier access to the configuration options.
 
-Version 1.2.0 MINOR (07/31/2023):
+Version 1.2.0 MINOR (09/10/2023):
 
 Added: Implemented plugin string internationalization, for plugin translation to various languages.
 
@@ -122,7 +122,7 @@ Modified: Added style changes in settings window
 
 For Developers: Added documentation with parameters and return variables before every function
 
-Version 1.3.0 MINOR (07/31/2023):
+Version 1.3.0 MINOR (10/04/2023):
 
 Fixed: Replaced hardcoded order statuses in plugin settings.
 
