@@ -139,6 +139,15 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 	 */
 	public function admin_options()
 	{
+		if (!$this->checkCurrency()) {
+			echo '<div class="notice notice-error dissmisable"><p>';
+			echo '<b>' . get_woocommerce_currency() . ' </b>';
+			esc_html_e('currency is not accepted by SpectroCoin. Please change your currency in the', 'spectrocoin-accepting-bitcoin');
+			echo ' <a href="' . admin_url('admin.php?page=wc-settings&tab=general') . '">';
+			esc_html_e('WooCommerce settings', 'spectrocoin-accepting-bitcoin');
+			echo '</a>.';
+			echo '</p></div>';
+		}
 		?>
 		<div class="header">
 			<div class="header-flex header-flex-1">
