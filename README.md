@@ -61,7 +61,7 @@ _Added:_ Introduced an informative message on the admin page, guiding users on h
 
 _Added_: Included a new option in admin menu, to display or not the SpectroCoin logo during checkout.
 
-### Version 1.2.0 MINOR (07/31/2023):
+### Version 1.2.0 MINOR (09/10/2023):
 
 _Added_: Implemented plugin string internationalization, for plugin translation to various languages.
 
@@ -73,7 +73,7 @@ _Modified_: Added style changes in settings window
 
 _For Developers_: Added documentation with parameters and return variables before every function
 
-### Version 1.3.0 MINOR (07/31/2023):
+### Version 1.3.0 MINOR (10/04/2023):
 
 _Fixed_: Replaced hardcoded order statuses in plugin settings.
 
