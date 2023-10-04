@@ -43,6 +43,7 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 		$this->has_fields = false;
 		$this->order_button_text = __('Pay with SpectroCoin', 'spectrocoin-accepting-bitcoin');
 		$this->method_title = __('SpectroCoin', 'spectrocoin-accepting-bitcoin');
+		$this->method_description = __('Take payments via SpectroCoin. Accept more than 30 cryptocurrencies, such as ETH, BTC, and USDT.', 'spectrocoin');
 		$this->supports = array('products');
 		// Define user set variables.
 		$this->title = $this->get_option('title');

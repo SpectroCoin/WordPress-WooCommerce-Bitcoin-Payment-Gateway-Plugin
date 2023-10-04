@@ -3,7 +3,7 @@ Contributors: SpectroCoin, spectrocoin.com
 Donate link: https://spectrocoin.com/en/
 Tags: woocommerce bitcoin plugin, crypto payments, accept cryptocurrencies, bitcoin payment gateway, spectrocoin payment gateway, secure payments, settle payments in fiat, altcoin support
 Requires at least: 6.1
-Tested up to: 6.2.2
+Tested up to: 6.3.1
 Stable tag: trunk
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -19,7 +19,7 @@ Welcome to the world of seamless cryptocurrency transactions on your WooCommerce
 
 Why is this the perfect solution for WooCommerce users? If you are already using WooCommerce, integrating our plugin is the recommended method for venturing into the world of crypto payments. It opens up a whole new realm of possibilities, allowing customers to make secure and hassle-free purchases on your site.
 
-==Benefits==
+== Benefits ==
 
 1. Accept Multiple Cryptocurrencies: Easily add BTC, ETH, USDT, and 25+ other cryptocurrencies to your WooCommerce site.
 2. Seamlessly integrate the plugin into your existing WooCommerce store without any hassle.
@@ -122,13 +122,18 @@ Modified: Added style changes in settings window
 
 For Developers: Added documentation with parameters and return variables before every function
 
-Version 1.2.1 PATCH (07/31/2023):
+Version 1.3.0 MINOR (07/31/2023):
 
 Fixed: Replaced hardcoded order statuses in plugin settings.
 
 Added: Custom order statuses created manually or using plugins will appear in SpectroCoin settings menu.
 
-Fixed: Httpful.phar warning and fatal error
+Added: During checkout, if error is occured, now client will see the error code and message instead of generic error message.
+
+Added: Now plugin checks the FIAT currency, if it is not supported by SpectroCoin, payment will not be available.
+
+Added: Added admin notice in admin plugin settings to notify that shop currency is not supported by SpectroCoin.
+
 
 == Frequently Asked Questions ==
 
