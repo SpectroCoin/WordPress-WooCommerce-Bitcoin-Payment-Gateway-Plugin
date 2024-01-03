@@ -2,9 +2,11 @@
 Contributors: SpectroCoin, spectrocoin.com
 Donate link: https://spectrocoin.com/en/
 Tags: woocommerce bitcoin plugin, crypto payments, accept cryptocurrencies, bitcoin payment gateway, spectrocoin payment gateway, secure payments, settle payments in fiat, altcoin support
-Requires at least: 6.1
-Tested up to: 6.3.1
-Stable tag: trunk
+Requires at least: 6.2
+Tested up to: 6.4.1
+Stable tag: 1.4.0
+WC requires at least: 7.4
+WC tested up to: 8.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -18,6 +20,8 @@ Bitcoin Payments for WooCommerce is a Wordpress plugin that allows to accept bit
 Welcome to the world of seamless cryptocurrency transactions on your WooCommerce site! With SpectroCoin's innovative WordPress Bitcoin payment plugin, you can now accept a wide range of cryptocurrencies, including BTC, ETH, USDT, and over 25 other popular digital assets, right on your online store.
 
 Why is this the perfect solution for WooCommerce users? If you are already using WooCommerce, integrating our plugin is the recommended method for venturing into the world of crypto payments. It opens up a whole new realm of possibilities, allowing customers to make secure and hassle-free purchases on your site.
+
+Plugin is currently not compatible with the new block-based Cart, Checkout, and Order Confirmation functionality introduced in WooCommerce 8.3. We will ensure compatibility with the future updates.
 
 == Benefits ==
 
@@ -89,6 +93,70 @@ Note: Keep in mind that if you want to use the business services of SpectroCoin,
 
 == Changelog ==
 
+Version 1.4.0 MINOR (01/03/2024):
+
+This update is significant to plugin's security and stability. The posibility of errors during checkout is minimized, reduced posibility of XSS and SQL injection attacks.
+
+Migrated: Since HTTPful is no longer maintained, we migrated to GuzzleHttp. In this case /vendor directory was added which contains GuzzleHttp dependencies.
+
+Added: Settings field sanitization.
+
+Added: Settings field validation. In this case we minimized possible error count during checkout, SpectroCoin won't appear in checkout until settings validation is passed.
+
+Added: Admin notice in admin plugin settings for all fields validation.
+
+Added: Escaping all output variables with appropriate functions.
+
+Added: "spectrocoin\_" prefix to functiton names.
+
+Added: "SpectroCoin\_" prefix to class names.
+
+Added: Validation and Sanitization when request payload is created.
+
+Added: Validation and Sanitization when callback is received.
+
+Added: Components class "SpectroCoin_ValidationUtil" for specific validation functions.
+
+Added: Logging to Wordpress log when errors occur.
+
+Added: Logging to WooCommerce status log when errors occur.
+
+Fixed: is_available() function sometimes returned false, even if all settings were correct.
+
+Optimised: Removed the The whole $_POST stack processing. Now only needed callback keys is being processed.
+
+Updated: Removed hardcoded notice display from admin_options() function.
+
+Updated: spectrocoin_admin_error_notice() function, added additional parameter to allow hyperlink display. Also the notice will be displayed once and won't be displayed in other admin screens except SpectroCoin settings.
+
+Version 1.3.0 MINOR (10/04/2023):
+
+Fixed: Replaced hardcoded order statuses in plugin settings.
+
+Added: Custom order statuses created manually or using plugins will appear in SpectroCoin settings menu.
+
+Added: During checkout, if error is occured, now client will see the error code and message instead of generic error message.
+
+Added: Now plugin checks the FIAT currency, if it is not supported by SpectroCoin, payment will not be available.
+
+Added: Added admin notice in admin plugin settings to notify that shop currency is not supported by SpectroCoin.
+
+Version 1.2.0 MINOR (09/10/2023):
+
+Added: Implemented plugin string internationalization, for plugin translation to various languages.
+
+Added: Included two additional links within admin window connecting to official wordpress.org website to easily rate, leave feedback and report bugs.
+
+Tested: Tested and checked compatibility with Wordpress 6.3 and WooCommerce 8.0.1
+
+Modified: Added style changes in settings window
+
+For Developers: Added documentation with parameters and return variables before every function
+
+Version 1.1.0 (07/31/2023):
+
+Added: Included a link to access SpectroCoin plugin settings directly from the plugin page. This enhancement provides users with easier access to the configuration options.
+
 Version 1.0.0 (07/31/2023):
 
 Fixed: Corrected a typo in the plugin's description. Changed "aplugin" to "a plugin" for better clarity.
@@ -105,35 +173,6 @@ Added: Specified a dependency on the WooCommerce plugin for the SpectroCoin plug
 Added: Enhanced the style of the admin's payment settings window to match the design of SpectroCoin.com, providing a more cohesive user experience.
 
 Added: Introduced an informative message on the admin page, guiding users on how to obtain the mandatory credentials required for using the SpectroCoin plugin effectively. This addition helps users easily find the necessary information for setup and configuration.
-
-Version 1.1.0 (07/31/2023):
-
-Added: Included a link to access SpectroCoin plugin settings directly from the plugin page. This enhancement provides users with easier access to the configuration options.
-
-Version 1.2.0 MINOR (09/10/2023):
-
-Added: Implemented plugin string internationalization, for plugin translation to various languages.
-
-Added: Included two additional links within admin window connecting to official wordpress.org website to easily rate, leave feedback and report bugs.
-
-Tested: Tested and checked compatibility with Wordpress 6.3 and WooCommerce 8.0.1
-
-Modified: Added style changes in settings window
-
-For Developers: Added documentation with parameters and return variables before every function
-
-Version 1.3.0 MINOR (10/04/2023):
-
-Fixed: Replaced hardcoded order statuses in plugin settings.
-
-Added: Custom order statuses created manually or using plugins will appear in SpectroCoin settings menu.
-
-Added: During checkout, if error is occured, now client will see the error code and message instead of generic error message.
-
-Added: Now plugin checks the FIAT currency, if it is not supported by SpectroCoin, payment will not be available.
-
-Added: Added admin notice in admin plugin settings to notify that shop currency is not supported by SpectroCoin.
-
 
 == Frequently Asked Questions ==
 

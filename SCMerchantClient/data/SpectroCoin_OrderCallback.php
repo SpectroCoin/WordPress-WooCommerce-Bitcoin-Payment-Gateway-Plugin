@@ -1,6 +1,10 @@
 <?php
 
-class OrderCallback
+if (!defined('ABSPATH')) {
+	die('Access denied.');
+}
+
+class SpectroCoin_OrderCallback
 {
 
 	private $userId;
@@ -17,6 +21,7 @@ class OrderCallback
 	private $orderRequestId;
 	private $status;
 	private $sign;
+
 
 	function __construct($userId, $merchantApiId, $merchantId, $apiId, $orderId, $payCurrency, $payAmount, $receiveCurrency, $receiveAmount, $receivedAmount, $description, $orderRequestId, $status, $sign)
 	{
@@ -89,7 +94,7 @@ class OrderCallback
 	 */
 	public function getPayAmount()
 	{
-		return FormattingUtil::formatCurrency($this->payAmount == null ? 0.0 : $this->payAmount);
+		return SpectroCoin_FormattingUtil::spectrocoin_format_currency($this->payAmount == null ? 0.0 : $this->payAmount);
 	}
 
 	/**
@@ -105,7 +110,7 @@ class OrderCallback
 	 */
 	public function getReceiveAmount()
 	{
-		return FormattingUtil::formatCurrency($this->receiveAmount == null ? 0.0 : $this->receiveAmount);
+		return SpectroCoin_FormattingUtil::spectrocoin_format_currency($this->receiveAmount == null ? 0.0 : $this->receiveAmount);
 	}
 
 	/**
@@ -113,7 +118,7 @@ class OrderCallback
 	 */
 	public function getReceivedAmount()
 	{
-		return FormattingUtil::formatCurrency($this->receivedAmount == null ? 0.0 : $this->receivedAmount);
+		return SpectroCoin_FormattingUtil::spectrocoin_format_currency($this->receivedAmount == null ? 0.0 : $this->receivedAmount);
 	}
 
 	/**
@@ -168,6 +173,7 @@ class OrderCallback
 
 		return $valid;
 	}
+
 
 
 }

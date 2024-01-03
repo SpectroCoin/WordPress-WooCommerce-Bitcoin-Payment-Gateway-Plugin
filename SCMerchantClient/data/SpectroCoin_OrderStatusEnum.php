@@ -1,6 +1,10 @@
 <?php
 
-class OrderStatusEnum
+if (!defined('ABSPATH')) {
+	die('Access denied.');
+}
+
+class SpectroCoin_OrderStatusEnum
 {
 
 	public static $New = 1;

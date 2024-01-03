@@ -1,6 +1,10 @@
 <?php
 
-class ApiError
+if (!defined('ABSPATH')) {
+	die('Access denied.');
+}
+
+class SpectroCoin_ApiError
 {
 	private $code;
 	private $message;

@@ -1,6 +1,10 @@
 <?php
 
-class CreateOrderRequest
+if (!defined('ABSPATH')) {
+	die('Access denied.');
+}
+
+class SpectroCoin_CreateOrderRequest
 {
 	private $orderId;
 	private $payCurrency;
@@ -44,7 +48,7 @@ class CreateOrderRequest
 	 */
 	public function getPayAmount()
 	{
-		return FormattingUtil::formatCurrency($this->payAmount == null ? 0.0 : $this->payAmount);
+		return SpectroCoin_FormattingUtil::spectrocoin_format_currency($this->payAmount == null ? 0.0 : $this->payAmount);
 	}
 
 	/**
@@ -68,7 +72,7 @@ class CreateOrderRequest
 	 */
 	public function getReceiveAmount()
 	{
-		return FormattingUtil::formatCurrency($this->receiveAmount == null ? 0.0 : $this->receiveAmount);
+		return SpectroCoin_FormattingUtil::spectrocoin_format_currency($this->receiveAmount == null ? 0.0 : $this->receiveAmount);
 	}
 
 	/**

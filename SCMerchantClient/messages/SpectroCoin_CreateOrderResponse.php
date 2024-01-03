@@ -1,6 +1,10 @@
 <?php
 
-class CreateOrderResponse
+if (!defined('ABSPATH')) {
+	die('Access denied.');
+}
+
+class SpectroCoin_CreateOrderResponse
 {
 
 	private $depositAddress;
