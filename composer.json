@@ -1,24 +1,5 @@
 {
-  "name": "spectrocoin/woocommerce-merchant",
-  "type": "wordpress-plugin",
-  "description": "SpectroCoin cryptocurrency payment gateway for Wordpress Woocommerce",
-  "version": "1.1.0",
-  "keywords": [
-    "bitcoin",
-    "btc",
-    "xem",
-    "dash",
-    "spectrocoin",
-    "merchant",
-    "woocommerce",
-    "wordpress",
-    "gateway",
-    "payment",
-    "altcoin"
-  ],
-  "homepage": "https://spectrocoin.com",
-  "require": {
-    "composer/installers": "^1.10"
-  },
-  "license": "GPL-3.0+"
+    "require": {
+        "guzzlehttp/guzzle": "^7.8"
+    }
 }
