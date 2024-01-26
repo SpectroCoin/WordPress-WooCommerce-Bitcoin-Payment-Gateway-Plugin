@@ -4,7 +4,7 @@ Donate link: https://spectrocoin.com/en/
 Tags: woocommerce bitcoin plugin, crypto payments, accept cryptocurrencies, bitcoin payment gateway, spectrocoin payment gateway, secure payments, settle payments in fiat, altcoin support
 Requires at least: 6.2
 Tested up to: 6.4.1
-Stable tag: 1.4.0
+Stable tag: 1.4.1
 WC requires at least: 7.4
 WC tested up to: 8.4
 License: GPLv2 or later
@@ -92,6 +92,12 @@ Note: Keep in mind that if you want to use the business services of SpectroCoin,
 3. Click "Delete".
 
 == Changelog ==
+
+Version 1.4.1 PATCH (01/26/2024):
+
+Removed: Plugin dependency from plugin directory names
+
+Fixed: Fatal error for new installations
 
 Version 1.4.0 MINOR (01/03/2024):
 

@@ -11,7 +11,6 @@ if (!in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
 if (!class_exists('WC_Payment_Gateway')) {
 	return;
 }
-;
 
 require_once __DIR__ . '/SCMerchantClient/SCMerchantClient.php';
 /**
@@ -19,6 +18,7 @@ require_once __DIR__ . '/SCMerchantClient/SCMerchantClient.php';
  */
 class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 {
+	
     /** @var bool Whether or not logging is enabled */
     public static $log_enabled = true;
     /** @var WC_Logger Logger instance */
@@ -40,7 +40,7 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
     public $merchant_id;
     public $project_id;
     public $private_key;
-    public $form_fields;
+    public $form_fields = array();
     public $order_status;
     private $all_order_statuses;
 	/**
@@ -68,8 +68,8 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 		add_action('woocommerce_thankyou_' . $this->id, array($this, 'thankyou_page'));
 		
         $this->spectrocoin_initialize_client();
-		$this->form_fields = $this->spectrocoin_generate_form_fields();
 		$this->init_settings();
+		$this->form_fields = $this->spectrocoin_generate_form_fields();
 	}
 
 	/**
@@ -190,7 +190,7 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 	}
 
 	/**
-	 * Logging method. Logs messages to woocommerce log if logging is enabled.
+	 * Logging method. Logs messages to WooCommerce log if logging is enabled.
 	 * @param string $message
 	 */
 	public static function spectrocoin_log($message)
@@ -214,8 +214,8 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 		if (!function_exists('is_plugin_active')) {
 			include_once(ABSPATH . 'wp-admin/includes/plugin.php');
 		}
-	
-		if (is_plugin_active('spectrocoin/spectrocoin.php') && $this->enabled === 'yes') {
+		$this->spectrocoin_log(SPECTROCOIN_PLUGIN_FOLDER_NAME);
+		if (is_plugin_active(SPECTROCOIN_PLUGIN_FOLDER_NAME . '/spectrocoin.php') && $this->enabled === 'yes') {
 			if ($this->spectrocoin_check_currency()) {
 				if($this->spectrocoin_validate_settings(false)){
 					if ($this->scClient === null) {
