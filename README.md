@@ -41,6 +41,12 @@ Don't forget to change it back when migrating website to public.
 
 ## Changelog
 
+### Version 1.4.1 PATCH (01/26/2024):
+
+Removed: Plugin dependency from plugin directory names
+
+Fixed: Fatal error for new installations
+
 ### Version 1.4.0 MINOR (01/03/2024):
 
 This update is significant to plugin's security and stability. The posibility of errors during checkout is minimized, reduced posibility of XSS and SQL injection attacks.
