@@ -593,4 +593,6 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 	{
 		return substr(md5(rand(1, pow(2, 16))), 0, $length);
 	}
+
+	
 }

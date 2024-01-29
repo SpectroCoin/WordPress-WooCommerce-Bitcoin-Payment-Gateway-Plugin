@@ -133,6 +133,7 @@ function spectrocoin_init_plugin()
 			add_filter('plugin_action_links', 'spectrocoin_add_custom_links_left', 10, 2);
 			add_filter('plugin_row_meta', 'spectrocoin_add_custom_links_right', 10, 2);
 
+			add_action('before_woocommerce_init', 'spectrocoin_declare_cart_checkout_blocks_compatibility');
 		}
 	}
 }
@@ -145,6 +146,8 @@ function spectrocoin_gateway_class($methods)
 	$methods[] = 'WC_Gateway_Spectrocoin';
 	return $methods;
 }
+
+
 
 /**
  * Get payment settings url
@@ -192,4 +195,36 @@ function spectrocoin_enqueue_admin_styles()
 	if ($current_screen->base === 'woocommerce_page_wc-settings' && isset($_GET['section']) && $_GET['section'] === 'spectrocoin') {
 		wp_enqueue_style('spectrocoin-payment-settings-css', esc_url(plugin_dir_url(__FILE__)) . 'assets/style/settings.css', array(), '1.0.0');
 	}
+}
+
+
+function spectrocoin_declare_cart_checkout_blocks_compatibility() {
+	if (class_exists('Automattic\WooCommerce\Utilities\FeaturesUtil'))
+		\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility('cart_checkout_blocks', __FILE__, true);
+}
+
+// Hook the custom function to the 'woocommerce_blocks_loaded' action
+add_action( 'woocommerce_blocks_loaded', 'spectrocoin_register_order_approval_payment_method_type' );
+
+/**
+ * Custom function to register a payment method type
+
+ */
+function spectrocoin_register_order_approval_payment_method_type() {
+    // Check if the required class exists
+    if ( ! class_exists( 'Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodType' ) ) {
+        return;
+    }
+
+    // Include the custom Blocks Checkout class
+    require_once plugin_dir_path(__FILE__) . '/includes/class-wc-gateway-spectrocoin-blocks-integration.php';
+
+    // Hook the registration function to the 'woocommerce_blocks_payment_method_type_registration' action
+    add_action(
+        'woocommerce_blocks_payment_method_type_registration',
+        function( Automattic\WooCommerce\Blocks\Payments\PaymentMethodRegistry $payment_method_registry ) {
+            // Register an instance of My_Custom_Gateway_Blocks
+            $payment_method_registry->register( new SpectroCoin_Gateway_Blocks );
+        }
+    );
 }
