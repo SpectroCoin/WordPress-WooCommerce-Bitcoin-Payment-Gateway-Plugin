@@ -76,15 +76,17 @@ function spectrocoin_requirements_met()
 function spectrocoin_admin_error_notice($message, $allow_hyperlink = false) {
     static $displayed_messages = array();
 
-    $allowed_html = array(
+    // Only specify the elements you want to allow - keeps <a> tags but escapes other text
+    $allowed_html = $allow_hyperlink ? array(
         'a' => array(
             'href' => array(),
             'title' => array(),
-            'target' => array()
+            'target' => array(),
         ),
-    );
+    ) : array();
 
-    $processed_message = $allow_hyperlink ? wp_kses($message, $allowed_html) : sanitize_text_field($message);
+    // Directly using wp_kses on the whole message assuming $message may contain <a> tags you added
+    $processed_message = wp_kses($message, $allowed_html);
 
     $current_page = isset($_GET['section']) ? sanitize_text_field($_GET['section']) : '';
 
@@ -92,9 +94,7 @@ function spectrocoin_admin_error_notice($message, $allow_hyperlink = false) {
         array_push($displayed_messages, $processed_message);
         ?>
         <div class="notice notice-error">
-            <p>
-			<?php echo esc_html__("SpectroCoin Error: ", 'spectrocoin-accepting-bitcoin') . esc_html($processed_message); ?>
-            </p>
+            <p><?php echo __("SpectroCoin Error: ", 'spectrocoin-accepting-bitcoin') . $processed_message; // Using $processed_message directly ?></p>
         </div>
         <script type="text/javascript">
             document.addEventListener("DOMContentLoaded", function() {
@@ -107,6 +107,7 @@ function spectrocoin_admin_error_notice($message, $allow_hyperlink = false) {
         <?php
     }
 }
+
 
 /**
  * Handle plugin deactivation
@@ -125,7 +126,7 @@ add_action('admin_enqueue_scripts', 'spectrocoin_enqueue_admin_styles');
 function spectrocoin_init_plugin()
 {
 	if (spectrocoin_requirements_met()) {
-		require_once(__DIR__ . '/class-wc-gateway-spectrocoin.php');
+		require_once(__DIR__ . '/includes/class-wc-gateway-spectrocoin.php');
 		load_plugin_textdomain('spectrocoin-accepting-bitcoin', false, dirname(plugin_basename(__FILE__)) . '/languages');
 
 		if (class_exists('WC_Gateway_Spectrocoin')) {

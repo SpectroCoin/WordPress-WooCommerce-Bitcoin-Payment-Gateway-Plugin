@@ -10,14 +10,14 @@ use Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodTyp
 
 final class SpectroCoin_Gateway_Blocks extends AbstractPaymentMethodType {
     private $gateway;
-    protected $name = 'spectrocoin'; // Match this with the ID in your main gateway class
+    protected $name = 'spectrocoin';
 
     public function initialize() {
-        $this->gateway = new WC_Gateway_Spectrocoin(); // Ensure this is the correct way to instantiate
+        $this->gateway = new WC_Gateway_Spectrocoin();
     }
 
     public function is_active() {
-        return $this->gateway->is_available(); // Use the is_available method from your main gateway class
+        return $this->gateway->is_available();
     }
 
     public function get_payment_method_script_handles() {
@@ -25,7 +25,7 @@ final class SpectroCoin_Gateway_Blocks extends AbstractPaymentMethodType {
             'spectrocoin-blocks-integration',
             plugin_dir_url(__FILE__) . 'block/checkout.js', // Ensure the JS file path is correct
             ['wc-blocks-registry', 'wc-settings', 'wp-element', 'wp-html-entities', 'wp-i18n'],
-            filemtime(plugin_dir_path(__FILE__) . 'block/checkout.js'), // Use file modification time for versioning
+            filemtime(plugin_dir_path(__FILE__) . '/../assets/js/checkout.js'), // Use file modification time for versioning
             true
         );
 

@@ -12,7 +12,7 @@ if (!class_exists('WC_Payment_Gateway')) {
 	return;
 }
 
-require_once __DIR__ . '/SCMerchantClient/SCMerchantClient.php';
+require_once __DIR__ . '/../SCMerchantClient/SCMerchantClient.php';
 /**
  * WC_Gateway_Spectrocoin Class.
  */
@@ -214,7 +214,6 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 		if (!function_exists('is_plugin_active')) {
 			include_once(ABSPATH . 'wp-admin/includes/plugin.php');
 		}
-		$this->spectrocoin_log(SPECTROCOIN_PLUGIN_FOLDER_NAME);
 		if (is_plugin_active(SPECTROCOIN_PLUGIN_FOLDER_NAME . '/spectrocoin.php') && $this->enabled === 'yes') {
 			if ($this->spectrocoin_check_currency()) {
 				if($this->spectrocoin_validate_settings(false)){
@@ -258,7 +257,7 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 		$display_logo = $this->spectrocoin_is_display_logo_enabled();
 
 		if ($display_logo) {
-			$icon = plugins_url('assets/images/spectrocoin-logo.svg', __FILE__);
+			$icon = plugins_url('/../assets/images/spectrocoin-logo.svg', __FILE__);
 			$icon_html = '<img src="' . esc_attr($icon) . '" alt="' . esc_attr__('SpectroCoin logo', 'spectrocoin-accepting-bitcoin') . '" />';
 			return apply_filters('woocommerce_gateway_icon', $icon_html, $this->id);
 		} else {
@@ -278,7 +277,7 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 				printf(
 					'<a class="logo-link" href="%1$s" target="_blank"><img class="spectrocoin-logo" src="%2$s" alt="%3$s"></a>',
 					esc_url('https://spectrocoin.com/'),
-					esc_url(plugins_url('/assets/images/spectrocoin-logo.svg', __FILE__)),
+					esc_url(plugins_url('/../assets/images/spectrocoin-logo.svg', __FILE__)),
 					esc_attr__('SpectroCoin logo', 'spectrocoin-accepting-bitcoin')
 				);
 				?>
@@ -287,7 +286,7 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 				<?php
 				printf(
 					'<img class="header-image" src="%1$s" alt="%2$s">',
-					esc_url(plugins_url('/assets/images/card_phone_top.svg', __FILE__)),
+					esc_url(plugins_url('/../assets/images/card_phone_top.svg', __FILE__)),
 					esc_attr__('Header Image', 'spectrocoin-accepting-bitcoin')
 				);
 				?>
@@ -573,7 +572,7 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 
 	private function spectrocoin_check_currency()
   	{	
-		$jsonFile = file_get_contents(plugin_dir_path( __FILE__ ) . 'SCMerchantClient/data/acceptedCurrencies.JSON'); 
+		$jsonFile = file_get_contents(plugin_dir_path( __FILE__ ) . '/../SCMerchantClient/data/acceptedCurrencies.JSON'); 
 		$acceptedCurrencies = json_decode($jsonFile, true);
 		$currentCurrencyIsoCode = get_woocommerce_currency();
 		if (in_array($currentCurrencyIsoCode, $acceptedCurrencies)) {
