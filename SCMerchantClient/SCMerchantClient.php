@@ -62,9 +62,9 @@ class SCMerchantClient
 			'receiveAmount' => $request->getReceiveAmount(),
 			'description' => $request->getDescription(),
 			'culture' => $request->getCulture(),
-			'callbackUrl' => $request->getCallbackUrl(),
-			'successUrl' => $request->getSuccessUrl(),
-			'failureUrl' => $request->getFailureUrl()
+			'callbackUrl' => 'http://localhost.com',
+			'successUrl' => 'http://localhost.com',
+			'failureUrl' => 'http://localhost.com'
 		);
 		
 		$form_params = $payload;
@@ -72,10 +72,7 @@ class SCMerchantClient
 		$payload['sign'] = $signature;
 		$sanitized_payload = $this->spectrocoin_sanitize_create_order_payload($payload);
 		if (!$this->spectrocoin_validate_create_order_payload($sanitized_payload)) {
-            error_log('SpectroCoin Error: Invalid order creation payload');
-			error_log('Payload: ' . print_r($payload, true));
-			wc_add_notice("SpectroCoin Error: Invalid order creation payload", 'error');
-            return new SpectroCoin_ApiError(-1, 'Invalid order creation payload');
+            return new SpectroCoin_ApiError(-1, 'Invalid order creation payload, payload: ' . json_encode($sanitized_payload));
         }
 		try {
 			$response = $this->guzzle_client->post($this->merchant_api_url . '/createOrder', [
@@ -101,17 +98,10 @@ class SCMerchantClient
 				);
 			}
 		} catch (RequestException $e) {
-
 			$errorBody = json_decode($e->getResponse()->getBody());
 			if ($errorBody !== null && is_array($errorBody) && count($errorBody) > 0 && isset($errorBody[0]->code)) {
-				$code = $errorBody[0]->code;
-				$message = $errorBody[0]->message;
-				error_log('SpectroCoin Error: ' . $code . ' - ' . $message);
-				wc_add_notice('SpectroCoin Error: ' . $code . ' - ' . $message, 'error');
-				return new SpectroCoin_ApiError($code, $message);
+				return new SpectroCoin_ApiError($errorBody[0]->code, $errorBody[0]->message);
 			} else {
-				error_log('SpectroCoin Error: Unexpected error');
-				wc_add_notice('SpectroCoin Error: Unexpected error', 'error');
 				return new SpectroCoin_ApiError(-1, 'Unexpected error');
 				}
 			}

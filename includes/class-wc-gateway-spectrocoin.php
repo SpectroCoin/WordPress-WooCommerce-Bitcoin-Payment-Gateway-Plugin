@@ -417,7 +417,7 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 				'desc_tip' => true,
 				'description' => esc_html__('Order status after payment has been received. Custom order statuses will appear in the list.', 'spectrocoin-accepting-bitcoin'),
 				'type' => 'select',
-				'default' => 'completed',
+				'default' => 'Completed',
 				'options' => $this->all_order_statuses
 			),
 			'display_logo' => array(
@@ -454,7 +454,8 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 		$request = $this->new_request($order, $total, $currency);
 		$response = $this->scClient->spectrocoin_create_order($request);
 		if ($response instanceof SpectroCoin_ApiError) {
-			self::spectrocoin_log("Failed to create SpectroCoin payment for order {$order_id}. Response message: {$response->getMessage()}. Response code: {$response->getCode()}");
+			self::spectrocoin_log("SpectroCoin error: Failed to create payment for order {$order_id}. Response message: {$response->getMessage()}. Response code: {$response->getCode()}");
+			error_log("SpectroCoin error: Failed to create payment for order {$order_id}. Response message: {$response->getMessage()}. Response code: {$response->getCode()}");
 			return array(
 				'result' => 'failure',
 				'messages' => $response->getMessage()
@@ -467,7 +468,6 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 			'result' => 'success',
 			'redirect' => $response->getRedirectUrl()
 		);
-
 	}
 
 	/**
@@ -544,7 +544,7 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 		$successCallback = $this->get_return_url($order);
 		$failureCallback = $this->get_return_url($order);
 		return new SpectroCoin_CreateOrderRequest(
-			$order->id . '-' . $this->spectrocoin_random_str(5),
+			$order->id . "-" . $this->spectrocoin_random_str(5),
 			self::$pay_currency,
 			null,
 			$receive_currency,
