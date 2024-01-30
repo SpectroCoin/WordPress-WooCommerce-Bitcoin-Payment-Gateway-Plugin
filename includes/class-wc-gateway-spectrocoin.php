@@ -358,11 +358,6 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 						</li>
 					</ul>
 				</div>
-				<div class = "settings-validation-note">
-					<h5><?php esc_html_e("If SpectroCoin payment option is not visible in checkout window, there are several reasons why this is happening:", 'spectrocoin-accepting-bitcoin')?> </h5> 
-               		<div class = "settings-note"> <?php esc_html_e("1. There are errors in plugin configuration settings, please ensure that when you save the plugin settings, there are no error notices.", 'spectrocoin-accepting-bitcoin')?></div>
-					<div class = "settings-note"> <?php esc_html_e("2. Plugin is currently not compatible with the new block-based Cart, Checkout, and Order Confirmation functionality introduced in WooCommerce 8.3. New installations will have these blocks by default. If updating to WooCommerce 8.3, your store will retain the traditional shortcode-based system, ensuring compatibility with our plugin. We guarantee that we will integrate our plugin with the new block system in later releases.", 'spectrocoin-accepting-bitcoin')?></div>
-                </div>
 				<?php
 				printf(
 					'<div class="contact-information">%1$s<br>%2$s <a href="skype:spectrocoin_merchant?chat">%3$s</a> &middot; <a href="mailto:%4$s">%5$s</a></div>',

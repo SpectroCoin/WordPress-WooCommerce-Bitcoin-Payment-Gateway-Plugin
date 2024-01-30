@@ -3,10 +3,10 @@ Contributors: SpectroCoin, spectrocoin.com
 Donate link: https://spectrocoin.com/en/
 Tags: woocommerce bitcoin plugin, crypto payments, accept cryptocurrencies, bitcoin payment gateway, spectrocoin payment gateway, secure payments, settle payments in fiat, altcoin support
 Requires at least: 6.2
-Tested up to: 6.4.1
-Stable tag: 1.4.1
+Tested up to: 6.4.2
+Stable tag: 1.5.0
 WC requires at least: 7.4
-WC tested up to: 8.4
+WC tested up to: 8.5.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -21,7 +21,7 @@ Welcome to the world of seamless cryptocurrency transactions on your WooCommerce
 
 Why is this the perfect solution for WooCommerce users? If you are already using WooCommerce, integrating our plugin is the recommended method for venturing into the world of crypto payments. It opens up a whole new realm of possibilities, allowing customers to make secure and hassle-free purchases on your site.
 
-Plugin is currently not compatible with the new block-based Cart, Checkout, and Order Confirmation functionality introduced in WooCommerce 8.3. We will ensure compatibility with the future updates.
+Plugin is now compatible with the new block-based cart, checkout, and order confirmation functionality introduced in WooCommerce 8.3.
 
 == Benefits ==
 
@@ -92,6 +92,12 @@ Note: Keep in mind that if you want to use the business services of SpectroCoin,
 3. Click "Delete".
 
 == Changelog ==
+
+Version 1.5.0 MINOR ():
+
+Added: Compatibility with the new block-based checkout functionality.
+
+Fixed: 
 
 Version 1.4.1 PATCH (01/26/2024):
 
