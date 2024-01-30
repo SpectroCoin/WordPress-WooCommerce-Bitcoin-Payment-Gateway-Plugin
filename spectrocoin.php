@@ -204,28 +204,23 @@ function spectrocoin_declare_cart_checkout_blocks_compatibility() {
 		\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility('cart_checkout_blocks', __FILE__, true);
 }
 
-// Hook the custom function to the 'woocommerce_blocks_loaded' action
 add_action( 'woocommerce_blocks_loaded', 'spectrocoin_register_order_approval_payment_method_type' );
 
 /**
  * Custom function to register a payment method type
-
  */
 function spectrocoin_register_order_approval_payment_method_type() {
-    // Check if the required class exists
     if ( ! class_exists( 'Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodType' ) ) {
         return;
     }
 
-    // Include the custom Blocks Checkout class
     require_once plugin_dir_path(__FILE__) . '/includes/class-wc-gateway-spectrocoin-blocks-integration.php';
 
-    // Hook the registration function to the 'woocommerce_blocks_payment_method_type_registration' action
     add_action(
         'woocommerce_blocks_payment_method_type_registration',
         function( Automattic\WooCommerce\Blocks\Payments\PaymentMethodRegistry $payment_method_registry ) {
             // Register an instance of My_Custom_Gateway_Blocks
-            $payment_method_registry->register( new SpectroCoin_Gateway_Blocks );
+            $payment_method_registry->register( new WC_Gateway_Blocks_SpectroCoin );
         }
     );
 }

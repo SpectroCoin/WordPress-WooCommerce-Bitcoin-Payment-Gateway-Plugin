@@ -8,7 +8,7 @@ if (!defined('ABSPATH')) {
 
 use Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodType;
 
-final class SpectroCoin_Gateway_Blocks extends AbstractPaymentMethodType {
+final class WC_Gateway_Blocks_SpectroCoin extends AbstractPaymentMethodType {
     private $gateway;
     protected $name = 'spectrocoin';
 
@@ -23,23 +23,26 @@ final class SpectroCoin_Gateway_Blocks extends AbstractPaymentMethodType {
     public function get_payment_method_script_handles() {
         wp_register_script(
             'spectrocoin-blocks-integration',
-            plugin_dir_url(__FILE__) . 'block/checkout.js', // Ensure the JS file path is correct
+            plugin_dir_url(__FILE__) . '../assets/js/checkout.js',
             ['wc-blocks-registry', 'wc-settings', 'wp-element', 'wp-html-entities', 'wp-i18n'],
-            filemtime(plugin_dir_path(__FILE__) . '/../assets/js/checkout.js'), // Use file modification time for versioning
+            filemtime(plugin_dir_path(__FILE__) . '../assets/js/checkout.js'),
             true
         );
 
         if (function_exists('wp_set_script_translations')) {
-            wp_set_script_translations('spectrocoin-blocks-integration', 'spectrocoin-accepting-bitcoin'); // Use your main class text domain
+            wp_set_script_translations('spectrocoin-blocks-integration', 'spectrocoin-accepting-bitcoin');
         }
 
-        return ['spectrocoin-blocks-integration']; // Ensure this matches the handle used in wp_register_script
+        return ['spectrocoin-blocks-integration'];
     }
 
     public function get_payment_method_data() {
+        $checkout_icon_url = plugins_url('/assets/images/spectrocoin-logo.svg', __DIR__);
+        error_log($checkout_icon_url);
         return [
-            'title' => $this->gateway->title, // Use title from your main gateway class
-            'description' => $this->gateway->description, // Use description from your main gateway class, ensure it's set and public
+            'title' => $this->gateway->title,
+            'description' => $this->gateway->description,
+            'checkout_icon' => $checkout_icon_url,
         ];
     }
 }

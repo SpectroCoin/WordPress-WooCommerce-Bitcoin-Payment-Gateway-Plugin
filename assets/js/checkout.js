@@ -5,8 +5,21 @@ const label =
 const Content = () => {
   return window.wp.element.createElement(
     "div",
-    null,
-    window.wp.htmlEntities.decodeEntities(settings.description || "")
+    {},
+    settings.checkout_icon &&
+      window.wp.element.createElement("img", {
+        src: settings.checkout_icon,
+        alt: window.wp.i18n.__(
+          "SpectroCoin Logo",
+          "spectrocoin-accepting-bitcoin"
+        ),
+        style: { marginBottom: "10px" },
+      }),
+    window.wp.element.createElement(
+      "div",
+      {},
+      window.wp.htmlEntities.decodeEntities(settings.description || "")
+    )
   );
 };
 

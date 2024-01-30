@@ -228,9 +228,11 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 			else{
 				$currency = esc_html(get_woocommerce_currency());
 				$message = $currency . ' currency is not accepted by SpectroCoin. Please change your currency in the ';
+				error_log('SpectroCoin Error: ' . $message . "WooCommerce settings");
 
 				$settings_link = esc_url(admin_url('admin.php?page=wc-settings&tab=general'));
 				$message .= ' <a href="' . $settings_link . '">WooCommerce settings</a>.';
+				
 				spectrocoin_admin_error_notice($message, true);
 			}
 		}
