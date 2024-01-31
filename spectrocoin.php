@@ -139,6 +139,7 @@ function spectrocoin_init_plugin()
 	}
 }
 
+
 /**
  * Gateway class initialization
  *  */

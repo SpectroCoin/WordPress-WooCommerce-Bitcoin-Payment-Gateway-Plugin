@@ -65,6 +65,7 @@ class SCMerchantClient
 			'callbackUrl' => $request->getCallbackUrl(),
 			'successUrl' => $request->getSuccessUrl(),
 			'failureUrl' => $request->getFailureUrl()
+
 		);
 		
 		$form_params = $payload;

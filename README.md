@@ -25,7 +25,7 @@ Integrate cryptocurrency payments seamlessly into your Wordpress store with the 
 
 ## Make it work on localhost
 
-In order to make the plugin work on localhost for testing purposes, <b>change these 3 lines in <em>SCMechantClient.php createOrder() function</em></b>:
+We gently suggest trying out the plugin in a server environment, as it will not be capable of receiving callbacks from SpectroCoin. To successfully create and order on localhost for testing purposes, <b>change these 3 lines in <em>SCMechantClient.php createOrder() function</em></b>:
 
 `'callbackUrl' => $request->getCallbackUrl(),
 'successUrl' => $request->getSuccessUrl(),

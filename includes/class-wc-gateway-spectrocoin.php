@@ -42,7 +42,6 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
     public $private_key;
     public $form_fields = array();
     public $order_status;
-	public $display_logo;
     private $all_order_statuses;
 	/**
 	 * Constructor for the gateway.
@@ -66,7 +65,6 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 		$this->all_order_statuses = wc_get_order_statuses();
 
         add_action('woocommerce_update_options_payment_gateways_' . $this->id, array($this, 'process_admin_options'));
-		
         $this->spectrocoin_initialize_client();
 		$this->init_settings();
 		$this->form_fields = $this->spectrocoin_generate_form_fields();
@@ -178,11 +176,18 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 			$is_valid = false;
 		}
 
-		$this->display_logo = sanitize_text_field($this->get_option('display_logo'));
-		if (!in_array($this->display_logo, ['yes', 'no'])) {
+		if (!in_array(sanitize_text_field($this->get_option('display_logo')), ['yes', 'no'])) {
 			if ($display_notice) {
 				spectrocoin_admin_error_notice('Invalid value for display logo status');
 				error_log('SpectroCoin Error: Invalid value for display logo status');
+			}
+			$is_valid = false;
+		}
+
+		if (!in_array(sanitize_text_field($this->get_option('test_mode')), ['yes', 'no'])) {
+			if ($display_notice) {
+				spectrocoin_admin_error_notice('Invalid value for test mode');
+				error_log('SpectroCoin Error: Invalid value for test mode');
 			}
 			$is_valid = false;
 		}
@@ -265,6 +270,15 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 		} else {
 			return '';
 		}
+	}
+
+	/**
+	 * Check if test mode is enabled.
+	 * @return bool
+	 */
+	public function spectrocoin_is_test_mode_enabled()
+	{
+		return $this->get_option('test_mode');
 	}
 
 	/**
@@ -428,6 +442,14 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 				'label' => esc_html__('Enable', 'spectrocoin-accepting-bitcoin'),
 				'default' => 'yes'
 			),
+			'test_mode' => array(
+				'title' => esc_html__('Test mode', 'spectrocoin-accepting-bitcoin'),
+				'description' => esc_html__('When enabled, if order callback is received, then test order will be set to selected order status (by default - "Completed").', 'spectrocoin-accepting-bitcoin'),
+				'desc_tip' => true,
+				'type' => 'checkbox',
+				'label' => esc_html__('Enable', 'spectrocoin-accepting-bitcoin'),
+				'default' => 'no'
+			),
 		);
 	}
 
@@ -445,12 +467,11 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 		$request = $this->new_request($order, $total, $currency);
 		$response = $this->scClient->spectrocoin_create_order($request);
 		if ($response instanceof SpectroCoin_ApiError) {
-			self::spectrocoin_log("SpectroCoin error: Failed to create payment for order {$order_id}. Response message: {$response->getMessage()}. Response code: {$response->getCode()}");
-			error_log("SpectroCoin error: Failed to create payment for order {$order_id}. Response message: {$response->getMessage()}. Response code: {$response->getCode()}");
-			return array(
-				'result' => 'failure',
-				'messages' => $response->getMessage()
-			);
+			$error_message = "SpectroCoin error: Failed to create payment for order {$order_id}. Response message: {$response->getMessage()}. Response code: {$response->getCode()}";
+        	self::spectrocoin_log($error_message);
+        	error_log($error_message);
+
+			//TO-DO redirect to error page
 		}
 		$order->update_status('on-hold', __('Waiting for SpectroCoin payment', 'spectrocoin-accepting-bitcoin'));
 		wc_reduce_stock_levels($order_id);
@@ -490,22 +511,25 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 				switch ($status) {
 					case (1): // new
 					case (2): // pending
-						$order->update_status('pending');
+						$order->update_status('Pending payment');
 						self::spectrocoin_log("Order {$order_id} status updated to pending");
 						break;
 					case (3): // paid
 						$order->update_status($this->order_status);
 						break;
 					case (4): // failed
-                        $order->update_status('failed');
+                        $order->update_status('Failed');
                         self::spectrocoin_log("Order {$order_id} status updated to failed");
                         break;
 					case (5): // expired
-						$order->update_status('failed');
+						$order->update_status('Failed');
                         self::spectrocoin_log("Order {$order_id} has expired, status updated to failed");
 						break;
 					case (6): // test
-						$order->update_status($this->order_status);
+						if($this->spectrocoin_is_test_mode_enabled()){
+							$order->update_status($this->order_status);
+							self::spectrocoin_log("Test order {$order_id} has been set to " . $this->order_status);
+						}
 						break;
 				}
 				echo esc_html__('*ok*', 'spectrocoin-accepting-bitcoin');
