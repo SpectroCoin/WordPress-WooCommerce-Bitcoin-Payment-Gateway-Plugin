@@ -42,6 +42,7 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
     public $private_key;
     public $form_fields = array();
     public $order_status;
+	public $display_logo;
     private $all_order_statuses;
 	/**
 	 * Constructor for the gateway.
@@ -430,15 +431,6 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 			),
 		);
 	}
-	/**
-	 * Output for the order received page.
-	 */
-	public function thankyou_page()
-	{
-		if ($this->instructions) {
-			echo wpautop(wptexturize(wp_kses_post($this->instructions)));
-		}
-	}
 
 	/**
 	 * Process the payment and return the result.
@@ -450,7 +442,7 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 		global $woocommerce;
 		$order = wc_get_order($order_id);
 		$total = $order->get_total();
-		$currency = $order->get_order_currency();
+		$currency = $order->get_currency();
 		$request = $this->new_request($order, $total, $currency);
 		$response = $this->scClient->spectrocoin_create_order($request);
 		if ($response instanceof SpectroCoin_ApiError) {
@@ -462,7 +454,7 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 			);
 		}
 		$order->update_status('on-hold', __('Waiting for SpectroCoin payment', 'spectrocoin-accepting-bitcoin'));
-		$order->reduce_order_stock();
+		wc_reduce_stock_levels($order_id);
 		$woocommerce->cart->empty_cart();
 		return array(
 			'result' => 'success',
@@ -544,12 +536,12 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 		$successCallback = $this->get_return_url($order);
 		$failureCallback = $this->get_return_url($order);
 		return new SpectroCoin_CreateOrderRequest(
-			$order->id . "-" . $this->spectrocoin_random_str(5),
+			$order->get_id() . "-" . $this->spectrocoin_random_str(5),
 			self::$pay_currency,
 			null,
 			$receive_currency,
 			$total,
-			"Order #{$order->id}",
+			"Order #{$order->get_id()}",
 			"en",
 			$callback,
 			$successCallback,

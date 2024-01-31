@@ -38,7 +38,6 @@ final class WC_Gateway_Blocks_SpectroCoin extends AbstractPaymentMethodType {
 
     public function get_payment_method_data() {
         $checkout_icon_url = plugins_url('/assets/images/spectrocoin-logo.svg', __DIR__);
-        error_log($checkout_icon_url);
         return [
             'title' => $this->gateway->title,
             'description' => $this->gateway->description,

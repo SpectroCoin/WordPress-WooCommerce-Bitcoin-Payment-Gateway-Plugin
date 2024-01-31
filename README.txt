@@ -97,13 +97,15 @@ Version 1.5.0 MINOR ():
 
 Added: Compatibility with the new block-based checkout functionality.
 
-Fixed: 
+Fixed: Deprecated functions/methods/variables.
+
+Removed: Empty instructions variable, if needed, it will be added in future versions.
 
 Version 1.4.1 PATCH (01/26/2024):
 
-Removed: Plugin dependency from plugin directory names
+Removed: Plugin dependency from plugin directory names.
 
-Fixed: Fatal error for new installations
+Fixed: Fatal error for new installations.
 
 Version 1.4.0 MINOR (01/03/2024):
 
