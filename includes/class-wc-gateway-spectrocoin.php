@@ -66,7 +66,6 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 		$this->all_order_statuses = wc_get_order_statuses();
 
         add_action('woocommerce_update_options_payment_gateways_' . $this->id, array($this, 'process_admin_options'));
-		add_action('woocommerce_thankyou_' . $this->id, array($this, 'thankyou_page'));
 		
         $this->spectrocoin_initialize_client();
 		$this->init_settings();

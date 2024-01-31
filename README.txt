@@ -101,6 +101,8 @@ Fixed: Deprecated functions/methods/variables.
 
 Removed: Empty instructions variable, if needed, it will be added in future versions.
 
+Fixed: Compatibility with "High-Performance Order Storage" introduced in WooCommerce 8.2
+
 Version 1.4.1 PATCH (01/26/2024):
 
 Removed: Plugin dependency from plugin directory names.
