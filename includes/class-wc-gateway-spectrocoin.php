@@ -526,7 +526,7 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
                         self::spectrocoin_log("Order {$order_id} has expired, status updated to failed");
 						break;
 					case (6): // test
-						if($this->spectrocoin_is_test_mode_enabled()){
+						if($this->spectrocoin_is_test_mode_enabled() === 'yes'){
 							$order->update_status($this->order_status);
 							self::spectrocoin_log("Test order {$order_id} has been set to " . $this->order_status);
 						}
