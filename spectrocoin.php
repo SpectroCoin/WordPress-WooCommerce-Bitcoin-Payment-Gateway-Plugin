@@ -206,6 +206,12 @@ function spectrocoin_declare_cart_checkout_blocks_compatibility() {
 
 add_action( 'woocommerce_blocks_loaded', 'spectrocoin_register_order_approval_payment_method_type' );
 
+add_action('before_woocommerce_init', function(){
+    if ( class_exists( \Automattic\WooCommerce\Utilities\FeaturesUtil::class ) ) {
+        \Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'custom_order_tables', __FILE__, true );
+    }
+});
+
 /**
  * Custom function to register a payment method type
  */
