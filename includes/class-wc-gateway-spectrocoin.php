@@ -460,7 +460,6 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 	 */
 	public function process_payment($order_id)
 	{
-		// wc_add_notice( 'This is a test error message for checkout.', 'error' );
 		global $woocommerce;
 		$order = wc_get_order($order_id);
 		$total = $order->get_total();
@@ -471,7 +470,6 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 			$error_message = "SpectroCoin error: Failed to create payment for order {$order_id}. Response message: {$response->getMessage()}. Response code: {$response->getCode()}";
         	self::spectrocoin_log($error_message);
         	error_log($error_message);
-			$order->update_status('failed', __('Waiting for SpectroCoin payment', 'spectrocoin-accepting-bitcoin'));
 			return array(
 				'result'   => 'fail',
 				'redirect' => ''
