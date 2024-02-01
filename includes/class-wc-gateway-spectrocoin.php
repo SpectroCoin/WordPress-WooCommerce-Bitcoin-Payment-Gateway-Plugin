@@ -198,7 +198,7 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 	 * Logging method. Logs messages to WooCommerce log if logging is enabled.
 	 * @param string $message
 	 */
-	public static function spectrocoin_log($message)
+	public static function spectrocoin_woocommerce_log($message)
 	{
 		if (self::$log_enabled) {
 			if (empty(self::$log)) {
@@ -466,21 +466,23 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 		$currency = $order->get_currency();
 		$request = $this->new_request($order, $total, $currency);
 		$response = $this->scClient->spectrocoin_create_order($request);
+		$order->update_status('on-hold', __('Waiting for SpectroCoin payment', 'spectrocoin-accepting-bitcoin'));
 		if ($response instanceof SpectroCoin_ApiError) {
 			$error_message = "SpectroCoin error: Failed to create payment for order {$order_id}. Response message: {$response->getMessage()}. Response code: {$response->getCode()}";
-        	self::spectrocoin_log($error_message);
-        	error_log($error_message);
+        	self::spectrocoin_woocommerce_log($error_message);
+			$order->add_order_note($error_message);
 			return array(
-				'result'   => 'fail',
+				'result'   => 'on-hold',
 				'redirect' => ''
 			);
 		}
-		$order->update_status('on-hold', __('Waiting for SpectroCoin payment', 'spectrocoin-accepting-bitcoin'));
+		$preorderUrl = $response->getRedirectUrl();
+        $order->add_order_note("SpectroCoin order has been created: " . $preorderUrl);
 		wc_reduce_stock_levels($order_id);
 		$woocommerce->cart->empty_cart();
 		return array(
 			'result' => 'success',
-			'redirect' => $response->getRedirectUrl()
+			'redirect' => $preorderUrl
 		);
 	}
 
@@ -514,35 +516,36 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 					case (1): // new
 					case (2): // pending
 						$order->update_status('Pending payment');
-						self::spectrocoin_log("Order {$order_id} status updated to pending");
 						break;
 					case (3): // paid
 						$order->update_status($this->order_status);
 						break;
 					case (4): // failed
                         $order->update_status('Failed');
-                        self::spectrocoin_log("Order {$order_id} status updated to failed");
                         break;
 					case (5): // expired
 						$order->update_status('Failed');
-                        self::spectrocoin_log("Order {$order_id} has expired, status updated to failed");
+						$order->add_order_note("Order {$order_id} has expired, status updated to failed. It might be the result of the customer underpaying or failing to pay for the order within the allotted time.");
 						break;
 					case (6): // test
 						if($this->spectrocoin_is_test_mode_enabled() === 'yes'){
 							$order->update_status($this->order_status);
-							self::spectrocoin_log("Test order {$order_id} has been set to " . $this->order_status);
+							self::spectrocoin_woocommerce_log("Test order {$order_id} has been received");
+						}
+						else{
+							$order->update_status('Failed');
 						}
 						break;
 				}
 				echo esc_html__('*ok*', 'spectrocoin-accepting-bitcoin');
 				exit;
 			} else {
-				self::spectrocoin_log("Order '{$order_id}' not found!");
+				self::spectrocoin_woocommerce_log("Order '{$order_id}' not found!");
 				echo esc_html__('order not found', 'spectrocoin-accepting-bitcoin');
 				exit;
 			}
 		} else {
-			self::spectrocoin_log("Sent callback is invalid");
+			self::spectrocoin_woocommerce_log("Sent callback is invalid");
 			echo esc_html__('invalid callback format', 'spectrocoin-accepting-bitcoin');
 			exit;
 		}
