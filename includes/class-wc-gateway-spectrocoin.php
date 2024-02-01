@@ -216,34 +216,39 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 	 * @return bool
 	 */
 	public function is_available() {
-		if (!function_exists('is_plugin_active')) {
-			include_once(ABSPATH . 'wp-admin/includes/plugin.php');
-		}
-		if (is_plugin_active(SPECTROCOIN_PLUGIN_FOLDER_NAME . '/spectrocoin.php') && $this->enabled === 'yes') {
-			if ($this->spectrocoin_check_currency()) {
-				if($this->spectrocoin_validate_settings(false)){
-					if ($this->scClient === null) {
-						$this->spectrocoin_initialize_client();
-					}
-					if ($this->scClient !== null) {
-						return true;
-					}
-				}
-			}
-			else{
-				$currency = esc_html(get_woocommerce_currency());
-				$message = $currency . ' currency is not accepted by SpectroCoin. Please change your currency in the ';
-				error_log('SpectroCoin Error: ' . $message . "WooCommerce settings");
-
-				$settings_link = esc_url(admin_url('admin.php?page=wc-settings&tab=general'));
-				$message .= ' <a href="' . $settings_link . '">WooCommerce settings</a>.';
-				
-				spectrocoin_admin_error_notice($message, true);
-			}
+		if (!function_exists('is_plugin_active') || !is_plugin_active(SPECTROCOIN_PLUGIN_FOLDER_NAME . '/spectrocoin.php') || $this->enabled !== 'yes') {
+			return false;
 		}
 	
-		return false;
+		if (!$this->spectrocoin_check_currency()) {
+			$currency = esc_html(get_woocommerce_currency());
+			$message = "{$currency} currency is not accepted by SpectroCoin. Please change your currency in the WooCommerce settings.";
+			error_log("SpectroCoin Error: {$message}");
+			
+			$settings_link = esc_url(admin_url('admin.php?page=wc-settings&tab=general'));
+			spectrocoin_admin_error_notice("{$message} <a href='{$settings_link}'>WooCommerce settings</a>.", true);
+			return false;
+		}
+	
+		if (!$this->spectrocoin_validate_settings(false)) {
+			return false;
+		}
+	
+		if ($this->scClient === null) {
+			$this->spectrocoin_initialize_client();
+		}
+	
+		if ($this->scClient === null) {
+			return false;
+		}
+	
+		if ($this->spectrocoin_is_test_mode_enabled() && !current_user_can('manage_options')) {
+			return false;
+		}
+
+		return true;
 	}
+	
 
 	/**
 	 * Check if display logo is enabled.
