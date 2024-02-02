@@ -95,17 +95,19 @@ Note: Keep in mind that if you want to use the business services of SpectroCoin,
 
 Version 1.5.0 MINOR ():
 
-Added: Compatibility with the new block-based checkout functionality.
+Added: Compatibility with the new block-based checkout functionality introduced in WooCommerce 8.2.
 
 Fixed: Deprecated functions/methods/variables.
 
 Removed: Empty instructions variable, if needed, it will be added in future versions.
 
-Fixed: Compatibility with "High-Performance Order Storage" introduced in WooCommerce 8.2
+Fixed: Compatibility with "High-Performance Order Storage" introduced in WooCommerce 8.2.
 
 Added: Test mode checkbox.
 
 Added: Messages related with order processing to order notes.
+
+Fixed: "Failed" status with failed and expired orders.
 
 Version 1.4.1 PATCH (01/26/2024):
 

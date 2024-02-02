@@ -36,7 +36,6 @@ function spectrocoin_requirements_met()
 	if (version_compare(PHP_VERSION, SPECTROCOIN_REQUIRED_PHP_VERSION, '<')) {
 		$requirements_met = false;
 		$message .= sprintf(
-			/*translators: %s is a placeholder for required PHP version */
 			esc_html__('Spectrocoin plugin requires PHP version %s or greater.', 'spectrocoin-accepting-bitcoin'),
 			SPECTROCOIN_REQUIRED_PHP_VERSION
 		);
@@ -49,7 +48,6 @@ function spectrocoin_requirements_met()
 	if (version_compare($GLOBALS['wp_version'], SPECTROCOIN_WP_VERSION, '<')) {
 		$requirements_met = false;
 		$message .= sprintf(
-			/*translators: %s is a placeholder for required Wordpress version */
 			esc_html__('SpectroCoin plugin requires WordPress version %s or greater.', 'spectrocoin-accepting-bitcoin'),
 			SPECTROCOIN_WP_VERSION
 		);
@@ -76,7 +74,6 @@ function spectrocoin_requirements_met()
 function spectrocoin_admin_error_notice($message, $allow_hyperlink = false) {
     static $displayed_messages = array();
 
-    // Only specify the elements you want to allow - keeps <a> tags but escapes other text
     $allowed_html = $allow_hyperlink ? array(
         'a' => array(
             'href' => array(),
@@ -85,7 +82,6 @@ function spectrocoin_admin_error_notice($message, $allow_hyperlink = false) {
         ),
     ) : array();
 
-    // Directly using wp_kses on the whole message assuming $message may contain <a> tags you added
     $processed_message = wp_kses($message, $allowed_html);
 
     $current_page = isset($_GET['section']) ? sanitize_text_field($_GET['section']) : '';

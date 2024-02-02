@@ -449,7 +449,7 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 			),
 			'test_mode' => array(
 				'title' => esc_html__('Test mode', 'spectrocoin-accepting-bitcoin'),
-				'description' => esc_html__('When enabled, if order callback is received, then test order will be set to selected order status (by default - "Completed").', 'spectrocoin-accepting-bitcoin'),
+				'description' => esc_html__('When enabled, if order callback is received, then test order will be set to selected order status (by default - "Completed"). Also SpectroCoin payment option will not be visible in checkout.', 'spectrocoin-accepting-bitcoin'),
 				'desc_tip' => true,
 				'type' => 'checkbox',
 				'label' => esc_html__('Enable', 'spectrocoin-accepting-bitcoin'),
