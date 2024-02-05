@@ -92,7 +92,7 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 	 */
     private function spectrocoin_initialize_client() {
         $this->scClient = new SCMerchantClient(
-            'https://spectrocoin.com/api/merchant/1',
+            'https://pp.spectrocoin.com/api/merchant/1',
             $this->merchant_id,
             $this->project_id,
             $this->private_key
@@ -479,7 +479,7 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 			$error_message = "SpectroCoin error: Failed to create payment for order {$order_id}. Response message: {$response->getMessage()}. Response code: {$response->getCode()}";
         	self::spectrocoin_woocommerce_log($error_message);
 			$order->add_order_note($error_message);
-			wc_add_notice(__('Failed to create payment. ' . $error_message, 'spectrocoin-accepting-bitcoin'), 'error');
+			wc_add_notice(__($error_message, 'spectrocoin-accepting-bitcoin'), 'error');
 			return array(
 				'result'   => 'on-hold',
 				'redirect' => ''
