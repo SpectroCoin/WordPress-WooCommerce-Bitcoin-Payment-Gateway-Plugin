@@ -21,7 +21,7 @@ const Content = () => {
       window.wp.htmlEntities.decodeEntities(settings.description || "")
     )
   );
-};
+}
 
 const SpectroCoinBlockGateway = {
   name: "spectrocoin",

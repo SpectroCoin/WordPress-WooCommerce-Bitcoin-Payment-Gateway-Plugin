@@ -23,9 +23,9 @@ final class WC_Gateway_Blocks_SpectroCoin extends AbstractPaymentMethodType {
     public function get_payment_method_script_handles() {
         wp_register_script(
             'spectrocoin-blocks-integration',
-            plugin_dir_url(__FILE__) . '../assets/js/checkout.js',
+            plugin_dir_url(__FILE__) . '../assets/js/block-checkout.js',
             ['wc-blocks-registry', 'wc-settings', 'wp-element', 'wp-html-entities', 'wp-i18n'],
-            filemtime(plugin_dir_path(__FILE__) . '../assets/js/checkout.js'),
+            filemtime(plugin_dir_path(__FILE__) . '../assets/js/block-checkout.js'),
             true
         );
 
