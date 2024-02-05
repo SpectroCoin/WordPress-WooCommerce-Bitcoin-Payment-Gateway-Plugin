@@ -41,7 +41,7 @@ Don't forget to change it back when migrating website to public.
 
 ## Changelog
 
-Version 1.5.0 MINOR (02/05/2024):
+### Version 1.5.0 MINOR (02/05/2024):
 
 Added: Compatibility with the new block-based checkout functionality introduced in WooCommerce 8.3.
 
