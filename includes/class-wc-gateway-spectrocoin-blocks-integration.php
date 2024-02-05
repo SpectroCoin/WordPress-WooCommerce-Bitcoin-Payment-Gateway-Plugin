@@ -1,7 +1,5 @@
 <?php
 
-//includes/class-wc-gateway-spectrocoin-blocks-integration.php
-
 if (!defined('ABSPATH')) {
 	die('Access denied.');
 }

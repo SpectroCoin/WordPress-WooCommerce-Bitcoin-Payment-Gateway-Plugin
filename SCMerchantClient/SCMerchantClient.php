@@ -66,9 +66,7 @@ class SCMerchantClient
 			'successUrl' => 'http://localhost.com',
 			'failureUrl' => 'http://localhost.com'
 		);
-		
-		$form_params = $payload;
-		$signature = $this->spectrocoin_generate_signature(http_build_query($form_params));
+		$signature = $this->spectrocoin_generate_signature(http_build_query($payload));
 		$payload['sign'] = $signature;
 		$sanitized_payload = $this->spectrocoin_sanitize_create_order_payload($payload);
 		if (!$this->spectrocoin_validate_create_order_payload($sanitized_payload)) {
@@ -131,8 +129,6 @@ class SCMerchantClient
 			'failureUrl' => filter_var($payload['failureUrl'], FILTER_SANITIZE_URL),
 			'sign' => sanitize_text_field($payload['sign'])
 		];
-
-
 		return $sanitized_payload;
     }
 
@@ -177,22 +173,17 @@ class SCMerchantClient
 	 * @return SpectroCoin_OrderCallback|null
 	 */
 	public function spectrocoin_process_callback($post_data) {
-		
 		if ($post_data != null) {
-			
 			$sanitized_data = $this->spectrocoin_sanitize_callback($post_data);
 			$isValid = $this->spectrocoin_validate_callback($sanitized_data);
-
 			if ($isValid) {
 				$order_callback = new SpectroCoin_OrderCallback($sanitized_data['userId'], $sanitized_data['merchantApiId'], $sanitized_data['merchantId'], $sanitized_data['apiId'], $sanitized_data['orderId'], $sanitized_data['payCurrency'], $sanitized_data['payAmount'], $sanitized_data['receiveCurrency'], $sanitized_data['receiveAmount'], $sanitized_data['receivedAmount'], $sanitized_data['description'], $sanitized_data['orderRequestId'], $sanitized_data['status'], $sanitized_data['sign']);
-
 				if ($this->spectrocoin_validate_callback_payload($order_callback)) {
 					return $order_callback;
 				}
 			}
 			
 		}
-
 		return null;
 	}
 
@@ -225,7 +216,6 @@ class SCMerchantClient
 	 * @param $sanitized_data
 	 * @return bool
 	 */
-
 	public function spectrocoin_validate_callback($sanitized_data) {
 		$isValid = true;
 		$failedFields = [];

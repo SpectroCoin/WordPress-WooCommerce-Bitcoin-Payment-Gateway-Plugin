@@ -25,6 +25,26 @@ define('SPECTROCOIN_WP_VERSION', '6.2');
 $plugin_folder = explode('/', plugin_basename(__FILE__))[0];
 define('SPECTROCOIN_PLUGIN_FOLDER_NAME', $plugin_folder );
 
+
+/**
+ * Initialize plugin
+ */
+function spectrocoin_init_plugin()
+{
+	if (spectrocoin_requirements_met()) {
+		require_once(__DIR__ . '/includes/class-wc-gateway-spectrocoin.php');
+		load_plugin_textdomain('spectrocoin-accepting-bitcoin', false, dirname(plugin_basename(__FILE__)) . '/languages');
+
+		if (class_exists('WC_Gateway_Spectrocoin')) {
+			add_filter('woocommerce_payment_gateways', 'spectrocoin_gateway_class');
+			add_filter('plugin_action_links', 'spectrocoin_add_custom_links_left', 10, 2);
+			add_filter('plugin_row_meta', 'spectrocoin_add_custom_links_right', 10, 2);
+
+			add_action('before_woocommerce_init', 'spectrocoin_declare_cart_checkout_blocks_compatibility');
+		}
+	}
+}
+
 /**
  * Checks if the system requirements are met
  * @return bool True if system requirements are met, false if not
@@ -113,29 +133,6 @@ function spectrocoin_deactivate_plugin()
 	deactivate_plugins(plugin_basename(__FILE__));
 }
 
-add_action('plugins_loaded', 'spectrocoin_init_plugin');
-add_action('admin_enqueue_scripts', 'spectrocoin_enqueue_admin_styles');
-
-/**
- * Initialize plugin
- */
-function spectrocoin_init_plugin()
-{
-	if (spectrocoin_requirements_met()) {
-		require_once(__DIR__ . '/includes/class-wc-gateway-spectrocoin.php');
-		load_plugin_textdomain('spectrocoin-accepting-bitcoin', false, dirname(plugin_basename(__FILE__)) . '/languages');
-
-		if (class_exists('WC_Gateway_Spectrocoin')) {
-			add_filter('woocommerce_payment_gateways', 'spectrocoin_gateway_class');
-			add_filter('plugin_action_links', 'spectrocoin_add_custom_links_left', 10, 2);
-			add_filter('plugin_row_meta', 'spectrocoin_add_custom_links_right', 10, 2);
-
-			add_action('before_woocommerce_init', 'spectrocoin_declare_cart_checkout_blocks_compatibility');
-		}
-	}
-}
-
-
 /**
  * Gateway class initialization
  *  */
@@ -144,8 +141,6 @@ function spectrocoin_gateway_class($methods)
 	$methods[] = 'WC_Gateway_Spectrocoin';
 	return $methods;
 }
-
-
 
 /**
  * Get payment settings url
@@ -195,7 +190,6 @@ function spectrocoin_enqueue_admin_styles()
 	}
 }
 
-
 function spectrocoin_declare_cart_checkout_blocks_compatibility() {
 	if (class_exists('Automattic\WooCommerce\Utilities\FeaturesUtil'))
 		\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility('cart_checkout_blocks', __FILE__, true);
@@ -227,3 +221,6 @@ function spectrocoin_register_order_approval_payment_method_type() {
         }
     );
 }
+
+add_action('plugins_loaded', 'spectrocoin_init_plugin');
+add_action('admin_enqueue_scripts', 'spectrocoin_enqueue_admin_styles');

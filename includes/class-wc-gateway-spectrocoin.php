@@ -13,6 +13,7 @@ if (!class_exists('WC_Payment_Gateway')) {
 }
 
 require_once __DIR__ . '/../SCMerchantClient/SCMerchantClient.php';
+
 /**
  * WC_Gateway_Spectrocoin Class.
  */
@@ -43,6 +44,8 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
     public $form_fields = array();
     public $order_status;
     private $all_order_statuses;
+
+	public $spectroCoinBlocksGateway;
 	/**
 	 * Constructor for the gateway.
 	 */
@@ -329,7 +332,7 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 					</p>
 					<p>
 						<?php
-						esc_html_e('The Spectroin plugin allows seamless integration of payment gateways into your WordPress website. To get started, you\'ll need to obtain the essential credentials: Merchant ID, Project ID, and Private Key. These credentials are required to enable secure transactions between your website and the payment gateway. Follow the step-by-step tutorial below to acquire these credentials:', 'spectrocoin-accepting-bitcoin');
+						esc_html_e('The SpectroCoin plugin allows seamless integration of payment gateways into your WordPress website. To get started, you\'ll need to obtain the essential credentials: Merchant ID, Project ID, and Private Key. These credentials are required to enable secure transactions between your website and the payment gateway. Follow the step-by-step tutorial below to acquire these credentials:', 'spectrocoin-accepting-bitcoin');
 						?>
 					</p>
 					<ul>
@@ -476,6 +479,7 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 			$error_message = "SpectroCoin error: Failed to create payment for order {$order_id}. Response message: {$response->getMessage()}. Response code: {$response->getCode()}";
         	self::spectrocoin_woocommerce_log($error_message);
 			$order->add_order_note($error_message);
+			wc_add_notice(__('Failed to create payment. ' . $error_message, 'spectrocoin-accepting-bitcoin'), 'error');
 			return array(
 				'result'   => 'on-hold',
 				'redirect' => ''
