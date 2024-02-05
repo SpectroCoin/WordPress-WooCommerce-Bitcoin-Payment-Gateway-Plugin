@@ -66,16 +66,11 @@ class SCMerchantClient
 			'successUrl' => $request->getSuccessUrl(),
 			'failureUrl' => $request->getFailureUrl()
 		);
-		
-		$form_params = $payload;
-		$signature = $this->spectrocoin_generate_signature(http_build_query($form_params));
+		$signature = $this->spectrocoin_generate_signature(http_build_query($payload));
 		$payload['sign'] = $signature;
 		$sanitized_payload = $this->spectrocoin_sanitize_create_order_payload($payload);
 		if (!$this->spectrocoin_validate_create_order_payload($sanitized_payload)) {
-            error_log('SpectroCoin Error: Invalid order creation payload');
-			error_log('Payload: ' . print_r($payload, true));
-			wc_add_notice("SpectroCoin Error: Invalid order creation payload", 'error');
-            return new SpectroCoin_ApiError(-1, 'Invalid order creation payload');
+            return new SpectroCoin_ApiError(-1, 'Invalid order creation payload, payload: ' . json_encode($sanitized_payload));
         }
 		try {
 			$response = $this->guzzle_client->post($this->merchant_api_url . '/createOrder', [
@@ -101,17 +96,10 @@ class SCMerchantClient
 				);
 			}
 		} catch (RequestException $e) {
-
 			$errorBody = json_decode($e->getResponse()->getBody());
 			if ($errorBody !== null && is_array($errorBody) && count($errorBody) > 0 && isset($errorBody[0]->code)) {
-				$code = $errorBody[0]->code;
-				$message = $errorBody[0]->message;
-				error_log('SpectroCoin Error: ' . $code . ' - ' . $message);
-				wc_add_notice('SpectroCoin Error: ' . $code . ' - ' . $message, 'error');
-				return new SpectroCoin_ApiError($code, $message);
+				return new SpectroCoin_ApiError($errorBody[0]->code, $errorBody[0]->message);
 			} else {
-				error_log('SpectroCoin Error: Unexpected error');
-				wc_add_notice('SpectroCoin Error: Unexpected error', 'error');
 				return new SpectroCoin_ApiError(-1, 'Unexpected error');
 				}
 			}
@@ -141,8 +129,6 @@ class SCMerchantClient
 			'failureUrl' => filter_var($payload['failureUrl'], FILTER_SANITIZE_URL),
 			'sign' => sanitize_text_field($payload['sign'])
 		];
-
-
 		return $sanitized_payload;
     }
 
@@ -187,22 +173,17 @@ class SCMerchantClient
 	 * @return SpectroCoin_OrderCallback|null
 	 */
 	public function spectrocoin_process_callback($post_data) {
-		
 		if ($post_data != null) {
-			
 			$sanitized_data = $this->spectrocoin_sanitize_callback($post_data);
 			$isValid = $this->spectrocoin_validate_callback($sanitized_data);
-
 			if ($isValid) {
 				$order_callback = new SpectroCoin_OrderCallback($sanitized_data['userId'], $sanitized_data['merchantApiId'], $sanitized_data['merchantId'], $sanitized_data['apiId'], $sanitized_data['orderId'], $sanitized_data['payCurrency'], $sanitized_data['payAmount'], $sanitized_data['receiveCurrency'], $sanitized_data['receiveAmount'], $sanitized_data['receivedAmount'], $sanitized_data['description'], $sanitized_data['orderRequestId'], $sanitized_data['status'], $sanitized_data['sign']);
-
 				if ($this->spectrocoin_validate_callback_payload($order_callback)) {
 					return $order_callback;
 				}
 			}
 			
 		}
-
 		return null;
 	}
 
@@ -235,7 +216,6 @@ class SCMerchantClient
 	 * @param $sanitized_data
 	 * @return bool
 	 */
-
 	public function spectrocoin_validate_callback($sanitized_data) {
 		$isValid = true;
 		$failedFields = [];
@@ -344,7 +324,6 @@ class SCMerchantClient
 			
 			$data = http_build_query($payload);
             if ($this->spectrocoin_validate_signature($data, $order_callback->getSign()) == 1) {
-				error_log('SpectroCoin: Signature validation succeeded');
 				return true;
 			} else {
 				error_log('SpectroCoin Error: Signature validation failed');

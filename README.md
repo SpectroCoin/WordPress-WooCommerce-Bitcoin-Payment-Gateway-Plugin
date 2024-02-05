@@ -4,8 +4,8 @@ Integrate cryptocurrency payments seamlessly into your Wordpress store with the 
 
 ## Installation
 
-0. We strongly reccomend downloading the plugin from Wordpress market. In this case you will be able to update the plugin automatically. In case you are downloading it from Github, please follow the installation steps below.</br>
-1. Download plugin files from [github](https://github.com/SpectroCoin/WordPress-WooCommerce-Bitcoin-Payment-Gateway-Plugin).
+0. We strongly recommend downloading the plugin from Wordpress plugins site. In this case you will be able to update the plugin automatically. In case you are downloading it from Github, please follow the installation steps below.</br>
+1. Download latest plugin release from [github](https://github.com/SpectroCoin/WordPress-WooCommerce-Bitcoin-Payment-Gateway-Plugin).
 2. Extract and upload plugin folder to your Wordpress <em>/wp-content/plugins</em> folder.<br />
    OR<br>
    in "Plugins" -> "Add New" -> "Upload Plugin". -> Upload <em>spectrocoin.zip</em>.</br>
@@ -25,7 +25,7 @@ Integrate cryptocurrency payments seamlessly into your Wordpress store with the 
 
 ## Make it work on localhost
 
-In order to make the plugin work on localhost for testing purposes, <b>change these 3 lines in <em>SCMechantClient.php createOrder() function</em></b>:
+We gently suggest trying out the plugin in a server environment, as it will not be capable of receiving callbacks from SpectroCoin. To successfully create and order on localhost for testing purposes, <b>change these 3 lines in <em>SCMechantClient.php createOrder() function</em></b>:
 
 `'callbackUrl' => $request->getCallbackUrl(),
 'successUrl' => $request->getSuccessUrl(),
@@ -41,11 +41,27 @@ Don't forget to change it back when migrating website to public.
 
 ## Changelog
 
+### Version 1.5.0 MINOR (02/05/2024):
+
+_Added_: Compatibility with the new block-based checkout functionality introduced in WooCommerce 8.3.
+
+_Fixed_: Deprecated functions/methods/variables.
+
+_Removed_: Empty instructions variable, if needed, it will be added in future versions.
+
+_Fixed_: Compatibility with "High-Performance Order Storage" introduced in WooCommerce 8.2.
+
+_Added_: Test mode checkbox. When enabled, if order callback is received, then test order will be set to selected order status (by default - "Completed"). Also SpectroCoin payment option will be visible only for admin user.
+
+_Added_: Messages related with order processing to order notes.
+
+_Fixed_: "Failed" status with failed and expired orders.
+
 ### Version 1.4.1 PATCH (01/26/2024):
 
-Removed: Plugin dependency from plugin directory names
+_Removed_: Plugin dependency from plugin directory names
 
-Fixed: Fatal error for new installations
+_Fixed_: Fatal error for new installations
 
 ### Version 1.4.0 MINOR (01/03/2024):
 

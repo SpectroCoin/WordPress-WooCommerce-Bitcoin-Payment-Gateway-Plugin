@@ -12,7 +12,8 @@ if (!class_exists('WC_Payment_Gateway')) {
 	return;
 }
 
-require_once __DIR__ . '/SCMerchantClient/SCMerchantClient.php';
+require_once __DIR__ . '/../SCMerchantClient/SCMerchantClient.php';
+
 /**
  * WC_Gateway_Spectrocoin Class.
  */
@@ -43,6 +44,8 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
     public $form_fields = array();
     public $order_status;
     private $all_order_statuses;
+
+	public $spectroCoinBlocksGateway;
 	/**
 	 * Constructor for the gateway.
 	 */
@@ -65,8 +68,6 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 		$this->all_order_statuses = wc_get_order_statuses();
 
         add_action('woocommerce_update_options_payment_gateways_' . $this->id, array($this, 'process_admin_options'));
-		add_action('woocommerce_thankyou_' . $this->id, array($this, 'thankyou_page'));
-		
         $this->spectrocoin_initialize_client();
 		$this->init_settings();
 		$this->form_fields = $this->spectrocoin_generate_form_fields();
@@ -178,11 +179,18 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 			$is_valid = false;
 		}
 
-		$this->display_logo = sanitize_text_field($this->get_option('display_logo'));
-		if (!in_array($this->display_logo, ['yes', 'no'])) {
+		if (!in_array(sanitize_text_field($this->get_option('display_logo')), ['yes', 'no'])) {
 			if ($display_notice) {
 				spectrocoin_admin_error_notice('Invalid value for display logo status');
 				error_log('SpectroCoin Error: Invalid value for display logo status');
+			}
+			$is_valid = false;
+		}
+
+		if (!in_array(sanitize_text_field($this->get_option('test_mode')), ['yes', 'no'])) {
+			if ($display_notice) {
+				spectrocoin_admin_error_notice('Invalid value for test mode');
+				error_log('SpectroCoin Error: Invalid value for test mode');
 			}
 			$is_valid = false;
 		}
@@ -193,7 +201,7 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 	 * Logging method. Logs messages to WooCommerce log if logging is enabled.
 	 * @param string $message
 	 */
-	public static function spectrocoin_log($message)
+	public static function spectrocoin_woocommerce_log($message)
 	{
 		if (self::$log_enabled) {
 			if (empty(self::$log)) {
@@ -211,33 +219,39 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 	 * @return bool
 	 */
 	public function is_available() {
-		if (!function_exists('is_plugin_active')) {
-			include_once(ABSPATH . 'wp-admin/includes/plugin.php');
-		}
-		$this->spectrocoin_log(SPECTROCOIN_PLUGIN_FOLDER_NAME);
-		if (is_plugin_active(SPECTROCOIN_PLUGIN_FOLDER_NAME . '/spectrocoin.php') && $this->enabled === 'yes') {
-			if ($this->spectrocoin_check_currency()) {
-				if($this->spectrocoin_validate_settings(false)){
-					if ($this->scClient === null) {
-						$this->spectrocoin_initialize_client();
-					}
-					if ($this->scClient !== null) {
-						return true;
-					}
-				}
-			}
-			else{
-				$currency = esc_html(get_woocommerce_currency());
-				$message = $currency . ' currency is not accepted by SpectroCoin. Please change your currency in the ';
-
-				$settings_link = esc_url(admin_url('admin.php?page=wc-settings&tab=general'));
-				$message .= ' <a href="' . $settings_link . '">WooCommerce settings</a>.';
-				spectrocoin_admin_error_notice($message, true);
-			}
+		if (!function_exists('is_plugin_active') || !is_plugin_active(SPECTROCOIN_PLUGIN_FOLDER_NAME . '/spectrocoin.php') || $this->enabled !== 'yes') {
+			return false;
 		}
 	
-		return false;
+		if (!$this->spectrocoin_check_currency()) {
+			$currency = esc_html(get_woocommerce_currency());
+			$message = "{$currency} currency is not accepted by SpectroCoin. Please change your currency in the WooCommerce settings.";
+			error_log("SpectroCoin Error: {$message}");
+			
+			$settings_link = esc_url(admin_url('admin.php?page=wc-settings&tab=general'));
+			spectrocoin_admin_error_notice("{$message} <a href='{$settings_link}'>WooCommerce settings</a>.", true);
+			return false;
+		}
+	
+		if (!$this->spectrocoin_validate_settings(false)) {
+			return false;
+		}
+	
+		if ($this->scClient === null) {
+			$this->spectrocoin_initialize_client();
+		}
+	
+		if ($this->scClient === null) {
+			return false;
+		}
+	
+		if ($this->spectrocoin_is_test_mode_enabled() && !current_user_can('manage_options')) {
+			return false;
+		}
+
+		return true;
 	}
+	
 
 	/**
 	 * Check if display logo is enabled.
@@ -258,12 +272,21 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 		$display_logo = $this->spectrocoin_is_display_logo_enabled();
 
 		if ($display_logo) {
-			$icon = plugins_url('assets/images/spectrocoin-logo.svg', __FILE__);
+			$icon = plugins_url('/../assets/images/spectrocoin-logo.svg', __FILE__);
 			$icon_html = '<img src="' . esc_attr($icon) . '" alt="' . esc_attr__('SpectroCoin logo', 'spectrocoin-accepting-bitcoin') . '" />';
 			return apply_filters('woocommerce_gateway_icon', $icon_html, $this->id);
 		} else {
 			return '';
 		}
+	}
+
+	/**
+	 * Check if test mode is enabled.
+	 * @return bool
+	 */
+	public function spectrocoin_is_test_mode_enabled()
+	{
+		return $this->get_option('test_mode');
 	}
 
 	/**
@@ -278,7 +301,7 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 				printf(
 					'<a class="logo-link" href="%1$s" target="_blank"><img class="spectrocoin-logo" src="%2$s" alt="%3$s"></a>',
 					esc_url('https://spectrocoin.com/'),
-					esc_url(plugins_url('/assets/images/spectrocoin-logo.svg', __FILE__)),
+					esc_url(plugins_url('/../assets/images/spectrocoin-logo.svg', __FILE__)),
 					esc_attr__('SpectroCoin logo', 'spectrocoin-accepting-bitcoin')
 				);
 				?>
@@ -287,7 +310,7 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 				<?php
 				printf(
 					'<img class="header-image" src="%1$s" alt="%2$s">',
-					esc_url(plugins_url('/assets/images/card_phone_top.svg', __FILE__)),
+					esc_url(plugins_url('/../assets/images/card_phone_top.svg', __FILE__)),
 					esc_attr__('Header Image', 'spectrocoin-accepting-bitcoin')
 				);
 				?>
@@ -309,7 +332,7 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 					</p>
 					<p>
 						<?php
-						esc_html_e('The Spectroin plugin allows seamless integration of payment gateways into your WordPress website. To get started, you\'ll need to obtain the essential credentials: Merchant ID, Project ID, and Private Key. These credentials are required to enable secure transactions between your website and the payment gateway. Follow the step-by-step tutorial below to acquire these credentials:', 'spectrocoin-accepting-bitcoin');
+						esc_html_e('The SpectroCoin plugin allows seamless integration of payment gateways into your WordPress website. To get started, you\'ll need to obtain the essential credentials: Merchant ID, Project ID, and Private Key. These credentials are required to enable secure transactions between your website and the payment gateway. Follow the step-by-step tutorial below to acquire these credentials:', 'spectrocoin-accepting-bitcoin');
 						?>
 					</p>
 					<ul>
@@ -357,11 +380,6 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 						</li>
 					</ul>
 				</div>
-				<div class = "settings-validation-note">
-					<h5><?php esc_html_e("If SpectroCoin payment option is not visible in checkout window, there are several reasons why this is happening:", 'spectrocoin-accepting-bitcoin')?> </h5> 
-               		<div class = "settings-note"> <?php esc_html_e("1. There are errors in plugin configuration settings, please ensure that when you save the plugin settings, there are no error notices.", 'spectrocoin-accepting-bitcoin')?></div>
-					<div class = "settings-note"> <?php esc_html_e("2. Plugin is currently not compatible with the new block-based Cart, Checkout, and Order Confirmation functionality introduced in WooCommerce 8.3. New installations will have these blocks by default. If updating to WooCommerce 8.3, your store will retain the traditional shortcode-based system, ensuring compatibility with our plugin. We guarantee that we will integrate our plugin with the new block system in later releases.", 'spectrocoin-accepting-bitcoin')?></div>
-                </div>
 				<?php
 				printf(
 					'<div class="contact-information">%1$s<br>%2$s <a href="skype:spectrocoin_merchant?chat">%3$s</a> &middot; <a href="mailto:%4$s">%5$s</a></div>',
@@ -421,7 +439,7 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 				'desc_tip' => true,
 				'description' => esc_html__('Order status after payment has been received. Custom order statuses will appear in the list.', 'spectrocoin-accepting-bitcoin'),
 				'type' => 'select',
-				'default' => 'completed',
+				'default' => 'Completed',
 				'options' => $this->all_order_statuses
 			),
 			'display_logo' => array(
@@ -432,16 +450,15 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 				'label' => esc_html__('Enable', 'spectrocoin-accepting-bitcoin'),
 				'default' => 'yes'
 			),
+			'test_mode' => array(
+				'title' => esc_html__('Test mode', 'spectrocoin-accepting-bitcoin'),
+				'description' => esc_html__('When enabled, if order callback is received, then test order will be set to selected order status (by default - "Completed"). Also SpectroCoin payment option will be visible only for admin user.', 'spectrocoin-accepting-bitcoin'),
+				'desc_tip' => true,
+				'type' => 'checkbox',
+				'label' => esc_html__('Enable', 'spectrocoin-accepting-bitcoin'),
+				'default' => 'no'
+			),
 		);
-	}
-	/**
-	 * Output for the order received page.
-	 */
-	public function thankyou_page()
-	{
-		if ($this->instructions) {
-			echo wpautop(wptexturize(wp_kses_post($this->instructions)));
-		}
 	}
 
 	/**
@@ -454,24 +471,28 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 		global $woocommerce;
 		$order = wc_get_order($order_id);
 		$total = $order->get_total();
-		$currency = $order->get_order_currency();
+		$currency = $order->get_currency();
 		$request = $this->new_request($order, $total, $currency);
 		$response = $this->scClient->spectrocoin_create_order($request);
+		$order->update_status('on-hold', __('Waiting for SpectroCoin payment', 'spectrocoin-accepting-bitcoin'));
 		if ($response instanceof SpectroCoin_ApiError) {
-			self::spectrocoin_log("Failed to create SpectroCoin payment for order {$order_id}. Response message: {$response->getMessage()}. Response code: {$response->getCode()}");
+			$error_message = "SpectroCoin error: Failed to create payment for order {$order_id}. Response message: {$response->getMessage()}. Response code: {$response->getCode()}";
+        	self::spectrocoin_woocommerce_log($error_message);
+			$order->add_order_note($error_message);
+			wc_add_notice(__($error_message, 'spectrocoin-accepting-bitcoin'), 'error');
 			return array(
-				'result' => 'failure',
-				'messages' => $response->getMessage()
+				'result'   => 'on-hold',
+				'redirect' => ''
 			);
 		}
-		$order->update_status('on-hold', __('Waiting for SpectroCoin payment', 'spectrocoin-accepting-bitcoin'));
-		$order->reduce_order_stock();
+		$preorderUrl = $response->getRedirectUrl();
+        $order->add_order_note("SpectroCoin order has been created: " . $preorderUrl);
+		wc_reduce_stock_levels($order_id);
 		$woocommerce->cart->empty_cart();
 		return array(
 			'result' => 'success',
-			'redirect' => $response->getRedirectUrl()
+			'redirect' => $preorderUrl
 		);
-
 	}
 
 	/**
@@ -503,33 +524,35 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 				switch ($status) {
 					case (1): // new
 					case (2): // pending
-						$order->update_status('pending');
-						self::spectrocoin_log("Order {$order_id} status updated to pending");
+						$order->update_status('Pending payment');
 						break;
 					case (3): // paid
 						$order->update_status($this->order_status);
 						break;
 					case (4): // failed
                         $order->update_status('failed');
-                        self::spectrocoin_log("Order {$order_id} status updated to failed");
                         break;
 					case (5): // expired
-						$order->update_status('failed');
-                        self::spectrocoin_log("Order {$order_id} has expired, status updated to failed");
+						$order->update_status('failed', "Order {$order_id} has expired, status updated to failed. It might be the result of the customer underpaying or failing to pay for the order within the allotted time.");
 						break;
 					case (6): // test
-						$order->update_status($this->order_status);
+						if($this->spectrocoin_is_test_mode_enabled() === 'yes'){
+							$order->update_status($this->order_status, "Test order {$order_id} has been completed.");
+						}
+						else{
+							$order->update_status('failed');
+						}
 						break;
 				}
 				echo esc_html__('*ok*', 'spectrocoin-accepting-bitcoin');
 				exit;
 			} else {
-				self::spectrocoin_log("Order '{$order_id}' not found!");
+				self::spectrocoin_woocommerce_log("Order '{$order_id}' not found!");
 				echo esc_html__('order not found', 'spectrocoin-accepting-bitcoin');
 				exit;
 			}
 		} else {
-			self::spectrocoin_log("Sent callback is invalid");
+			self::spectrocoin_woocommerce_log("Sent callback is invalid");
 			echo esc_html__('invalid callback format', 'spectrocoin-accepting-bitcoin');
 			exit;
 		}
@@ -548,12 +571,12 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 		$successCallback = $this->get_return_url($order);
 		$failureCallback = $this->get_return_url($order);
 		return new SpectroCoin_CreateOrderRequest(
-			$order->id . '-' . $this->spectrocoin_random_str(5),
+			$order->get_id() . "-" . $this->spectrocoin_random_str(5),
 			self::$pay_currency,
 			null,
 			$receive_currency,
 			$total,
-			"Order #{$order->id}",
+			"Order #{$order->get_id()}",
 			"en",
 			$callback,
 			$successCallback,
@@ -573,7 +596,7 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 
 	private function spectrocoin_check_currency()
   	{	
-		$jsonFile = file_get_contents(plugin_dir_path( __FILE__ ) . 'SCMerchantClient/data/acceptedCurrencies.JSON'); 
+		$jsonFile = file_get_contents(plugin_dir_path( __FILE__ ) . '/../SCMerchantClient/data/acceptedCurrencies.JSON'); 
 		$acceptedCurrencies = json_decode($jsonFile, true);
 		$currentCurrencyIsoCode = get_woocommerce_currency();
 		if (in_array($currentCurrencyIsoCode, $acceptedCurrencies)) {
@@ -593,4 +616,6 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 	{
 		return substr(md5(rand(1, pow(2, 16))), 0, $length);
 	}
+
+	
 }
