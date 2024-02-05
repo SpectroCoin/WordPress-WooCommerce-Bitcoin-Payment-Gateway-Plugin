@@ -4,8 +4,8 @@ Integrate cryptocurrency payments seamlessly into your Wordpress store with the 
 
 ## Installation
 
-0. We strongly reccomend downloading the plugin from Wordpress market. In this case you will be able to update the plugin automatically. In case you are downloading it from Github, please follow the installation steps below.</br>
-1. Download plugin files from [github](https://github.com/SpectroCoin/WordPress-WooCommerce-Bitcoin-Payment-Gateway-Plugin).
+0. We strongly recommend downloading the plugin from Wordpress plugins site. In this case you will be able to update the plugin automatically. In case you are downloading it from Github, please follow the installation steps below.</br>
+1. Download latest plugin release from [github](https://github.com/SpectroCoin/WordPress-WooCommerce-Bitcoin-Payment-Gateway-Plugin).
 2. Extract and upload plugin folder to your Wordpress <em>/wp-content/plugins</em> folder.<br />
    OR<br>
    in "Plugins" -> "Add New" -> "Upload Plugin". -> Upload <em>spectrocoin.zip</em>.</br>
