@@ -43,25 +43,25 @@ Don't forget to change it back when migrating website to public.
 
 ### Version 1.5.0 MINOR (02/05/2024):
 
-Added: Compatibility with the new block-based checkout functionality introduced in WooCommerce 8.3.
+_Added_: Compatibility with the new block-based checkout functionality introduced in WooCommerce 8.3.
 
-Fixed: Deprecated functions/methods/variables.
+_Fixed_: Deprecated functions/methods/variables.
 
-Removed: Empty instructions variable, if needed, it will be added in future versions.
+_Removed_: Empty instructions variable, if needed, it will be added in future versions.
 
-Fixed: Compatibility with "High-Performance Order Storage" introduced in WooCommerce 8.2.
+_Fixed_: Compatibility with "High-Performance Order Storage" introduced in WooCommerce 8.2.
 
-Added: Test mode checkbox.
+_Added_: Test mode checkbox.
 
-Added: Messages related with order processing to order notes.
+_Added_: Messages related with order processing to order notes.
 
-Fixed: "Failed" status with failed and expired orders.
+_Fixed_: "Failed" status with failed and expired orders.
 
 ### Version 1.4.1 PATCH (01/26/2024):
 
-Removed: Plugin dependency from plugin directory names
+_Removed_: Plugin dependency from plugin directory names
 
-Fixed: Fatal error for new installations
+_Fixed_: Fatal error for new installations
 
 ### Version 1.4.0 MINOR (01/03/2024):
 
