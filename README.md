@@ -51,7 +51,7 @@ _Removed_: Empty instructions variable, if needed, it will be added in future ve
 
 _Fixed_: Compatibility with "High-Performance Order Storage" introduced in WooCommerce 8.2.
 
-_Added_: Test mode checkbox.
+_Added_: Test mode checkbox. When enabled, if order callback is received, then test order will be set to selected order status (by default - "Completed"). Also SpectroCoin payment option will be visible only for admin user.
 
 _Added_: Messages related with order processing to order notes.
 
