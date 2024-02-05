@@ -92,7 +92,7 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 	 */
     private function spectrocoin_initialize_client() {
         $this->scClient = new SCMerchantClient(
-            'https://pp.spectrocoin.com/api/merchant/1',
+            'https://spectrocoin.com/api/merchant/1',
             $this->merchant_id,
             $this->project_id,
             $this->private_key
@@ -452,7 +452,7 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 			),
 			'test_mode' => array(
 				'title' => esc_html__('Test mode', 'spectrocoin-accepting-bitcoin'),
-				'description' => esc_html__('When enabled, if order callback is received, then test order will be set to selected order status (by default - "Completed"). Also SpectroCoin payment option will not be visible in checkout.', 'spectrocoin-accepting-bitcoin'),
+				'description' => esc_html__('When enabled, if order callback is received, then test order will be set to selected order status (by default - "Completed"). Also SpectroCoin payment option will be visible only for admin user.', 'spectrocoin-accepting-bitcoin'),
 				'desc_tip' => true,
 				'type' => 'checkbox',
 				'label' => esc_html__('Enable', 'spectrocoin-accepting-bitcoin'),

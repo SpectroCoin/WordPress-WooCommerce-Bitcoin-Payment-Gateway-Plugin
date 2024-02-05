@@ -62,9 +62,9 @@ class SCMerchantClient
 			'receiveAmount' => $request->getReceiveAmount(),
 			'description' => $request->getDescription(),
 			'culture' => $request->getCulture(),
-			'callbackUrl' => 'http://localhost.com',
-			'successUrl' => 'http://localhost.com',
-			'failureUrl' => 'http://localhost.com'
+			'callbackUrl' => $request->getCallbackUrl(),
+			'successUrl' => $request->getSuccessUrl(),
+			'failureUrl' => $request->getFailureUrl()
 		);
 		$signature = $this->spectrocoin_generate_signature(http_build_query($payload));
 		$payload['sign'] = $signature;
@@ -324,7 +324,6 @@ class SCMerchantClient
 			
 			$data = http_build_query($payload);
             if ($this->spectrocoin_validate_signature($data, $order_callback->getSign()) == 1) {
-				error_log('SpectroCoin: Signature validation succeeded');
 				return true;
 			} else {
 				error_log('SpectroCoin Error: Signature validation failed');
