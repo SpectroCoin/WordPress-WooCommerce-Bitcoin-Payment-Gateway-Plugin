@@ -6,9 +6,10 @@ if (!defined('ABSPATH')) {
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\RequestOptions;
 
-include_once('components/SpectroCoin_FormattingUtil.php');
-include_once('components/SpectroCoin_ValidationUtil.php');
+include_once('components/SpectroCoin_Utilities.php');
 include_once('data/SpectroCoin_ApiError.php');
 include_once('data/SpectroCoin_OrderStatusEnum.php');
 include_once('data/SpectroCoin_OrderCallback.php');
@@ -21,27 +22,29 @@ class SCMerchantClient
 {
 
 	private $merchant_api_url;
-	private $private_key;
-	private $public_spectrocoin_cert_location;
-
-	private $merchant_id;
 	private $project_id;
+	private $client_id;
+	private $client_secret;
+	private $auth_url;
+	private $accessTokenData;
+	
 
 	protected $guzzle_client;
 
 	/**
 	 * @param $merchant_api_url
-	 * @param $merchant_id
 	 * @param $project_id
+	 * @param $client_id
+	 * @param $client_secret
+	 * @param $auth_url
 	 */
-	function __construct($merchant_api_url, $merchant_id, $project_id, $private_key)
+	function __construct($merchant_api_url, $project_id, $client_id, $client_secret, $auth_url)
 	{
 		$this->merchant_api_url = $merchant_api_url;
-		$this->merchant_id = $merchant_id;
 		$this->project_id = $project_id;
-		$this->private_key = $private_key;
-		$this->public_spectrocoin_cert_location = 'https://spectrocoin.com/files/merchant.public.pem';
-
+		$this->client_id = $client_id;
+		$this->client_secret = $client_secret;
+		$this->auth_url = $auth_url;
 		$this->guzzle_client = new Client();
 
 	}
@@ -52,58 +55,121 @@ class SCMerchantClient
 	 */
 	public function spectrocoin_create_order(SpectroCoin_CreateOrderRequest $request)
 	{
+		$this->accessTokenData = $this->spectrocoin_get_access_token_data();
+
+		if (!$this->accessTokenData) {
+			return new SpectroCoin_ApiError('AuthError', 'Failed to obtain access token');
+		}
+
 		$payload = array(
-			'userId' => $this->merchant_id,
-			'merchantApiId' => $this->project_id,
-			'orderId' => $request->getOrderId(),
-			'payCurrency' => $request->getPayCurrency(),
-			'payAmount' => $request->getPayAmount(),
-			'receiveCurrency' => $request->getReceiveCurrency(),
-			'receiveAmount' => $request->getReceiveAmount(),
-			'description' => $request->getDescription(),
-			'culture' => $request->getCulture(),
-			'callbackUrl' => $request->getCallbackUrl(),
-			'successUrl' => $request->getSuccessUrl(),
-			'failureUrl' => $request->getFailureUrl()
+			"callbackUrl" => $request->getCallbackUrl(),
+			"description" => $request->getDescription(),
+			"failureUrl" => $request->getFailureUrl(),
+			"lang" => $request->getLang(),
+			"orderId" => $request->getOrderId(),
+			"payAmount" => $request->getPayAmount(),
+			"payCurrencyCode" => $request->getPayCurrencyCode(),
+			"payNetworkName" => $request->getPayNetworkName(),
+			"payerDateOfBirth" => $request->getPayerDateOfBirth(),
+			"payerEmail" => $request->getPayerEmail(),
+			"payerName" => $request->getPayerName(),
+			"payerSurname" => $request->getPayerSurname(),
+			"projectId" => $this->project_id,
+			"receiveAmount" => $request->getReceiveAmount(),
+			"receiveCurrencyCode" => $request->getReceiveCurrencyCode(),
+			"successUrl" => $request->getSuccessUrl(),
 		);
-		$signature = $this->spectrocoin_generate_signature(http_build_query($payload));
-		$payload['sign'] = $signature;
-		$sanitized_payload = $this->spectrocoin_sanitize_create_order_payload($payload);
-		if (!$this->spectrocoin_validate_create_order_payload($sanitized_payload)) {
-            return new SpectroCoin_ApiError(-1, 'Invalid order creation payload, payload: ' . json_encode($sanitized_payload));
+
+		$jsonPayload = json_encode($payload);
+
+        try {
+            $response = $this->guzzle_client->request('POST', $this->merchant_api_url . '/merchants/orders/create', [
+                RequestOptions::HEADERS => [
+					'Content-Type' => 'application/json',
+					'Authorization' => 'Bearer ' . $this->accessTokenData['access_token']
+			],
+                RequestOptions::BODY => $jsonPayload
+            ]);
+
+            $statusCode = $response->getStatusCode();
+            $body = json_decode($response->getBody()->getContents(), true); 
+
+            if ($statusCode == 200 && $body != null) {
+                if (is_array($body) && count($body) > 0 && isset($body[0]->code)) {
+                    return new SpectroCoin_ApiError($body[0]->code, $body[0]->message);
+                } else {
+					return new SpectroCoin_CreateOrderResponse(
+						$body['depositAddress'],
+						$body['memo'],
+						$body['orderId'],
+						$body['payAmount'],
+						$body['payCurrency'],
+						$body['payNetworkName'],
+						$body['preOrderId'],
+						$body['receiveAmount'],
+						$body['receiveCurrency'],
+						$body['redirectUrl'],
+						$body['validUntil']
+					);
+                }
+            }
+        } catch (GuzzleException $e) {
+            return new SpectroCoin_ApiError($e->getCode(), $e->getMessage());
         }
-		try {
-			$response = $this->guzzle_client->post($this->merchant_api_url . '/createOrder', [
-				'form_params' => $sanitized_payload,
-				'headers' => ['Content-Type' => 'application/x-www-form-urlencoded'],
-			]);
-
-			$body = json_decode($response->getBody());
-
-			if (is_array($body) && count($body) > 0 && isset($body[0]->code)) {
-				return new SpectroCoin_ApiError($body[0]->code, $body[0]->message);
-			} else {
-				return new SpectroCoin_CreateOrderResponse(
-					$body->orderRequestId,
-					$body->orderId,
-					$body->depositAddress,
-					$body->payAmount,
-					$body->payCurrency,
-					$body->receiveAmount,
-					$body->receiveCurrency,
-					$body->validUntil,
-					$body->redirectUrl
-				);
-			}
-		} catch (RequestException $e) {
-			$errorBody = json_decode($e->getResponse()->getBody());
-			if ($errorBody !== null && is_array($errorBody) && count($errorBody) > 0 && isset($errorBody[0]->code)) {
-				return new SpectroCoin_ApiError($errorBody[0]->code, $errorBody[0]->message);
-			} else {
-				return new SpectroCoin_ApiError(-1, 'Unexpected error');
-				}
-			}
+        return new SpectroCoin_ApiError('Invalid Response', 'No valid response received.');
 	}
+
+	private function spectrocoin_get_access_token_data() {
+        $currentTime = time();
+
+        $this->accessTokenData = $this->retrieveAccessTokenData();
+
+        if ($this->isTokenValid($currentTime)) {
+            return $this->accessTokenData;
+        }
+
+        return $this->refreshAccessToken($currentTime);
+    }
+
+    private function retrieveAccessTokenData() {
+        if (isset($_SESSION['encryptedAccessTokenData'])) {
+            $encryptedTokenData = $_SESSION['encryptedAccessTokenData'];
+            return json_decode(decrypt($encryptedTokenData, $this->encryptionKey), true);
+        }
+        return null;
+    }
+
+    private function isTokenValid($currentTime) {
+        return $this->accessTokenData && isset($this->accessTokenData['expires_at']) && $currentTime < ($this->accessTokenData['expires_at'] - 60);
+    }
+
+    private function refreshAccessToken($currentTime) {
+        try {
+            $response = $this->guzzleClient->post($this->authUrl, [
+                'form_params' => [
+                    'grant_type' => 'client_credentials',
+                    'client_id' => $this->clientId,
+                    'client_secret' => $this->clientSecret,
+                ],
+            ]);
+
+            $data = json_decode($response->getBody(), true);
+            if (!isset($data['access_token'], $data['expires_in'])) {
+                writeToLog('Invalid access token response: ' . $response->getBody());
+                return null;
+            }
+
+            $data['expires_at'] = $currentTime + $data['expires_in'];
+            $this->accessTokenData = $data;
+
+            $_SESSION['encryptedAccessTokenData'] = encrypt(json_encode($data), $this->encryptionKey);
+
+            return $this->accessTokenData;
+        } catch (GuzzleException $e) {
+            writeToLog('Failed to get access token: ' . $e->getMessage());
+            return null;
+        }
+    }
 
 
 	// --------------- VALIDATION AND SANITIZATION BEFORE REQEUST -----------------

@@ -94,10 +94,11 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 	 */
     private function spectrocoin_initialize_client() {
         $this->scClient = new SCMerchantClient(
-            'https://test.spectrocoin.com/api/merchant/1',
+            'https://test.spectrocoin.com/api/public',
+			$this->project_id,
             $this->client_id,
-            $this->project_id,
-            $this->client_secret
+            $this->client_secret,
+			'https://test.spectrocoin.com/api/public/oauth/token'
         );
         add_action('woocommerce_api_' . self::$callback_name, array($this, 'callback'));
 		
