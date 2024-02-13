@@ -4,7 +4,7 @@ if (!defined('ABSPATH')) {
 	die('Access denied.');
 }
 
-class SpectroCoin_FormattingUtil
+class SpectroCoin_Utilities
 {
 
 	/**
@@ -12,7 +12,7 @@ class SpectroCoin_FormattingUtil
 	 * @param $amount
 	 * @return string
 	 */
-	protected static function spectrocoin_format_currency($amount)
+	public static function spectrocoin_format_currency($amount)
 	{
 		$decimals = strlen(substr(strrchr(rtrim(sprintf('%.8f', $amount), '0'), "."), 1));
 		$decimals = $decimals < 1 ? 1 : $decimals;
@@ -32,7 +32,7 @@ class SpectroCoin_FormattingUtil
 	 * @return string The encrypted data encoded in base64, with the IV appended.
 	 * @throws Exception If an error occurs during encryption or IV generation.
 	 */
-	protected static function encrypt($data, $key) {
+	public static function encrypt($data, $key) {
 		$ivLength = openssl_cipher_iv_length($cipher = "AES-128-CBC");
 		$iv = openssl_random_pseudo_bytes($ivLength);
 		$encryptedData = openssl_encrypt($data, $cipher, $key, 0, $iv);
@@ -52,11 +52,17 @@ class SpectroCoin_FormattingUtil
 	 * @return string The decrypted plaintext data.
 	 * @throws Exception If an error occurs during decryption or if the data format is invalid.
 	 */
-	protected static function decrypt($data, $key) {
+	public static function decrypt($data, $key) {
 		list($encryptedData, $iv) = explode('::', base64_decode($data), 2);
 		return openssl_decrypt($encryptedData, "AES-128-CBC", $key, 0, $iv);
 	}
 
+
+	public static function generate_encryption_key() {
+		// Generate a secure random key
+		$key = openssl_random_pseudo_bytes(32); // 256 bits
+		return base64_encode($key); // Encode to base64 for easy storage
+	}
 
 	
 }

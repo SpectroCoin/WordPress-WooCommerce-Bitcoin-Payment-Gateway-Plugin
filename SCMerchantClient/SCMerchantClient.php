@@ -9,6 +9,8 @@ use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\RequestOptions;
 
+use SpectroCoin_Utilities;
+
 include_once('components/SpectroCoin_Utilities.php');
 include_once('data/SpectroCoin_ApiError.php');
 include_once('data/SpectroCoin_OrderStatusEnum.php');
@@ -26,8 +28,8 @@ class SCMerchantClient
 	private $client_id;
 	private $client_secret;
 	private $auth_url;
-	private $accessTokenData;
-	
+	private $access_token_data;
+	private $encryption_key;
 
 	protected $guzzle_client;
 
@@ -46,55 +48,60 @@ class SCMerchantClient
 		$this->client_secret = $client_secret;
 		$this->auth_url = $auth_url;
 		$this->guzzle_client = new Client();
-
+		$this->encryption_key = "TEMPORARY HARDCODED";
 	}
 
 	/**
-	 * @param SpectroCoin_CreateOrderRequest $request
-	 * @return SpectroCoin_ApiError|SpectroCoin_CreateOrderResponse
+	 * Creates a new order with SpectroCoin and returns the order details or an error.
+	 * This method first obtains an access token, then uses it to create an order with the provided request parameters.
+	 * If successful, it returns a `SpectroCoin_CreateOrderResponse` object with the order details.
+	 * In case of failure, it returns a `SpectroCoin_ApiError` object with the error details.
+	 *
+	 * @param SpectroCoin_CreateOrderRequest $request The order request parameters.
+	 * @return SpectroCoin_ApiError|SpectroCoin_CreateOrderResponse The response object with order details or an error object.
+	 * @throws GuzzleException If there's an error in the HTTP request.
 	 */
 	public function spectrocoin_create_order(SpectroCoin_CreateOrderRequest $request)
 	{
-		$this->accessTokenData = $this->spectrocoin_get_access_token_data();
+		$this->access_token_data = $this->spectrocoin_get_access_token_data();
 
-		if (!$this->accessTokenData) {
+		if (!$this->access_token_data) {
 			return new SpectroCoin_ApiError('AuthError', 'Failed to obtain access token');
 		}
 
 		$payload = array(
-			"callbackUrl" => $request->getCallbackUrl(),
-			"description" => $request->getDescription(),
-			"failureUrl" => $request->getFailureUrl(),
-			"lang" => $request->getLang(),
 			"orderId" => $request->getOrderId(),
+			"projectId" => $this->project_id,
+			"description" => $request->getDescription(),
 			"payAmount" => $request->getPayAmount(),
 			"payCurrencyCode" => $request->getPayCurrencyCode(),
-			"payNetworkName" => $request->getPayNetworkName(),
-			"payerDateOfBirth" => $request->getPayerDateOfBirth(),
-			"payerEmail" => $request->getPayerEmail(),
-			"payerName" => $request->getPayerName(),
-			"payerSurname" => $request->getPayerSurname(),
-			"projectId" => $this->project_id,
 			"receiveAmount" => $request->getReceiveAmount(),
 			"receiveCurrencyCode" => $request->getReceiveCurrencyCode(),
+			"callbackUrl" => $request->getCallbackUrl(),
 			"successUrl" => $request->getSuccessUrl(),
+			"failureUrl" => $request->getFailureUrl(),
 		);
 
-		$jsonPayload = json_encode($payload);
+		$sanitized_payload = $this->spectrocoin_sanitize_create_order_payload($payload);
+
+		if (!$this->spectrocoin_validate_create_order_payload($sanitized_payload)) {
+            return new SpectroCoin_ApiError(-1, 'Invalid order creation payload, payload: ' . json_encode($sanitized_payload));
+		}
+		$json_payload = json_encode($sanitized_payload);
 
         try {
             $response = $this->guzzle_client->request('POST', $this->merchant_api_url . '/merchants/orders/create', [
                 RequestOptions::HEADERS => [
 					'Content-Type' => 'application/json',
-					'Authorization' => 'Bearer ' . $this->accessTokenData['access_token']
+					'Authorization' => 'Bearer ' . $this->access_token_data['access_token']
 			],
-                RequestOptions::BODY => $jsonPayload
+                RequestOptions::BODY => $json_payload
             ]);
 
-            $statusCode = $response->getStatusCode();
+            $status_code = $response->getStatusCode();
             $body = json_decode($response->getBody()->getContents(), true); 
 
-            if ($statusCode == 200 && $body != null) {
+            if ($status_code == 200 && $body != null) {
                 if (is_array($body) && count($body) > 0 && isset($body[0]->code)) {
                     return new SpectroCoin_ApiError($body[0]->code, $body[0]->message);
                 } else {
@@ -114,60 +121,87 @@ class SCMerchantClient
                 }
             }
         } catch (GuzzleException $e) {
-            return new SpectroCoin_ApiError($e->getCode(), $e->getMessage());
+			return new SpectroCoin_ApiError($e->getCode(), $e->getMessage());
         }
         return new SpectroCoin_ApiError('Invalid Response', 'No valid response received.');
 	}
+	
 
+	/**
+	 * Retrieves and validates the current access token data from the session.
+	 * If the token is valid, it returns the token data. If the token is expired or not present,
+	 * it attempts to refresh the token and update the session with the new token data.
+	 *
+	 * @return array|null The access token data array if valid or refreshed successfully, null otherwise.
+	 */
 	private function spectrocoin_get_access_token_data() {
         $currentTime = time();
 
-        $this->accessTokenData = $this->retrieveAccessTokenData();
+        $this->access_token_data = $this->spectrocoin_retrieve_access_token_data();
 
-        if ($this->isTokenValid($currentTime)) {
-            return $this->accessTokenData;
+        if ($this->spectrocoin_is_token_valid($currentTime)) {
+            return $this->access_token_data;
         }
 
-        return $this->refreshAccessToken($currentTime);
+        return $this->spectrocoin_refresh_access_token($currentTime);
     }
 
-    private function retrieveAccessTokenData() {
+	/**
+	 * Retrieves the access token data from the session, if available.
+	 * Decrypts the token data using the class's encryption key before returning it.
+	 *
+	 * @return array|null The decrypted access token data if present in the session, null otherwise.
+	 */
+    private function spectrocoin_retrieve_access_token_data() {
         if (isset($_SESSION['encryptedAccessTokenData'])) {
             $encryptedTokenData = $_SESSION['encryptedAccessTokenData'];
-            return json_decode(decrypt($encryptedTokenData, $this->encryptionKey), true);
+            return json_decode(SpectroCoin_Utilities::decrypt($encryptedTokenData, $this->encryption_key), true);
         }
         return null;
     }
 
-    private function isTokenValid($currentTime) {
-        return $this->accessTokenData && isset($this->accessTokenData['expires_at']) && $currentTime < ($this->accessTokenData['expires_at'] - 60);
+	/**
+	 * Checks if the current access token is valid based on its expiration time.
+	 * Considers the token valid if the current time is less than the token's expiration time minus a buffer.
+	 *
+	 * @param int $currentTime The current timestamp.
+	 * @return bool True if the token is valid, false otherwise.
+	 */
+    private function spectrocoin_is_token_valid($currentTime) {
+        return $this->access_token_data && isset($this->access_token_data['expires_at']) && $currentTime < ($this->access_token_data['expires_at'] - 60);
     }
 
-    private function refreshAccessToken($currentTime) {
+	/**
+	 * Refreshes the access token by making a request to the authorization server.
+	 * Updates the session with the new encrypted token data if the refresh is successful.
+	 *
+	 * @param int $currentTime The current timestamp.
+	 * @return array|null The new access token data if refreshed successfully, null on failure.
+	 * @throws GuzzleException If there's an error in the HTTP request.
+	 */
+    private function spectrocoin_refresh_access_token($currentTime) {
         try {
-            $response = $this->guzzleClient->post($this->authUrl, [
+            $response = $this->guzzle_client->post($this->auth_url, [
                 'form_params' => [
                     'grant_type' => 'client_credentials',
-                    'client_id' => $this->clientId,
-                    'client_secret' => $this->clientSecret,
+                    'client_id' => $this->client_id,
+                    'client_secret' => $this->client_secret,
                 ],
             ]);
 
             $data = json_decode($response->getBody(), true);
             if (!isset($data['access_token'], $data['expires_in'])) {
-                writeToLog('Invalid access token response: ' . $response->getBody());
-                return null;
+				return new SpectroCoin_ApiError('Invalid access token response: ' . $response->getBody(), 'No valid response code received.');
             }
 
             $data['expires_at'] = $currentTime + $data['expires_in'];
-            $this->accessTokenData = $data;
+            $this->access_token_data = $data;
 
-            $_SESSION['encryptedAccessTokenData'] = encrypt(json_encode($data), $this->encryptionKey);
+            $_SESSION['encryptedAccessTokenData'] = SpectroCoin_Utilities::encrypt(json_encode($data), $this->encryption_key);
 
-            return $this->accessTokenData;
+            return $this->access_token_data;
         } catch (GuzzleException $e) {
-            writeToLog('Failed to get access token: ' . $e->getMessage());
-            return null;
+            return new SpectroCoin_ApiError('Failed to get access token: ' . $e->getMessage(), 'No valid response code received.');
         }
     }
 

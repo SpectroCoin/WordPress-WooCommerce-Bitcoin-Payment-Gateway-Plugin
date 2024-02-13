@@ -145,12 +145,6 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 				error_log('SpectroCoin Error: Private Key is empty');
 			}
 			$is_valid = false;
-		} elseif (!SpectroCoin_ValidationUtil::spectrocoin_validate_client_secret($this->client_secret)) {
-			if ($display_notice) {
-				spectrocoin_admin_error_notice('Invalid Private Key');
-				error_log('SpectroCoin Error: Invalid Private Key');
-			}
-			$is_valid = false;
 		}
 
 		$this->title = sanitize_text_field($this->get_option('title'));
@@ -573,7 +567,7 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 		$failureCallback = $this->get_return_url($order);
 		return new SpectroCoin_CreateOrderRequest(
 			$order->get_id() . "-" . $this->spectrocoin_random_str(5),
-			self::$pay_currency,
+			self::$pay_currency, 
 			null,
 			$receive_currency,
 			$total,
