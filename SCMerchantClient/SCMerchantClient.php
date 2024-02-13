@@ -77,9 +77,9 @@ class SCMerchantClient
 			"payCurrencyCode" => $request->getPayCurrencyCode(),
 			"receiveAmount" => $request->getReceiveAmount(),
 			"receiveCurrencyCode" => $request->getReceiveCurrencyCode(),
-			"callbackUrl" => $request->getCallbackUrl(),
-			"successUrl" => $request->getSuccessUrl(),
-			"failureUrl" => $request->getFailureUrl(),
+			'callbackUrl' => 'http://localhost.com',
+			'successUrl' => 'http://localhost.com',
+			'failureUrl' => 'http://localhost.com'
 		);
 
 		$sanitized_payload = $this->spectrocoin_sanitize_create_order_payload($payload);
@@ -110,11 +110,10 @@ class SCMerchantClient
 						$body['memo'],
 						$body['orderId'],
 						$body['payAmount'],
-						$body['payCurrency'],
-						$body['payNetworkName'],
+						$body['payCurrencyCode'],
 						$body['preOrderId'],
 						$body['receiveAmount'],
-						$body['receiveCurrency'],
+						$body['receiveCurrencyCode'],
 						$body['redirectUrl'],
 						$body['validUntil']
 					);
@@ -167,7 +166,7 @@ class SCMerchantClient
             if (!isset($data['access_token'], $data['expires_in'])) {
                 return new SpectroCoin_ApiError('Invalid access token response', 'No valid response received.');
             }
-            $data['expires_at'] = $currentTime + $data['expires_in'];
+            $data['expires_at'] = time() + $data['expires_in'];
             $this->access_token_data = $data;
 			$encryptedAccessTokenData = SpectroCoin_Utilities::spectrocoin_encrypt_auth_data(json_encode($data), $this->encryption_key);
 			set_transient($this->access_token_transient_key, $encryptedAccessTokenData, $data['expires_in']);
@@ -185,11 +184,9 @@ class SCMerchantClient
 	 * @param int $currentTime The current timestamp, typically obtained using `time()`.
 	 * @return bool Returns true if the token is valid (i.e., not expired), false otherwise.
 	 */
-    private function spectrocoin_is_token_valid($currentTime) {
-        return $this->access_token_data && isset($this->access_token_data['expires_at']) && $currentTime < $this->access_token_data['expires_at'];
-    }
-
-
+	private function spectrocoin_is_token_valid($currentTime) {
+		return isset($this->access_token_data['expires_at']) && $currentTime < $this->access_token_data['expires_at'];
+	}
 
 	// --------------- VALIDATION AND SANITIZATION BEFORE REQUEST -----------------
 
