@@ -46,8 +46,9 @@ class SCMerchantClient
 		$this->client_id = $client_id;
 		$this->client_secret = $client_secret;
 		$this->auth_url = $auth_url;
+		
 		$this->guzzle_client = new Client();
-		$this->encryption_key = "TEMPORARY HARDCODED";
+		$this->encryption_key = hash('sha256', AUTH_KEY . SECURE_AUTH_KEY . LOGGED_IN_KEY . NONCE_KEY);
 		$this->access_token_transient_key = "spectrocoin_transient_key";
 	}
 
