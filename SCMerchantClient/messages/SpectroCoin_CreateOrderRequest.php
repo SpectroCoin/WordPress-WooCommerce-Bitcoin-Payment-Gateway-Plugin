@@ -7,7 +7,6 @@ if (!defined('ABSPATH')) {
 class SpectroCoin_CreateOrderRequest
 {
 	private $orderId;
-	private $projectId;
 	private $description;
 	private $payAmount;
 	private $payCurrencyCode;
@@ -19,7 +18,6 @@ class SpectroCoin_CreateOrderRequest
 
 	/**
 	 * @param $orderId
-	 * @param $projectId
 	 * @param $description
 	 * @param $payAmount
 	 * @param $payCurrencyCode
@@ -29,10 +27,9 @@ class SpectroCoin_CreateOrderRequest
 	 * @param $successUrl
 	 * @param $failureUrl
 	 */
-	function __construct($orderId, $projectId, $description, $payAmount, $payCurrencyCode, $receiveAmount, $receiveCurrencyCode, $callbackUrl, $successUrl, $failureUrl)
+	function __construct($orderId,  $description, $payAmount, $payCurrencyCode, $receiveAmount, $receiveCurrencyCode, $callbackUrl, $successUrl, $failureUrl)
 	{
 		$this->orderId = $orderId;
-		$this->projectId = $projectId;
 		$this->description = $description;
 		$this->payAmount = $payAmount;
 		$this->payCurrencyCode = $payCurrencyCode;
@@ -49,14 +46,6 @@ class SpectroCoin_CreateOrderRequest
 	public function getOrderId()
 	{
 		return $this->orderId == null ? '' : $this->orderId;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getProjectId()
-	{
-		return $this->projectId == null ? '' : $this->projectId;
 	}
 
 	/**

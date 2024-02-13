@@ -9,8 +9,6 @@ use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\RequestOptions;
 
-use SpectroCoin_Utilities;
-
 include_once('components/SpectroCoin_Utilities.php');
 include_once('data/SpectroCoin_ApiError.php');
 include_once('data/SpectroCoin_OrderStatusEnum.php');
@@ -30,6 +28,7 @@ class SCMerchantClient
 	private $auth_url;
 	private $access_token_data;
 	private $encryption_key;
+	private $access_token_transient_key;
 
 	protected $guzzle_client;
 
@@ -49,6 +48,7 @@ class SCMerchantClient
 		$this->auth_url = $auth_url;
 		$this->guzzle_client = new Client();
 		$this->encryption_key = "TEMPORARY HARDCODED";
+		$this->access_token_transient_key = "spectrocoin_transient_key";
 	}
 
 	/**
@@ -126,58 +126,32 @@ class SCMerchantClient
         return new SpectroCoin_ApiError('Invalid Response', 'No valid response received.');
 	}
 	
-
 	/**
-	 * Retrieves and validates the current access token data from the session.
-	 * If the token is valid, it returns the token data. If the token is expired or not present,
-	 * it attempts to refresh the token and update the session with the new token data.
+	 * Retrieves the current access token data, checking if it's still valid based on its expiration time. If the token is expired or not present, it attempts to refresh the token.
+	 * The function uses WordPress transients for token storage, providing a reliable and persistent storage mechanism within WordPress environments.
 	 *
-	 * @return array|null The access token data array if valid or refreshed successfully, null otherwise.
+	 * @return array|null Returns the access token data array if the token is valid or has been refreshed successfully. Returns null if the token is not present and cannot be refreshed.
 	 */
 	private function spectrocoin_get_access_token_data() {
         $currentTime = time();
-
-        $this->access_token_data = $this->spectrocoin_retrieve_access_token_data();
-
-        if ($this->spectrocoin_is_token_valid($currentTime)) {
-            return $this->access_token_data;
-        }
-
+		$encryptedAccessTokenData = get_transient($this->access_token_transient_key);
+		if ($encryptedAccessTokenData) {
+			$accessTokenData = json_decode(SpectroCoin_Utilities::spectrocoin_decrypt_auth_data($encryptedAccessTokenData, $this->encryption_key), true);
+			$this->access_token_data = $accessTokenData;
+			if ($this->spectrocoin_is_token_valid($currentTime)) {
+				return $this->access_token_data;
+			}
+		}
         return $this->spectrocoin_refresh_access_token($currentTime);
     }
 
 	/**
-	 * Retrieves the access token data from the session, if available.
-	 * Decrypts the token data using the class's encryption key before returning it.
+	 * Refreshes the access token by making a request to the SpectroCoin authorization server using client credentials. If successful, it updates the stored token data in WordPress transients.
+	 * This method ensures that the application always has a valid token for authentication with SpectroCoin services.
 	 *
-	 * @return array|null The decrypted access token data if present in the session, null otherwise.
-	 */
-    private function spectrocoin_retrieve_access_token_data() {
-        if (isset($_SESSION['encryptedAccessTokenData'])) {
-            $encryptedTokenData = $_SESSION['encryptedAccessTokenData'];
-            return json_decode(SpectroCoin_Utilities::decrypt($encryptedTokenData, $this->encryption_key), true);
-        }
-        return null;
-    }
-
-	/**
-	 * Checks if the current access token is valid based on its expiration time.
-	 * Considers the token valid if the current time is less than the token's expiration time minus a buffer.
-	 *
-	 * @param int $currentTime The current timestamp.
-	 * @return bool True if the token is valid, false otherwise.
-	 */
-    private function spectrocoin_is_token_valid($currentTime) {
-        return $this->access_token_data && isset($this->access_token_data['expires_at']) && $currentTime < ($this->access_token_data['expires_at'] - 60);
-    }
-
-	/**
-	 * Refreshes the access token by making a request to the authorization server.
-	 * Updates the session with the new encrypted token data if the refresh is successful.
-	 *
-	 * @param int $currentTime The current timestamp.
-	 * @return array|null The new access token data if refreshed successfully, null on failure.
-	 * @throws GuzzleException If there's an error in the HTTP request.
+	 * @param int $currentTime The current timestamp, used to calculate the new expiration time for the refreshed token.
+	 * @return array|null Returns the new access token data if the refresh operation is successful. Returns null if the operation fails due to a network error or invalid response from the server.
+	 * @throws GuzzleException Thrown if there is an error in the HTTP request to the SpectroCoin authorization server.
 	 */
     private function spectrocoin_refresh_access_token($currentTime) {
         try {
@@ -191,19 +165,30 @@ class SCMerchantClient
 
             $data = json_decode($response->getBody(), true);
             if (!isset($data['access_token'], $data['expires_in'])) {
-				return new SpectroCoin_ApiError('Invalid access token response: ' . $response->getBody(), 'No valid response code received.');
+                return new SpectroCoin_ApiError('Invalid access token response', 'No valid response received.');
             }
-
             $data['expires_at'] = $currentTime + $data['expires_in'];
             $this->access_token_data = $data;
-
-            $_SESSION['encryptedAccessTokenData'] = SpectroCoin_Utilities::encrypt(json_encode($data), $this->encryption_key);
-
+			$encryptedAccessTokenData = SpectroCoin_Utilities::spectrocoin_encrypt_auth_data(json_encode($data), $this->encryption_key);
+			set_transient($this->access_token_transient_key, $encryptedAccessTokenData, $data['expires_in']);
+			$this->access_token_data = $data;
             return $this->access_token_data;
         } catch (GuzzleException $e) {
-            return new SpectroCoin_ApiError('Failed to get access token: ' . $e->getMessage(), 'No valid response code received.');
+            return new SpectroCoin_ApiError('Failed to refresh access token', $e->getMessage());
         }
     }
+
+
+	/**
+	 * Checks if the current access token is valid by comparing the current time against the token's expiration time. A buffer can be applied to ensure the token is refreshed before it actually expires.
+	 *
+	 * @param int $currentTime The current timestamp, typically obtained using `time()`.
+	 * @return bool Returns true if the token is valid (i.e., not expired), false otherwise.
+	 */
+    private function spectrocoin_is_token_valid($currentTime) {
+        return $this->access_token_data && isset($this->access_token_data['expires_at']) && $currentTime < $this->access_token_data['expires_at'];
+    }
+
 
 
 	// --------------- VALIDATION AND SANITIZATION BEFORE REQUEST -----------------

@@ -19,47 +19,22 @@ class SpectroCoin_Utilities
 		return number_format($amount, $decimals, '.', '');
 	}
 
-	/**
-	 * Encrypts the given data using AES-128-CBC encryption algorithm.
-	 *
-	 * This method takes a plaintext data string and a secret key, then uses
-	 * the AES-128-CBC cipher to encrypt the data. The initialization vector (IV)
-	 * is generated randomly for each encryption and is appended to the encrypted
-	 * data, separated by '::'. The resulting string is then encoded in base64.
-	 *
-	 * @param string $data The plaintext data to be encrypted.
-	 * @param string $key The secret key used for encryption. Must be 16 bytes long (128 bits).
-	 * @return string The encrypted data encoded in base64, with the IV appended.
-	 * @throws Exception If an error occurs during encryption or IV generation.
-	 */
-	public static function encrypt($data, $key) {
-		$ivLength = openssl_cipher_iv_length($cipher = "AES-128-CBC");
-		$iv = openssl_random_pseudo_bytes($ivLength);
-		$encryptedData = openssl_encrypt($data, $cipher, $key, 0, $iv);
-		return base64_encode($encryptedData . '::' . $iv);
-	}
+	public static function spectrocoin_encrypt_auth_data($data, $encryption_key) {
+        $iv = openssl_random_pseudo_bytes(openssl_cipher_iv_length('aes-256-cbc'));
+        $encryptedData = openssl_encrypt($data, 'aes-256-cbc', $encryption_key, 0, $iv);
+        return base64_encode($encryptedData . '::' . $iv); // Store $iv with encrypted data
+    }
+
+	public static function spectrocoin_decrypt_auth_data($encryptedDataWithIv, $encryption_key) {
+        list($encryptedData, $iv) = explode('::', base64_decode($encryptedDataWithIv), 2);
+        return openssl_decrypt($encryptedData, 'aes-256-cbc', $encryption_key, 0, $iv);
+    }
 
 	/**
-	 * Decrypts the given data using AES-128-CBC encryption algorithm.
-	 *
-	 * This method takes an encrypted data string, which was encrypted by the
-	 * `encrypt` method, and a secret key to decrypt the data. The method
-	 * extracts the initialization vector (IV) from the encrypted string, then
-	 * uses it along with the key to decrypt the data using AES-128-CBC cipher.
-	 *
-	 * @param string $data The encrypted data in base64 encoding, with the IV appended.
-	 * @param string $key The secret key used for decryption. Must be the same key used for encryption.
-	 * @return string The decrypted plaintext data.
-	 * @throws Exception If an error occurs during decryption or if the data format is invalid.
+	 * Generates a random 128-bit secret key for AES-128-CBC encryption.
+	 * @return string The generated secret key encoded in base64.
 	 */
-	public static function decrypt($data, $key) {
-		list($encryptedData, $iv) = explode('::', base64_decode($data), 2);
-		return openssl_decrypt($encryptedData, "AES-128-CBC", $key, 0, $iv);
-	}
-
-
-	public static function generate_encryption_key() {
-		// Generate a secure random key
+	public static function spectrocoin_generate_encryption_key() {
 		$key = openssl_random_pseudo_bytes(32); // 256 bits
 		return base64_encode($key); // Encode to base64 for easy storage
 	}

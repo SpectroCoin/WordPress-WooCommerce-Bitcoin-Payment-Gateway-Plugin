@@ -125,24 +125,24 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 
 		if (empty($this->client_id)) {
 			if ($display_notice) {
-				spectrocoin_admin_error_notice('Merchant ID is empty');
-				error_log('SpectroCoin Error: Merchant ID is empty');
+				spectrocoin_admin_error_notice('Client id is empty');
+				error_log('SpectroCoin Error: Client id is empty');
 			}
 			$is_valid = false;
 		}
 
 		if (empty($this->project_id)) {
 			if ($display_notice) {
-				spectrocoin_admin_error_notice('Project ID is empty');
-				error_log('SpectroCoin Error: Project ID is empty');
+				spectrocoin_admin_error_notice('Project id is empty');
+				error_log('SpectroCoin Error: Project id is empty');
 			}
 			$is_valid = false;
 		}
 
 		if (empty($this->client_secret)) {
 			if ($display_notice) {
-				spectrocoin_admin_error_notice('Private Key is empty');
-				error_log('SpectroCoin Error: Private Key is empty');
+				spectrocoin_admin_error_notice('Client secret is empty');
+				error_log('SpectroCoin Error: Client secret is empty');
 			}
 			$is_valid = false;
 		}
@@ -567,12 +567,11 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 		$failureCallback = $this->get_return_url($order);
 		return new SpectroCoin_CreateOrderRequest(
 			$order->get_id() . "-" . $this->spectrocoin_random_str(5),
-			self::$pay_currency, 
-			null,
-			$receive_currency,
-			$total,
 			"Order #{$order->get_id()}",
-			"en",
+			null,
+			self::$pay_currency, 
+			$total,
+			$receive_currency,
 			$callback,
 			$successCallback,
 			$failureCallback
