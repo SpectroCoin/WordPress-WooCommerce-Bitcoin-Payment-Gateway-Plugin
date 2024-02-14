@@ -26,10 +26,11 @@ class SCMerchantClient
 	private $client_id;
 	private $client_secret;
 	private $auth_url;
+	
 	private $access_token_data;
 	private $encryption_key;
 	private $access_token_transient_key;
-
+	private $public_spectrocoin_cert_location;
 	protected $guzzle_client;
 
 	/**
@@ -46,10 +47,11 @@ class SCMerchantClient
 		$this->client_id = $client_id;
 		$this->client_secret = $client_secret;
 		$this->auth_url = $auth_url;
-		
+
 		$this->guzzle_client = new Client();
 		$this->encryption_key = hash('sha256', AUTH_KEY . SECURE_AUTH_KEY . LOGGED_IN_KEY . NONCE_KEY);
 		$this->access_token_transient_key = "spectrocoin_transient_key";
+		$this->public_spectrocoin_cert_location = "https://test.spectrocoin.com/public.pem"; PROD:https://spectrocoin.com/files/merchant.public.pem
 	}
 
 	/**
@@ -369,9 +371,8 @@ class SCMerchantClient
 		}
 
 		if (!$isValid) {
-			error_log('SpectroCoin Callback Failed fields: ' . implode(', ', $failedFields));
+			error_log('SpectroCoin error: Callback validation failed fields: ' . implode(', ', $failedFields));
 		}
-		error_log('SpectroCoin Callback Field Validation Success: ');
 		return $isValid;
 	}
 
@@ -409,36 +410,6 @@ class SCMerchantClient
 		return false;
 	}
 
-	// ------------------------ SIGNATURE ------------------------
-
-	/**
-	 * Function which generates signature;
-	 * if the retrieval of the private key fails, the function returns false and logs to error_log;
-	 * if the signature generation fails, the function returns false and logs to error_log;
-	 * if the signature generation succeeds, the function returns the signature;
-	 * @param $data
-	 * @return bool/string
-	 */
-	private function spectrocoin_generate_signature($data)
-	{
-
-		$pkey_id = openssl_pkey_get_private($this->private_key);
-
-		if ($pkey_id  === false) {
-			error_log("SpectroCoin Error: Unable to load private key");
-			return false;
-		}
-
-		$s = openssl_sign($data, $signature, $pkey_id, OPENSSL_ALGO_SHA1);
-		if ($s === false) {
-			error_log("SpectroCoin Error: Signature generation failed");
-			return false;
-		}
-
-		$encodedSignature = base64_encode($signature);
-
-		return $encodedSignature;
-	}
 
 	/**
 	 * @param $data

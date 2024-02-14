@@ -72,7 +72,7 @@
   transition: all 0.1s, visibility 0s;
 }
 
-.button-primary:hover {
+.woocommerce-save-button:hover {
   background: #6c8bf5 !important;
   border-color: #6c8bf5 !important;
   color: #fff;

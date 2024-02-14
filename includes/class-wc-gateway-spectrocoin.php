@@ -329,17 +329,17 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 					</p>
 					<p>
 						<?php
-						esc_html_e('The SpectroCoin plugin allows seamless integration of payment gateways into your WordPress website. To get started, you\'ll need to obtain the essential credentials: Merchant ID, Project ID, and Private Key. These credentials are required to enable secure transactions between your website and the payment gateway. Follow the step-by-step tutorial below to acquire these credentials:', 'spectrocoin-accepting-bitcoin');
+						esc_html_e('The SpectroCoin plugin allows seamless integration of payment gateways into your WordPress website. To get started, you\'ll need to obtain the essential credentials: "Project id", "Client id", and "Client secret". These credentials are required to enable secure transactions between your website and the payment gateway. Follow the step-by-step tutorial below to acquire these credentials:', 'spectrocoin-accepting-bitcoin');
 						?>
 					</p>
 					<ul>
 						<li>
 							<span>1. </span>
-							<?php printf('<a href="%s" target="_blank">%s</a> %s', esc_url('https://auth.spectrocoin.com/signup'), esc_html__('Sign up', 'spectrocoin-accepting-bitcoin'), esc_html__('for a Spectroin Account.', 'spectrocoin-accepting-bitcoin')); ?>
+							<?php printf('<a href="%s" target="_blank"><strong>%s</strong></a> %s', esc_url('https://auth.spectrocoin.com/signup'), esc_html__('Sign up', 'spectrocoin-accepting-bitcoin'), esc_html__('for a SpectroCoin Account.', 'spectrocoin-accepting-bitcoin')); ?>
 						</li>
 						<li>
 							<span>2. </span>
-							<?php printf('<a href="%s" target="_blank">%s</a> %s', esc_url('https://auth.spectrocoin.com/login'), esc_html__('Log in', 'spectrocoin-accepting-bitcoin'), esc_html__('to your Spectroin account.', 'spectrocoin-accepting-bitcoin')); ?>
+							<?php printf('<a href="%s" target="_blank"><strong>%s</strong></a> %s', esc_url('https://auth.spectrocoin.com/login'), esc_html__('Log in', 'spectrocoin-accepting-bitcoin'), esc_html__('to your SpectroCoin account.', 'spectrocoin-accepting-bitcoin')); ?>
 						</li>
 						<li>
 							<span>3. </span>
@@ -355,23 +355,40 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 						</li>
 						<li>
 							<span>6. </span>
-							<?php printf('%s <b>%s</b> %s', esc_html__('The', 'spectrocoin-accepting-bitcoin'), esc_html__('Private Key', 'spectrocoin-accepting-bitcoin'), esc_html__('can be obtained by switching on the Public key radio button (Private key won\'t be visible in the settings window, and it will have to be regenerated in settings). Copy or download the newly generated private key.', 'spectrocoin-accepting-bitcoin')); ?>
+							<?php esc_html_e('Click "Submit".', 'spectrocoin-accepting-bitcoin'); ?>
 						</li>
 						<li>
 							<span>7. </span>
-							<?php esc_html_e('Click Submit.', 'spectrocoin-accepting-bitcoin'); ?>
+							<?php esc_html_e('Copy and paste the "Project id".', 'spectrocoin-accepting-bitcoin'); ?>
 						</li>
 						<li>
 							<span>8. </span>
-							<?php esc_html_e('Copy and paste the Merchant ID and Project ID.', 'spectrocoin-accepting-bitcoin'); ?>
+							<?php
+							echo esc_html__('Click on the user icon in the top right and navigate to ', 'spectrocoin-accepting-bitcoin') .
+								'<strong><a href="' . esc_url('https://test.spectrocoin.com/en/settings/') . '">' .
+								esc_html__('Settings', 'spectrocoin-accepting-bitcoin') .
+								'</a></strong>' .
+								esc_html__('. Then click on ', 'spectrocoin-accepting-bitcoin') .
+								'<strong><a href="' . esc_url('https://test.spectrocoin.com/en/settings/api') . '">' .
+								esc_html__('API', 'spectrocoin-accepting-bitcoin') .
+								'</a></strong>' .
+								esc_html__(' and choose ', 'spectrocoin-accepting-bitcoin') .
+								'<strong><a href="' . esc_url('https://test.spectrocoin.com/en/settings/api/create') . '">' .
+								esc_html__('Create New API', 'spectrocoin-accepting-bitcoin') .
+								'</a></strong>.';
+							?>
 						</li>
 						<li>
 							<span>9. </span>
-							<?php esc_html_e('Generate a test product. Create a test page on your WordPress website with a payment form connected to the Spectroin payment gateway. Perform a trial transaction using the test payment gateway (Test mode can be activated in project settings) to validate the integration\'s functionality. Verify the transaction details on the Spectroin dashboard to ensure it was successfully processed.', 'spectrocoin-accepting-bitcoin'); ?>
+							<?php esc_html_e('Add "API name", in scope groups select "View merchant preorders", "Create merchant preorders", "View merchant orders", "Create merchant orders", "Cancel merchant orders" and click "Create API".', 'spectrocoin-accepting-bitcoin'); ?>
+						</li>
+						<li>
+							<span>10. </span>
+							<?php esc_html_e('Copy ant store "Client id" and "Client secret". Save the settings', 'spectrocoin-accepting-bitcoin'); ?>
 						</li>
 						<br>
 						<li><b>
-								<?php esc_html_e('Note:', 'spectrocoin-accepting-bitcoin'); ?>
+							<?php esc_html_e('Note:', 'spectrocoin-accepting-bitcoin'); ?>
 							</b>
 							<?php esc_html_e('Keep in mind that if you want to use the business services of SpectroCoin, your account has to be verified.', 'spectrocoin-accepting-bitcoin'); ?>
 						</li>
