@@ -384,7 +384,7 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 						</li>
 						<li>
 							<span>10. </span>
-							<?php esc_html_e('Copy ant store "Client id" and "Client secret". Save the settings', 'spectrocoin-accepting-bitcoin'); ?>
+							<?php esc_html_e('Copy ant store "Client id" and "Client secret". Please be aware that the "Client secret" will be showed once, so it should be stored safely. Lastly, save the settings.', 'spectrocoin-accepting-bitcoin'); ?>
 						</li>
 						<br>
 						<li><b>

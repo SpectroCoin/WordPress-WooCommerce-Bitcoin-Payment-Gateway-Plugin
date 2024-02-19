@@ -80,9 +80,9 @@ class SCMerchantClient
 			"payCurrencyCode" => $request->getPayCurrencyCode(),
 			"receiveAmount" => $request->getReceiveAmount(),
 			"receiveCurrencyCode" => $request->getReceiveCurrencyCode(),
-			'callbackUrl' => 'http://localhost.com',
-			'successUrl' => 'http://localhost.com',
-			'failureUrl' => 'http://localhost.com'
+			'callbackUrl' => $request->getCallbackUrl(),
+			'successUrl' => $request->getSuccessUrl(),
+			'failureUrl' => $request->getFailureUrl()
 		);
 
 		$sanitized_payload = $this->spectrocoin_sanitize_create_order_payload($payload);
