@@ -365,15 +365,15 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 							<span>8. </span>
 							<?php
 							echo esc_html__('Click on the user icon in the top right and navigate to ', 'spectrocoin-accepting-bitcoin') .
-								'<strong><a href="' . esc_url('https://test.spectrocoin.com/en/settings/') . '">' .
+								'<strong><a href="' . esc_url('https://spectrocoin.com/en/settings/') . '">' .
 								esc_html__('Settings', 'spectrocoin-accepting-bitcoin') .
 								'</a></strong>' .
 								esc_html__('. Then click on ', 'spectrocoin-accepting-bitcoin') .
-								'<strong><a href="' . esc_url('https://test.spectrocoin.com/en/settings/api') . '">' .
+								'<strong><a href="' . esc_url('https://spectrocoin.com/en/settings/api') . '">' .
 								esc_html__('API', 'spectrocoin-accepting-bitcoin') .
 								'</a></strong>' .
 								esc_html__(' and choose ', 'spectrocoin-accepting-bitcoin') .
-								'<strong><a href="' . esc_url('https://test.spectrocoin.com/en/settings/api/create') . '">' .
+								'<strong><a href="' . esc_url('https://spectrocoin.com/en/settings/api/create') . '">' .
 								esc_html__('Create New API', 'spectrocoin-accepting-bitcoin') .
 								'</a></strong>.';
 							?>
