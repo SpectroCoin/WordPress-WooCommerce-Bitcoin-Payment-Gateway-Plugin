@@ -67,12 +67,11 @@ class SCMerchantClient
 	public function spectrocoin_create_order(SpectroCoin_CreateOrderRequest $request)
 	{
 		$this->access_token_data = $this->spectrocoin_get_access_token_data();
-
 		if (!$this->access_token_data) {
-			return new SpectroCoin_ApiError('AuthError', 'Failed to obtain access token');
+			return new SpectroCoin_ApiError('AuthError', 'Failed to obtain or refresh access token');
 		}
 
-		$payload = array(
+		$payload = [
 			"orderId" => $request->getOrderId(),
 			"projectId" => $this->project_id,
 			"description" => $request->getDescription(),
@@ -83,49 +82,93 @@ class SCMerchantClient
 			'callbackUrl' => $request->getCallbackUrl(),
 			'successUrl' => $request->getSuccessUrl(),
 			'failureUrl' => $request->getFailureUrl()
-		);
+		];
 
 		$sanitized_payload = $this->spectrocoin_sanitize_create_order_payload($payload);
-
 		if (!$this->spectrocoin_validate_create_order_payload($sanitized_payload)) {
-            return new SpectroCoin_ApiError(-1, 'Invalid order creation payload, payload: ' . json_encode($sanitized_payload));
+			return new SpectroCoin_ApiError(-1, 'Invalid order creation payload');
 		}
+
 		$json_payload = json_encode($sanitized_payload);
 
-        try {
-            $response = $this->guzzle_client->request('POST', $this->merchant_api_url . '/merchants/orders/create', [
-                RequestOptions::HEADERS => [
-					'Content-Type' => 'application/json',
-					'Authorization' => 'Bearer ' . $this->access_token_data['access_token']
-			],
-                RequestOptions::BODY => $json_payload
-            ]);
+		try {
+			$response = $this->guzzle_client->request('POST', $this->merchant_api_url . '/merchants/orders/create', [
+				RequestOptions::HEADERS => [
+					'Authorization' => 'Bearer ' . $this->access_token_data['access_token'],
+					'Content-Type' => 'application/json'
+				],
+				RequestOptions::BODY => $json_payload
+			]);
 
-            $status_code = $response->getStatusCode();
-            $body = json_decode($response->getBody()->getContents(), true); 
+			$body = json_decode($response->getBody()->getContents(), true);
 
-            if ($status_code == 200 && $body != null) {
-                if (is_array($body) && count($body) > 0 && isset($body[0]->code)) {
-                    return new SpectroCoin_ApiError($body[0]->code, $body[0]->message);
-                } else {
-					return new SpectroCoin_CreateOrderResponse(
-						$body['depositAddress'],
-						$body['memo'],
-						$body['orderId'],
-						$body['payAmount'],
-						$body['payCurrencyCode'],
-						$body['preOrderId'],
-						$body['receiveAmount'],
-						$body['receiveCurrencyCode'],
-						$body['redirectUrl'],
-						$body['validUntil']
-					);
-                }
-            }
-        } catch (GuzzleException $e) {
+			return new SpectroCoin_CreateOrderResponse(
+					$body['depositAddress'],
+					$body['memo'],
+					$body['orderId'],
+					$body['payAmount'],
+					$body['payCurrencyCode'],
+					$body['preOrderId'],
+					$body['receiveAmount'],
+					$body['receiveCurrencyCode'],
+					$body['redirectUrl'],
+					$body['validUntil']
+			);
+
+		} catch (RequestException $e) {
+			if ($e->getResponse() && $e->getResponse()->getStatusCode() == 403) {
+				$this->access_token_data = $this->spectrocoin_refresh_access_token(time());
+
+				if (!$this->access_token_data) {
+					return new SpectroCoin_ApiError('AuthError', 'Failed to refresh access token');
+				}
+
+				return $this->retry_spectrocoin_create_order($json_payload);
+			} else {
+				return new SpectroCoin_ApiError($e->getCode(), $e->getMessage());
+			}
+		} catch (GuzzleException $e) {
 			return new SpectroCoin_ApiError($e->getCode(), $e->getMessage());
-        }
-        return new SpectroCoin_ApiError('Invalid Response', 'No valid response received.');
+		}
+
+		return new SpectroCoin_ApiError('UnknownError', 'An unknown error occurred during order creation');
+	}
+
+		/**
+	 * Retries the order creation request with a refreshed token.
+	 *
+	 * @param string $json_payload The JSON-encoded payload for the order creation request.
+	 * @return SpectroCoin_ApiError|SpectroCoin_CreateOrderResponse The response object with order details or an error object.
+	 */
+	private function retry_spectrocoin_create_order($json_payload)
+	{
+		try {
+			$response = $this->guzzle_client->request('POST', $this->merchant_api_url . '/merchants/orders/create', [
+				RequestOptions::HEADERS => [
+					'Authorization' => 'Bearer ' . $this->access_token_data['access_token'],
+					'Content-Type' => 'application/json'
+				],
+				RequestOptions::BODY => $json_payload
+			]);
+
+			$body = json_decode($response->getBody()->getContents(), true);
+
+			return new SpectroCoin_CreateOrderResponse(
+				$body['depositAddress'],
+				$body['memo'],
+				$body['orderId'],
+				$body['payAmount'],
+				$body['payCurrencyCode'],
+				$body['preOrderId'],
+				$body['receiveAmount'],
+				$body['receiveCurrencyCode'],
+				$body['redirectUrl'],
+				$body['validUntil']
+			);
+
+		} catch (GuzzleException $e) {
+			return new SpectroCoin_ApiError($e->getCode(), $e->getMessage());
+		}
 	}
 	
 	/**
@@ -156,29 +199,35 @@ class SCMerchantClient
 	 * @throws GuzzleException Thrown if there is an error in the HTTP request to the SpectroCoin authorization server.
 	 */
     private function spectrocoin_refresh_access_token($currentTime) {
-        try {
-            $response = $this->guzzle_client->post($this->auth_url, [
-                'form_params' => [
-                    'grant_type' => 'client_credentials',
-                    'client_id' => $this->client_id,
-                    'client_secret' => $this->client_secret,
-                ],
-            ]);
-
-            $data = json_decode($response->getBody(), true);
-            if (!isset($data['access_token'], $data['expires_in'])) {
-                return new SpectroCoin_ApiError('Invalid access token response', 'No valid response received.');
-            }
-            $data['expires_at'] = time() + $data['expires_in'];
-            $this->access_token_data = $data;
+		try {
+			$response = $this->guzzle_client->post($this->auth_url, [
+				'form_params' => [
+					'grant_type' => 'client_credentials',
+					'client_id' => $this->client_id,
+					'client_secret' => $this->client_secret,
+				],
+			]);
+	
+			$data = json_decode($response->getBody(), true);
+			if (!isset($data['access_token'], $data['expires_in'])) {
+				return new SpectroCoin_ApiError('Invalid access token response', 'No valid response received.');
+			}
+	
+			// Delete the old transient before setting a new one
+			delete_transient($this->access_token_transient_key);
+	
+			$data['expires_at'] = $currentTime + $data['expires_in'];
 			$encryptedAccessTokenData = SpectroCoin_Utilities::spectrocoin_encrypt_auth_data(json_encode($data), $this->encryption_key);
+	
+			// Set the new transient with the refreshed token
 			set_transient($this->access_token_transient_key, $encryptedAccessTokenData, $data['expires_in']);
+	
 			$this->access_token_data = $data;
-            return $this->access_token_data;
-        } catch (GuzzleException $e) {
-            return new SpectroCoin_ApiError('Failed to refresh access token', $e->getMessage());
-        }
-    }
+			return $this->access_token_data;
+		} catch (GuzzleException $e) {
+			return new SpectroCoin_ApiError('Failed to refresh access token', $e->getMessage());
+		}
+	}
 
 
 	/**
