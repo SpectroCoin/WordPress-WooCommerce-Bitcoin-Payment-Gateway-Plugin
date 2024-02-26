@@ -518,14 +518,12 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 		$expected_keys = ['userId', 'merchantApiId', 'merchantId', 'apiId', 'orderId', 'payCurrency', 'payAmount', 'receiveCurrency', 'receiveAmount', 'receivedAmount', 'description', 'orderRequestId', 'status', 'sign'];
 
 		$post_data = [];
-		$this->spectrocoin_woocommerce_log('$_POST variable: ' . print_r($_POST, true)); //DEBUG
 		foreach ($expected_keys as $key) {
 			if (isset($_POST[$key])) {
 				$post_data[$key] = $_POST[$key];
 			}
 		}
 		$callback = $this->scClient->spectrocoin_process_callback($post_data);
-		$this->spectrocoin_woocommerce_log("callback() callback: " . print_r($callback, true)); //DEBUG
 		if ($callback) {
 			$order_id = $this->spectrocoin_parse_order_id($callback->getOrderId());
 			$status = $callback->getStatus();
