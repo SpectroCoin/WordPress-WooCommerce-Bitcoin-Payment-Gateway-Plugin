@@ -457,7 +457,6 @@ class SCMerchantClient
 		return false;
 	}
 
-
 	/**
 	 * @param $data
 	 * @param $signature
@@ -471,5 +470,4 @@ class SCMerchantClient
 		$r = openssl_verify($data, $sig, $public_key_pem, OPENSSL_ALGO_SHA1);
 		return $r;
 	}
-
 }

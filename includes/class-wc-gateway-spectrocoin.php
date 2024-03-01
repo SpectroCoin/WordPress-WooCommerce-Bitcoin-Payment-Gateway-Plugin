@@ -125,24 +125,24 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 
 		if (empty($this->client_id)) {
 			if ($display_notice) {
-				spectrocoin_admin_error_notice('Client id is empty');
-				error_log('SpectroCoin Error: Client id is empty');
+				spectrocoin_admin_error_notice('Client ID is empty');
+				error_log('SpectroCoin Error: Client ID is empty');
 			}
 			$is_valid = false;
 		}
 
 		if (empty($this->project_id)) {
 			if ($display_notice) {
-				spectrocoin_admin_error_notice('Project id is empty');
-				error_log('SpectroCoin Error: Project id is empty');
+				spectrocoin_admin_error_notice('Project ID is empty');
+				error_log('SpectroCoin Error: Project ID is empty');
 			}
 			$is_valid = false;
 		}
 
 		if (empty($this->client_secret)) {
 			if ($display_notice) {
-				spectrocoin_admin_error_notice('Client secret is empty');
-				error_log('SpectroCoin Error: Client secret is empty');
+				spectrocoin_admin_error_notice('Client Secret is empty');
+				error_log('SpectroCoin Error: Client Secret is empty');
 			}
 			$is_valid = false;
 		}
@@ -384,7 +384,7 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 						</li>
 						<li>
 							<span>10. </span>
-							<?php esc_html_e('Copy ant store "Client id" and "Client secret". Please be aware that the "Client secret" will be showed once, so it should be stored safely. Lastly, save the settings.', 'spectrocoin-accepting-bitcoin'); ?>
+							<?php esc_html_e('Copy ant store "Client ID" and "Client Secret". Please be aware that the "Client Secret" will be showed once, so it should be stored safely. Lastly, save the settings.', 'spectrocoin-accepting-bitcoin'); ?>
 						</li>
 						<br>
 						<li><b>
