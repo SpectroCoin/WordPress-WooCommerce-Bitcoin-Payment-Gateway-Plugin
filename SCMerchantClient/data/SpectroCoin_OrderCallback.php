@@ -173,7 +173,4 @@ class SpectroCoin_OrderCallback
 
 		return $valid;
 	}
-
-
-
 }

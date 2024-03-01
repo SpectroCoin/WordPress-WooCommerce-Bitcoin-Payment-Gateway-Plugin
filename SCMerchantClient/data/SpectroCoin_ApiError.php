@@ -34,6 +34,4 @@ class SpectroCoin_ApiError
 	{
 		return $this->message;
 	}
-
-
 }

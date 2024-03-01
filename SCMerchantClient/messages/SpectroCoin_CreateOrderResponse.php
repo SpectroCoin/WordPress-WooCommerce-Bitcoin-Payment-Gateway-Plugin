@@ -6,7 +6,6 @@ if (!defined('ABSPATH')) {
 
 class SpectroCoin_CreateOrderResponse
 {
-
 	private $depositAddress;
 	private $orderId;
 	private $orderRequestId;

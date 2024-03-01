@@ -112,6 +112,4 @@ class SpectroCoin_CreateOrderRequest
 	{
 		return $this->failureUrl == null ? '' : $this->failureUrl;
 	}
-
-
 }
