@@ -329,7 +329,7 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 					</p>
 					<p>
 						<?php
-						esc_html_e('The SpectroCoin plugin allows seamless integration of payment gateways into your WordPress website. To get started, you\'ll need to obtain the essential credentials: "Project id", "Client id", and "Client secret". These credentials are required to enable secure transactions between your website and the payment gateway. Follow the step-by-step tutorial below to acquire these credentials:', 'spectrocoin-accepting-bitcoin');
+						esc_html_e('The SpectroCoin plugin allows seamless integration of payment gateways into your WordPress website. To get started, you\'ll need to obtain the essential credentials: "Project ID", "Client ID", and "Client Secret". These credentials are required to enable secure transactions between your website and the payment gateway. Follow the step-by-step tutorial below to acquire these credentials:', 'spectrocoin-accepting-bitcoin');
 						?>
 					</p>
 					<ul>
@@ -359,7 +359,7 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 						</li>
 						<li>
 							<span>7. </span>
-							<?php esc_html_e('Copy and paste the "Project id".', 'spectrocoin-accepting-bitcoin'); ?>
+							<?php esc_html_e('Copy and paste the "Project ID".', 'spectrocoin-accepting-bitcoin'); ?>
 						</li>
 						<li>
 							<span>8. </span>
@@ -435,15 +435,15 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 				'description' => esc_html__('This controls the description which the user sees during checkout.', 'spectrocoin-accepting-bitcoin'),
 			),
 			'project_id' => array(
-				'title' => esc_html__('Project id', 'spectrocoin-accepting-bitcoin'),
+				'title' => esc_html__('Project ID', 'spectrocoin-accepting-bitcoin'),
 				'type' => 'text',
 			),
 			'client_id' => array(
-				'title' => esc_html__('Client id', 'spectrocoin-accepting-bitcoin'),
+				'title' => esc_html__('Client ID', 'spectrocoin-accepting-bitcoin'),
 				'type' => 'text'
 			),
 			'client_secret' => array(
-				'title' => esc_html__('Client secret', 'spectrocoin-accepting-bitcoin'),
+				'title' => esc_html__('Client Secret', 'spectrocoin-accepting-bitcoin'),
 				'type' => 'text',
 			),
 			'order_status' => array(
@@ -497,13 +497,13 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 				'redirect' => ''
 			);
 		}
-		$preorderUrl = $response->getRedirectUrl();
-        $order->add_order_note("SpectroCoin order has been created: " . $preorderUrl);
+		$preorder_url = $response->getRedirectUrl();
+        $order->add_order_note("SpectroCoin order has been created: " . $preorder_url);
 		wc_reduce_stock_levels($order_id);
 		$woocommerce->cart->empty_cart();
 		return array(
 			'result' => 'success',
-			'redirect' => $preorderUrl
+			'redirect' => $preorder_url
 		);
 	}
 
