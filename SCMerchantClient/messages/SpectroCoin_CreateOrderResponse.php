@@ -6,109 +6,99 @@ if (!defined('ABSPATH')) {
 
 class SpectroCoin_CreateOrderResponse
 {
-	private $depositAddress;
-	private $orderId;
-	private $orderRequestId;
-	private $payAmount;
-	private $payCurrency;
-	private $receiveAmount;
-	private $receiveCurrency;
-	private $validUntil;
-	private $redirectUrl;
+    private $preOrderId;
+    private $orderId;
+    private $validUntil;
+    private $payCurrencyCode;
+    private $payNetworkCode;
+    private $receiveCurrencyCode;
+    private $payAmount;
+    private $receiveAmount;
+    private $depositAddress;
+    private $memo;
+    private $redirectUrl;
 
-	/**
-	 * @param $orderRequestId
-	 * @param $orderId
-	 * @param $depositAddress
-	 * @param $payAmount
-	 * @param $payCurrency
-	 * @param $receiveAmount
-	 * @param $receiveCurrency
-	 * @param $validUntil
-	 * @param $redirectUrl
-	 */
-	function __construct($orderRequestId, $orderId, $depositAddress, $payAmount, $payCurrency, $receiveAmount, $receiveCurrency, $validUntil, $redirectUrl)
-	{
-		$this->orderRequestId = $orderRequestId;
-		$this->orderId = $orderId;
-		$this->depositAddress = $depositAddress;
-		$this->payAmount = $payAmount;
-		$this->payCurrency = $payCurrency;
-		$this->receiveAmount = $receiveAmount;
-		$this->receiveCurrency = $receiveCurrency;
-		$this->validUntil = $validUntil;
-		$this->redirectUrl = $redirectUrl;
-	}
+    /**
+     * @param $preOrderId
+     * @param $orderId
+     * @param $validUntil
+     * @param $payCurrencyCode
+     * @param $payNetworkCode
+     * @param $receiveCurrencyCode
+     * @param $payAmount
+     * @param $receiveAmount
+     * @param $depositAddress
+     * @param $memo
+     * @param $redirectUrl
+     */
+    function __construct($preOrderId, $orderId, $validUntil, $payCurrencyCode, $payNetworkCode, $receiveCurrencyCode, $payAmount, $receiveAmount, $depositAddress, $memo, $redirectUrl)
+    {
+        $this->preOrderId = $preOrderId;
+        $this->orderId = $orderId;
+        $this->validUntil = $validUntil;
+        $this->payCurrencyCode = $payCurrencyCode;
+        $this->payNetworkCode = $payNetworkCode;
+        $this->receiveCurrencyCode = $receiveCurrencyCode;
+        $this->payAmount = $payAmount;
+        $this->receiveAmount = $receiveAmount;
+        $this->depositAddress = $depositAddress;
+        $this->memo = $memo;
+        $this->redirectUrl = $redirectUrl;
+    }
 
-	/**
-	 * @return String
-	 */
-	public function getDepositAddress()
-	{
-		return $this->depositAddress;
-	}
+    // Getter methods for each property
+    public function getPreOrderId()
+    {
+        return $this->preOrderId;
+    }
 
-	/**
-	 * @return String
-	 */
-	public function getOrderId()
-	{
-		return $this->orderId;
-	}
+    public function getOrderId()
+    {
+        return $this->orderId;
+    }
 
-	/**
-	 * @return Integer
-	 */
-	public function getOrderRequestId()
-	{
-		return $this->orderRequestId;
-	}
+    public function getValidUntil()
+    {
+        return $this->validUntil;
+    }
 
-	/**
-	 * @return Float
-	 */
-	public function getPayAmount()
-	{
-		return $this->payAmount;
-	}
+    public function getPayCurrencyCode()
+    {
+        return $this->payCurrencyCode;
+    }
 
-	/**
-	 * @return String
-	 */
-	public function getPayCurrency()
-	{
-		return $this->payCurrency;
-	}
+    public function getPayNetworkCode()
+    {
+        return $this->payNetworkCode;
+    }
 
-	/**
-	 * @return Float
-	 */
-	public function getReceiveAmount()
-	{
-		return $this->receiveAmount;
-	}
+    public function getReceiveCurrencyCode()
+    {
+        return $this->receiveCurrencyCode;
+    }
 
-	/**
-	 * @return String
-	 */
-	public function getReceiveCurrency()
-	{
-		return $this->receiveCurrency;
-	}
+    public function getPayAmount()
+    {
+        return $this->payAmount;
+    }
 
-	/**
-	 * @return Integer
-	 */
-	public function getValidUntil()
-	{
-		return $this->validUntil;
-	}
+    public function getReceiveAmount()
+    {
+        return $this->receiveAmount;
+    }
 
-	/**
-	 * @return mixed
-	 */
-	public function getRedirectUrl()
-	{
-		return $this->redirectUrl;
-	}
+    public function getDepositAddress()
+    {
+        return $this->depositAddress;
+    }
+
+    public function getMemo()
+    {
+        return $this->memo;
+    }
+
+    public function getRedirectUrl()
+    {
+        return $this->redirectUrl;
+    }
 }

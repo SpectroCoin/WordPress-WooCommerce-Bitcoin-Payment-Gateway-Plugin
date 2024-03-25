@@ -451,7 +451,7 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 				'desc_tip' => true,
 				'description' => esc_html__('Order status after payment has been received. Custom order statuses will appear in the list.', 'spectrocoin-accepting-bitcoin'),
 				'type' => 'select',
-				'default' => 'Completed',
+				'default' => 'completed',
 				'options' => $this->all_order_statuses
 			),
 			'display_logo' => array(

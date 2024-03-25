@@ -4,12 +4,12 @@ Integrate cryptocurrency payments seamlessly into your Wordpress store with the 
 
 ## Installation
 
-0. We strongly recommend downloading the plugin from Wordpress plugins site. In this case you will be able to update the plugin automatically. In case you are downloading it from Github, please follow the installation steps below.</br>
-1. Download latest plugin release from [github](https://github.com/SpectroCoin/WordPress-WooCommerce-Bitcoin-Payment-Gateway-Plugin).
-2. Extract and upload plugin folder to your Wordpress <em>/wp-content/plugins</em> folder.<br />
+0. We strongly recommend downloading the plugin from [Wordpress](https://wordpress.org/plugins/spectrocoin-accepting-bitcoin/). In case you are downloading it from github, please follow the installation steps below.</br>
+1. Download latest release from github.
+2. Extract and upload plugin folder to your Wordpress <em>/wp-content/plugins/</em> directory.<br />
    OR<br>
-   in "Plugins" -> "Add New" -> "Upload Plugin". -> Upload <em>spectrocoin.zip</em>.</br>
-3. Go to "Plugins" -> "Installed Plugins" -> Locate installed plugin and click "Activate" -> Click "Settings".
+   From Wordpress admin dashboard navigate tp **"Plugins"** -> **"Add New"** -> **"Upload Plugin"**. -> Upload <em>spectrocoin.zip</em>.</br>
+3. Go to **"Plugins"** -> **"Installed Plugins"** -> Locate installed plugin and click **"Activate"** -> **"Settings"**.
 
 ## Setting up
 
@@ -18,27 +18,27 @@ Integrate cryptocurrency payments seamlessly into your Wordpress store with the 
 3. On the dashboard, locate the **[Business](https://spectrocoin.com/en/merchants/projects)** tab and click on it.
 4. Click on **[New project](https://spectrocoin.com/en/merchants/projects/new)**.
 5. Fill in the project details and select desired settings (settings can be changed).
-6. Click "Submit".
+6. Click **"Submit"**.
 7. Copy and paste the "Project id".
 8. Click on the user icon in the top right and navigate to **[Settings](https://test.spectrocoin.com/en/settings/)**. Then click on **[API](https://test.spectrocoin.com/en/settings/api)** and choose **[Create New API](https://test.spectrocoin.com/en/settings/api/create)**.
-9. Add "API name", in scope groups select "View merchant preorders", "Create merchant preorders", "View merchant orders", "Create merchant orders", "Cancel merchant orders" and click "Create API".
+9. Add "API name", in scope groups select **"View merchant preorders"**, **"Create merchant preorders"**, **"View merchant orders"**, **"Create merchant orders"**, **"Cancel merchant orders"** and click **"Create API"**.
 10. Copy and store "Client id" and "Client secret". Save the settings.
 
 **Note:** Keep in mind that if you want to use the business services of SpectroCoin, your account has to be verified.
 
-## Make it work on localhost
+## Test order creation on localhost
 
-We gently suggest trying out the plugin in a server environment, as it will not be capable of receiving callbacks from SpectroCoin. To successfully create and order on localhost for testing purposes, <b>change these 3 lines in <em>SCMechantClient.php createOrder() function</em></b>:
+We gently suggest trying out the plugin in a server environment, as it will not be capable of receiving callbacks from SpectroCoin if it will be hosted on localhost. To successfully create an order on localhost for testing purposes, <b>change these 3 lines in <em>SCMechantClient.php spectrocoinCreateOrder() function</em></b>:
 
-`'callbackUrl' => $request->getCallbackUrl(),
-'successUrl' => $request->getSuccessUrl(),
-'failureUrl' => $request->getFailureUrl()`
+`'callbackUrl' => $request->getCallbackUrl()`, <br>
+`'successUrl' => $request->getSuccessUrl()`, <br>
+`'failureUrl' => $request->getFailureUrl()`
 
 <b>To</b>
 
-`'callbackUrl' => 'http://localhost.com',
-'successUrl' => 'http://localhost.com',
-'failureUrl' => 'http://localhost.com'`
+`'callbackUrl' => 'http://localhost.com'`, <br>
+`'successUrl' => 'http://localhost.com'`, <br>
+`'failureUrl' => 'http://localhost.com'`
 
 Adjust it appropriately if your local environment URL differs.
 Don't forget to change it back when migrating website to public.
@@ -55,7 +55,7 @@ _Added_: OAuth functionality introduced for authentication, requiring Client ID 
 
 _Fixed_: Changed save button class to prevent conflicts with other buttons.
 
-### Version 1.5.0 MINOR (02/05/2024):
+### 1.5.0 MINOR (02/05/2024):
 
 _Added_: Compatibility with the new block-based checkout functionality introduced in WooCommerce 8.3.
 
@@ -71,21 +71,21 @@ _Added_: Messages related with order processing to order notes.
 
 _Fixed_: "Failed" status with failed and expired orders.
 
-### Version 1.4.1 PATCH (01/26/2024):
+### 1.4.1 PATCH (01/26/2024):
 
 _Removed_: Plugin dependency from plugin directory names
 
 _Fixed_: Fatal error for new installations
 
-### Version 1.4.0 MINOR (01/03/2024):
+### 1.4.0 MINOR (01/03/2024):
 
 This update is significant to plugin's security and stability. The posibility of errors during checkout is minimized, reduced posibility of XSS and SQL injection attacks.
 
-Migrated: Since HTTPful is no longer maintained, we migrated to GuzzleHttp. In this case /vendor directory was added which contains GuzzleHttp dependencies.
+_Migrated_: Since HTTPful is no longer maintained, we migrated to GuzzleHttp. In this case /vendor directory was added which contains GuzzleHttp dependencies.
 
-Added: Settings field sanitization.
+_Added_: Settings field sanitization.
 
-Added: Settings field validation. In this case we minimized possible error count during checkout, SpectroCoin won't appear in checkout until settings validation is passed.
+_Added_: Settings field validation. In this case we minimized possible error count during checkout, SpectroCoin won't appear in checkout until settings validation is passed.
 
 _Added_: Admin notice in admin plugin settings for all fields validation.
 
@@ -113,7 +113,7 @@ _Updated_: Removed hardcoded notice display from admin_options() function.
 
 _Updated_: spectrocoin_admin_error_notice() function, added additional parameter to allow hyperlink display. Also the notice will be displayed once and won't be displayed in other admin screens except SpectroCoin settings.
 
-### Version 1.3.0 MINOR (10/04/2023):
+### 1.3.0 MINOR (10/04/2023):
 
 _Fixed_: Replaced hardcoded order statuses in plugin settings.
 
@@ -125,7 +125,7 @@ _Added:_ Now plugin checks the FIAT currency, if it is not supported by SpectroC
 
 _Added:_ Added admin notice in admin plugin settings to notify that shop currency is not supported by SpectroCoin.
 
-### Version 1.2.0 MINOR (09/10/2023):
+### 1.2.0 MINOR (09/10/2023):
 
 _Added_: Implemented plugin string internationalization, for plugin translation to various languages.
 
@@ -137,13 +137,11 @@ _Modified_: Added style changes in settings window
 
 _For Developers_: Added documentation with parameters and return variables before every function
 
-### Version 1.1.0 MINOR (07/31/2023):
+### 1.1.0 MINOR (07/31/2023):
 
 _Added_: Included a new option in admin menu, to display or not the SpectroCoin logo during checkout.
 
-### Version 1.0.0 MAJOR (07/31/2023):
-
-_Fixed:_ Corrected a typo in the plugin's description. Changed "aplugin" to "a plugin" for better clarity.
+### 1.0.0 MAJOR (07/31/2023):
 
 _Added_: Included a link to access SpectroCoin plugin settings directly from the plugin page. This enhancement provides users with easier access to the configuration options.
 
@@ -165,5 +163,5 @@ This client has been developed by SpectroCoin.com If you need any further suppor
 E-mail: merchant@spectrocoin.com </br>
 Skype: spectrocoin_merchant </br>
 [Web](https://spectrocoin.com) </br>
-[Twitter](https://twitter.com/spectrocoin) </br>
-[Facebook](https://www.facebook.com/spectrocoin/)<br />
+[X (formerly Twitter)](https://twitter.com/spectrocoin) </br>
+[Facebook](https://www.facebook.com/spectrocoin/)
