@@ -107,16 +107,17 @@ class SCMerchantClient
 			$body = json_decode($response->getBody()->getContents(), true);
 
 			return new SpectroCoin_CreateOrderResponse(
+					$body['preOrderId'],
+					$body['orderId'],
+					$body['validUntil'],
+					$body['payCurrencyCode'],
+					$body['payNetworkCode'],
+					$body['receiveCurrencyCode'],
+					$body['payAmount'],
+					$body['receiveAmount'],
 					$body['depositAddress'],
 					$body['memo'],
-					$body['orderId'],
-					$body['payAmount'],
-					$body['payCurrencyCode'],
-					$body['preOrderId'],
-					$body['receiveAmount'],
-					$body['receiveCurrencyCode'],
-					$body['redirectUrl'],
-					$body['validUntil']
+					$body['redirectUrl']
 			);
 
 		} catch (RequestException $e) {
