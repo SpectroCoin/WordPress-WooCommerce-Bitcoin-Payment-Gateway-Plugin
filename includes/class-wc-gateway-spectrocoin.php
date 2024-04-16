@@ -574,7 +574,6 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 	 */
 	private function new_request($order, $total, $receive_currency)
 	{
-		$test_callback_url = "https://testingcallbacks.loca.lt" . '?wc-api=' . self::$callback_name;
 		$callback_url = get_site_url(null, '?wc-api=' . self::$callback_name);
 		$success_url = $this->get_return_url($order);
 		$failure_url = $this->get_return_url($order);
@@ -585,7 +584,7 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 			self::$pay_currency, 
 			$total,
 			$receive_currency,
-			$test_callback_url,
+			$callback_url,
 			$success_url,
 			$failure_url
 		);
