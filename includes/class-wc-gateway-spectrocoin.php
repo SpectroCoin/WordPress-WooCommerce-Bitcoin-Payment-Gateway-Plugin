@@ -449,7 +449,7 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 			'order_status' => array(
 				'title' => esc_html__('Order status', 'spectrocoin-accepting-bitcoin'),
 				'desc_tip' => true,
-				'description' => esc_html__('Order status after payment has been received. Custom order statuses will appear in the list.', 'spectrocoin-accepting-bitcoin'),
+				'description' => esc_html__('Order status after payment has been received or when a test callback was using test mode. Custom order statuses will appear in the list.', 'spectrocoin-accepting-bitcoin'),
 				'type' => 'select',
 				'default' => 'completed',
 				'options' => $this->all_order_statuses
@@ -464,7 +464,7 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 			),
 			'test_mode' => array(
 				'title' => esc_html__('Test mode', 'spectrocoin-accepting-bitcoin'),
-				'description' => esc_html__('When enabled, if order callback is received, then test order will be set to selected order status (by default - "Completed"). Also SpectroCoin payment option will be visible only for admin user.', 'spectrocoin-accepting-bitcoin'),
+				'description' => esc_html__('When enabled, test order will be set according to chosen SpectroCoin test status, if "paid", then to selected order status (by default "completed"), if "expired", then the order will flagged as "failed" order status. Also SpectroCoin payment option will be visible only for admin user.', 'spectrocoin-accepting-bitcoin'),
 				'desc_tip' => true,
 				'type' => 'checkbox',
 				'label' => esc_html__('Enable', 'spectrocoin-accepting-bitcoin'),
@@ -536,21 +536,19 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 						$order->update_status('Pending payment');
 						break;
 					case (3): // paid
+						if($this->spectrocoin_is_test_mode_enabled() === 'yes'){
+							$order->update_status($this->order_status, "Test order {$order_id} with SpectroCoin status 'paid' was set to 'completed'.");
+						}
 						$order->update_status($this->order_status);
 						break;
 					case (4): // failed
                         $order->update_status('failed');
                         break;
 					case (5): // expired
-						$order->update_status('failed', "Order {$order_id} has expired, status updated to failed. It might be the result of the customer underpaying or failing to pay for the order within the allotted time.");
-						break;
-					case (6): // test
 						if($this->spectrocoin_is_test_mode_enabled() === 'yes'){
-							$order->update_status($this->order_status, "Test order {$order_id} has been completed.");
+							$order->update_status('failed', "Test order {$order_id} with SpectroCoin status 'expired' was set to 'failed'.");
 						}
-						else{
-							$order->update_status('failed');
-						}
+						$order->update_status('failed', "Order {$order_id} has expired, status updated to failed. It might be the result of the customer underpaying or failing to pay for the order within the allotted time.");
 						break;
 				}
 				echo esc_html__('*ok*', 'spectrocoin-accepting-bitcoin');
