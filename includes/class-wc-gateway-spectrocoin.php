@@ -463,8 +463,8 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 				'default' => 'yes'
 			),
 			'test_mode' => array(
-				'title' => esc_html__('Test mode', 'spectrocoin-accepting-bitcoin'),
-				'description' => esc_html__('When enabled, test order will be set according to chosen SpectroCoin test status, if "paid", then to selected order status (by default "completed"), if "expired", then the order will flagged as "failed" order status. Also SpectroCoin payment option will be visible only for admin user.', 'spectrocoin-accepting-bitcoin'),
+				'title' => esc_html__('Hide from checkout', 'spectrocoin-accepting-bitcoin'),
+				'description' => esc_html__('When enabled SpectroCoin payment option will be visible only for admin user.', 'spectrocoin-accepting-bitcoin'),
 				'desc_tip' => true,
 				'type' => 'checkbox',
 				'label' => esc_html__('Enable', 'spectrocoin-accepting-bitcoin'),
@@ -536,19 +536,13 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 						$order->update_status('Pending payment');
 						break;
 					case (3): // paid
-						if($this->spectrocoin_is_test_mode_enabled() === 'yes'){
-							$order->update_status($this->order_status, "This is a TEST order. It was not paid and the order status was changed based on the SpectroCoin project settings.");
-						}
 						$order->update_status($this->order_status);
 						break;
 					case (4): // failed
                         $order->update_status('failed');
                         break;
 					case (5): // expired
-						if($this->spectrocoin_is_test_mode_enabled() === 'yes'){
-							$order->update_status($this->order_status, "This is a TEST order. It was not paid and the order status was changed based on the SpectroCoin project settings.");
-						}
-						$order->update_status('failed', "Order {$order_id} has expired, status updated to failed. It might be the result of the customer underpaying or failing to pay for the order within the allotted time.");
+						$order->update_status($this->order_status);
 						break;
 				}
 				echo esc_html__('*ok*', 'spectrocoin-accepting-bitcoin');
