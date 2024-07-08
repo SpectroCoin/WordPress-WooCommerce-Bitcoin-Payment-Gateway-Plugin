@@ -11,5 +11,4 @@ class SpectroCoin_OrderStatusEnum
 	public static $Paid = 3;
 	public static $Failed = 4;
 	public static $Expired = 5;
-	public static $Test = 6;
 }

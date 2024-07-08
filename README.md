@@ -40,8 +40,11 @@ We gently suggest trying out the plugin in a server environment, as it will not 
 `'successUrl' => 'http://localhost.com'`, <br>
 `'failureUrl' => 'http://localhost.com'`
 
-Adjust it appropriately if your local environment URL differs.
 Don't forget to change it back when migrating website to public.
+
+## Debugging
+
+If you get "Something went wrong. Please contact us to get assistance." message during checkout process, please navigate to **"WooCommerce"** -> **"Status"** -> **"Logs"** and check **"spectrocoin"** log file for more information. If the logs are not helpful or do not display, please contact us and provide the log file details so that we can help.
 
 ## Changelog
 
@@ -156,7 +159,7 @@ _Added:_ Enhanced the style of the admin's payment settings window to match the 
 
 _Added:_ Introduced an informative message on the admin page, guiding users on how to obtain the mandatory credentials required for using the SpectroCoin plugin effectively. This addition helps users easily find the necessary information for setup and configuration.
 
-## Information
+## Contact
 
 This client has been developed by SpectroCoin.com If you need any further support regarding our services you can contact us via:
 
