@@ -537,7 +537,7 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 						break;
 					case (3): // paid
 						if($this->spectrocoin_is_test_mode_enabled() === 'yes'){
-							$order->update_status($this->order_status, "Test order {$order_id} with SpectroCoin status 'paid' was set to 'completed'.");
+							$order->update_status($this->order_status, "This is a TEST order. It was not paid and the order status was changed based on the SpectroCoin project settings.");
 						}
 						$order->update_status($this->order_status);
 						break;
@@ -546,7 +546,7 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
                         break;
 					case (5): // expired
 						if($this->spectrocoin_is_test_mode_enabled() === 'yes'){
-							$order->update_status('failed', "Test order {$order_id} with SpectroCoin status 'expired' was set to 'failed'.");
+							$order->update_status($this->order_status, "This is a TEST order. It was not paid and the order status was changed based on the SpectroCoin project settings.");
 						}
 						$order->update_status('failed', "Order {$order_id} has expired, status updated to failed. It might be the result of the customer underpaying or failing to pay for the order within the allotted time.");
 						break;
