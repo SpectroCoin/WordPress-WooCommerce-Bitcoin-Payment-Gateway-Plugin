@@ -7,10 +7,10 @@ Text Domain: spectrocoin-accepting-bitcoin
 Plugin URI:  https://github.com/SpectroCoin/WordPress-WooCommerce-Bitcoin-Payment-Gateway-Plugin
 Description: Integrates SpectroCoin crypto payments with WooCommerce.
 Version:     2.0.0
-Requires at least: 6.2
-Requires PHP: 7.4
-WC requires at least: 7.4
-WC tested up to: 8.7.0
+Requires at least: 6.5.5
+Requires PHP: 8.0
+WC requires at least: 8.0
+WC tested up to: 9.0.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 */
