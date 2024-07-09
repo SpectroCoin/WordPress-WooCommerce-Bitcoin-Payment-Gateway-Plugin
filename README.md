@@ -58,7 +58,11 @@ _Added_: OAuth functionality introduced for authentication, requiring Client ID 
 
 _Fixed_: Changed save button class to prevent conflicts with other buttons.
 
-### 1.5.0 MINOR (02/05/2024):
+_Updated_: Class and some method names have been updated based on PSR-12 standards.
+
+_Updated_: Composer class autoloading has been implemented.
+
+### 1.5.0 (02/05/2024):
 
 _Added_: Compatibility with the new block-based checkout functionality introduced in WooCommerce 8.3.
 
@@ -74,13 +78,13 @@ _Added_: Messages related with order processing to order notes.
 
 _Fixed_: "Failed" status with failed and expired orders.
 
-### 1.4.1 PATCH (01/26/2024):
+### 1.4.1 (01/26/2024):
 
 _Removed_: Plugin dependency from plugin directory names
 
 _Fixed_: Fatal error for new installations
 
-### 1.4.0 MINOR (01/03/2024):
+### 1.4.0 (01/03/2024):
 
 This update is significant to plugin's security and stability. The posibility of errors during checkout is minimized, reduced posibility of XSS and SQL injection attacks.
 
@@ -116,7 +120,7 @@ _Updated_: Removed hardcoded notice display from admin_options() function.
 
 _Updated_: spectrocoin_admin_error_notice() function, added additional parameter to allow hyperlink display. Also the notice will be displayed once and won't be displayed in other admin screens except SpectroCoin settings.
 
-### 1.3.0 MINOR (10/04/2023):
+### 1.3.0 (10/04/2023):
 
 _Fixed_: Replaced hardcoded order statuses in plugin settings.
 
@@ -128,7 +132,7 @@ _Added:_ Now plugin checks the FIAT currency, if it is not supported by SpectroC
 
 _Added:_ Added admin notice in admin plugin settings to notify that shop currency is not supported by SpectroCoin.
 
-### 1.2.0 MINOR (09/10/2023):
+### 1.2.0 (09/10/2023):
 
 _Added_: Implemented plugin string internationalization, for plugin translation to various languages.
 
@@ -140,11 +144,11 @@ _Modified_: Added style changes in settings window
 
 _For Developers_: Added documentation with parameters and return variables before every function
 
-### 1.1.0 MINOR (07/31/2023):
+### 1.1.0 (07/31/2023):
 
 _Added_: Included a new option in admin menu, to display or not the SpectroCoin logo during checkout.
 
-### 1.0.0 MAJOR (07/31/2023):
+### 1.0.0 (07/31/2023):
 
 _Added_: Included a link to access SpectroCoin plugin settings directly from the plugin page. This enhancement provides users with easier access to the configuration options.
 
