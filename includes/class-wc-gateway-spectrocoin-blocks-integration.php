@@ -1,5 +1,7 @@
 <?php
 
+namespace SpectroCoin\Includes;
+
 if (!defined('ABSPATH')) {
 	die('Access denied.');
 }

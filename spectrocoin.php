@@ -20,6 +20,8 @@ if (!defined('ABSPATH')) {
 	die('Access denied.');
 }
 
+require_once __DIR__ . '/vendor/autoload.php';
+
 define('SPECTROCOIN_REQUIRED_PHP_VERSION', '7.4');
 define('SPECTROCOIN_WP_VERSION', '6.2');
 

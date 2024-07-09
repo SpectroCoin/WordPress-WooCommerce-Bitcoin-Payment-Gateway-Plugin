@@ -1,5 +1,7 @@
 <?php
 
+namespace SpectroCoin\SCMerchantClient\Messages;
+
 if (!defined('ABSPATH')) {
 	die('Access denied.');
 }
