@@ -8,7 +8,7 @@ if (!defined('ABSPATH')) {
 
 use Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodType;
 
-final class WC_Gateway_Blocks_SpectroCoin extends AbstractPaymentMethodType {
+final class WCGatewayBlocksSpectroCoin extends AbstractPaymentMethodType {
     private $gateway;
     protected $name = 'spectrocoin';
 

@@ -6,7 +6,7 @@ if (!defined('ABSPATH')) {
 	die('Access denied.');
 }
 
-class SpectroCoin_OrderStatusEnum
+class SpectroCoinOrderStatusEnum
 {
 	public static $New = 1;
 	public static $Pending = 2;

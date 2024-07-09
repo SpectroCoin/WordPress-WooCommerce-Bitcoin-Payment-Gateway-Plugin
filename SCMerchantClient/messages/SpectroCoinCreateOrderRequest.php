@@ -6,7 +6,7 @@ if (!defined('ABSPATH')) {
 	die('Access denied.');
 }
 
-class SpectroCoin_CreateOrderRequest
+class SpectroCoinCreateOrderRequest
 {
 	private $orderId;
 	private $description;

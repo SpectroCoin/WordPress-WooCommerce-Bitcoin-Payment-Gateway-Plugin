@@ -2,11 +2,11 @@
 
 namespace SpectroCoin\Includes;
 
+use SpectroCoin\SCMerchantClient\SCMerchantClient;
+
 if (!defined('ABSPATH')) {
 	die('Access denied.');
 }
-
-
 
 if (!in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_option('active_plugins')))) {
 	return;
@@ -16,12 +16,10 @@ if (!class_exists('WC_Payment_Gateway')) {
 	return;
 }
 
-require_once __DIR__ . '/../SCMerchantClient/SCMerchantClient.php';
-
 /**
  * WC_Gateway_Spectrocoin Class.
  */
-class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
+class WCGatewaySpectrocoin extends WC_Payment_Gateway
 {
 	
     /** @var bool Whether or not logging is enabled */

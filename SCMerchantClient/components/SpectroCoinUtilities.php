@@ -6,7 +6,7 @@ if (!defined('ABSPATH')) {
 	die('Access denied.');
 }
 
-class SpectroCoin_Utilities
+class SpectroCoinUtilities
 {
 	/**
 	 * Formats currency amount with '0.0#######' format

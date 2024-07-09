@@ -6,7 +6,7 @@ if (!defined('ABSPATH')) {
 	die('Access denied.');
 }
 
-class SpectroCoin_ApiError
+class SpectroCoinApiError
 {
 	private $code;
 	private $message;
