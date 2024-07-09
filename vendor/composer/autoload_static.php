@@ -15,7 +15,7 @@ class ComposerStaticInit84739704e55b10d7924a36b205f60895
     public static $prefixLengthsPsr4 = array (
         'S' => 
         array (
-            'Spectrocoin\\SCMerchantClient\\' => 29,
+            'SpectroCoin\\SCMerchantClient\\' => 29,
             'SpectroCoin\\Includes\\' => 21,
         ),
         'P' => 
@@ -32,7 +32,7 @@ class ComposerStaticInit84739704e55b10d7924a36b205f60895
     );
 
     public static $prefixDirsPsr4 = array (
-        'Spectrocoin\\SCMerchantClient\\' => 
+        'SpectroCoin\\SCMerchantClient\\' => 
         array (
             0 => __DIR__ . '/../..' . '/SCMerchantClient',
         ),

@@ -3,6 +3,8 @@
 namespace SpectroCoin\Includes;
 
 use SpectroCoin\SCMerchantClient\SCMerchantClient;
+use SpectroCoin\SCMerchantClient\Messages\SpectroCoinCreateOrderRequest;
+use SpectroCoin\SCMerchantClient\Data\SpectroCoinApiError;
 use WC_Payment_Gateway;
 use function SpectroCoin\spectrocoinAdminErrorNotice;
 
@@ -486,7 +488,7 @@ class WCGatewaySpectrocoin extends WC_Payment_Gateway
 		$request = $this->new_request($order, $total, $currency);
 		$response = $this->scClient->spectrocoinCreateOrder($request);
 		$order->update_status('on-hold', __('Waiting for SpectroCoin payment', 'spectrocoin-accepting-bitcoin'));
-		if ($response instanceof SpectroCoin_ApiError) {
+		if ($response instanceof SpectroCoinApiError) {
 			$error_message = "SpectroCoin error: Failed to create payment for order {$order_id}. Response message: {$response->getMessage()}. Response code: {$response->getCode()}";
         	self::spectrocoinWoocommerceLog($error_message);
 			$order->add_order_note($error_message);
@@ -570,7 +572,7 @@ class WCGatewaySpectrocoin extends WC_Payment_Gateway
 		$callback_url = get_site_url(null, '?wc-api=' . self::$callback_name);
 		$success_url = $this->get_return_url($order);
 		$failure_url = $this->get_return_url($order);
-		return new SpectroCoin_CreateOrderRequest(
+		return new SpectroCoinCreateOrderRequest(
 			$order->get_id() . "-" . $this->spectrocoinRandomStr(5),
 			"Order #{$order->get_id()}",
 			null,
