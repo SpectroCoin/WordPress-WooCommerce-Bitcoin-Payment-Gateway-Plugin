@@ -20,6 +20,7 @@ namespace SpectroCoin;
 
 use SpectroCoin\Includes\WCGatewaySpectroCoin;
 use SpectroCoin\Includes\WCGatewaySpectroCoinBlocksIntegration;
+use SpectroCoin\Includes\SCConfig;
 use Automattic\WooCommerce\Blocks\Payments\PaymentMethodRegistry;
 use Automattic\WooCommerce\Utilities\FeaturesUtil;
 
@@ -28,12 +29,6 @@ if (!defined('ABSPATH')) {
 }
 
 require_once __DIR__ . '/vendor/autoload.php';
-
-define('SPECTROCOIN_REQUIRED_PHP_VERSION', '7.4');
-define('SPECTROCOIN_WP_VERSION', '6.2');
-
-$plugin_folder = explode('/', plugin_basename(__FILE__))[0];
-define('SPECTROCOIN_PLUGIN_FOLDER_NAME', $plugin_folder);
 
 /**
  * Initialize plugin
@@ -61,11 +56,11 @@ function spectrocoinRequirementsMet()
 {
     $requirements_met = true;
     $message = '';
-    if (version_compare(PHP_VERSION, SPECTROCOIN_REQUIRED_PHP_VERSION, '<')) {
+    if (version_compare(PHP_VERSION, SCConfig::SPECTROCOIN_REQUIRED_PHP_VERSION, '<')) {
         $requirements_met = false;
         $message .= sprintf(
             esc_html__('Spectrocoin plugin requires PHP version %s or greater.', 'spectrocoin-accepting-bitcoin'),
-            SPECTROCOIN_REQUIRED_PHP_VERSION
+            SCConfig::SPECTROCOIN_REQUIRED_PHP_VERSION
         );
     }
 
@@ -73,11 +68,11 @@ function spectrocoinRequirementsMet()
         require_once ABSPATH . '/wp-admin/includes/plugin.php';
     }
 
-    if (version_compare($GLOBALS['wp_version'], SPECTROCOIN_WP_VERSION, '<')) {
+    if (version_compare($GLOBALS['wp_version'], SCConfig::SPECTROCOIN_WP_VERSION, '<')) {
         $requirements_met = false;
         $message .= sprintf(
             esc_html__('SpectroCoin plugin requires WordPress version %s or greater.', 'spectrocoin-accepting-bitcoin'),
-            SPECTROCOIN_WP_VERSION
+            SCConfig::SPECTROCOIN_WP_VERSION
         );
     }
 
@@ -142,7 +137,7 @@ function spectrocoinDeactivatePlugin()
 
 /**
  * Gateway class initialization
- *  */
+ */
 function spectrocoinGatewayClass($methods)
 {
     $methods[] = 'SpectroCoin\Includes\WCGatewaySpectroCoin';
@@ -206,13 +201,10 @@ add_action( 'woocommerce_blocks_loaded', '\SpectroCoin\spectrocoinRegisterOrderA
 
 add_action('before_woocommerce_init', function(){
     if ( class_exists( FeaturesUtil::class ) ) {
-        FeaturesUtil::declare_compatibility( 'custom_order_tables', __FILE__, true );
+        FeaturesUtil::declare_compatibility( 'custom_order_tables', __FILE__, true);
     }
 });
 
-/**
- * Custom function to register a payment method type
- */
 function spectrocoinRegisterOrderApprovalPaymentMethodType() {
     if ( ! class_exists( 'Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodType' ) ) {
         return;
@@ -221,7 +213,6 @@ function spectrocoinRegisterOrderApprovalPaymentMethodType() {
     add_action(
         'woocommerce_blocks_payment_method_type_registration',
         function( PaymentMethodRegistry $payment_method_registry ) {
-            // Register an instance of My_Custom_Gateway_Blocks
             $payment_method_registry->register( new WCGatewaySpectrocoinBlocksIntegration );
         }
     );

@@ -8,6 +8,7 @@ use SpectroCoin\SCMerchantClient\Data\SpectroCoinOrderCallback;
 use SpectroCoin\SCMerchantClient\Data\SpectroCoinOrderStatusEnum;
 use SpectroCoin\SCMerchantClient\Messages\SpectroCoinCreateOrderRequest;
 use SpectroCoin\SCMerchantClient\Messages\SpectroCoinCreateOrderResponse;
+use SpectroCoin\Includes\SCConfig;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
@@ -53,7 +54,7 @@ class SCMerchantClient
 		$this->guzzle_client = new Client();
 		$this->encryption_key = hash('sha256', AUTH_KEY . SECURE_AUTH_KEY . LOGGED_IN_KEY . NONCE_KEY);
 		$this->access_token_transient_key = "spectrocoin_transient_key";
-		$this->public_spectrocoin_cert_location = "https://test.spectrocoin.com/public.pem"; //PROD:https://spectrocoin.com/files/merchant.public.pem
+		$this->public_spectrocoin_cert_location = SCConfig::PUBLIC_SPECTROCOIN_CERT_LOCATION;
 	}
 
 	/**

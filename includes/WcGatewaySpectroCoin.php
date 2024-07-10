@@ -7,6 +7,7 @@ use SpectroCoin\SCMerchantClient\Messages\SpectroCoinCreateOrderRequest;
 use SpectroCoin\SCMerchantClient\Data\SpectroCoinApiError;
 use WC_Payment_Gateway;
 use function SpectroCoin\spectrocoinAdminErrorNotice;
+use SpectroCoin\Includes\SCConfig;
 
 if (!defined('ABSPATH')) {
 	die('Access denied.');
@@ -95,11 +96,11 @@ class WCGatewaySpectrocoin extends WC_Payment_Gateway
 	 */
     private function spectrocoinInitializeClient() {
         $this->scClient = new SCMerchantClient(
-            'https://test.spectrocoin.com/api/public',
+            SCConfig::MERCHANT_API_URL,
 			$this->project_id,
             $this->client_id,
             $this->client_secret,
-			'https://test.spectrocoin.com/api/public/oauth/token'
+			SCConfig::AUTH_URL
         );
         add_action('woocommerce_api_' . self::$callback_name, array($this, 'callback'));
 		
@@ -217,7 +218,7 @@ class WCGatewaySpectrocoin extends WC_Payment_Gateway
 	 * @return bool
 	 */
 	public function is_available() {
-		if (!function_exists('is_plugin_active') || !is_plugin_active(SPECTROCOIN_PLUGIN_FOLDER_NAME . '/spectrocoin.php') || $this->enabled !== 'yes') {
+		if (!function_exists('is_plugin_active') || !is_plugin_active(SCConfig::getPluginFolderName() . '/spectrocoin.php') || $this->enabled !== 'yes') {
 			return false;
 		}
 	
