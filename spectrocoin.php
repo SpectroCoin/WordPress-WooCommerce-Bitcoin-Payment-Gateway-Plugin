@@ -19,8 +19,9 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 namespace SpectroCoin;
 
 use SpectroCoin\Includes\WCGatewaySpectroCoin;
-use SpectroCoin\Includes\WCGatewaySpectroCoinBlocksIntegration;
-use SpectroCoin\Includes\SCConfig;
+use SpectroCoin\Includes\WCGatewaySpectrocoinBlocksIntegration;
+use SpectroCoin\SCMerchantClient\Config;
+
 use Automattic\WooCommerce\Blocks\Payments\PaymentMethodRegistry;
 use Automattic\WooCommerce\Utilities\FeaturesUtil;
 
@@ -56,11 +57,11 @@ function spectrocoinRequirementsMet()
 {
     $requirements_met = true;
     $message = '';
-    if (version_compare(PHP_VERSION, SCConfig::SPECTROCOIN_REQUIRED_PHP_VERSION, '<')) {
+    if (version_compare(PHP_VERSION, Config::SPECTROCOIN_REQUIRED_PHP_VERSION, '<')) {
         $requirements_met = false;
         $message .= sprintf(
             esc_html__('Spectrocoin plugin requires PHP version %s or greater.', 'spectrocoin-accepting-bitcoin'),
-            SCConfig::SPECTROCOIN_REQUIRED_PHP_VERSION
+            Config::SPECTROCOIN_REQUIRED_PHP_VERSION
         );
     }
 
@@ -68,11 +69,11 @@ function spectrocoinRequirementsMet()
         require_once ABSPATH . '/wp-admin/includes/plugin.php';
     }
 
-    if (version_compare($GLOBALS['wp_version'], SCConfig::SPECTROCOIN_WP_VERSION, '<')) {
+    if (version_compare($GLOBALS['wp_version'], Config::SPECTROCOIN_WP_VERSION, '<')) {
         $requirements_met = false;
         $message .= sprintf(
             esc_html__('SpectroCoin plugin requires WordPress version %s or greater.', 'spectrocoin-accepting-bitcoin'),
-            SCConfig::SPECTROCOIN_WP_VERSION
+            Config::SPECTROCOIN_WP_VERSION
         );
     }
 

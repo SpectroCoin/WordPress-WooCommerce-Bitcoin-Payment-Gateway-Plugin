@@ -1,12 +1,12 @@
 <?php
 
-namespace SpectroCoin\SCMerchantClient\Messages;
+namespace SpectroCoin\SCMerchantClient\Responses;
 
 if (!defined('ABSPATH')) {
 	die('Access denied.');
 }
 
-class SpectroCoinCreateOrderResponse
+class CreateOrderResponse
 {
     private $preOrderId;
     private $orderId;

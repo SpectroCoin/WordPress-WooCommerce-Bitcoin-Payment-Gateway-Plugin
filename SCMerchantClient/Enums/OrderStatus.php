@@ -1,12 +1,12 @@
 <?php
 
-namespace SpectroCoin\SCMerchantClient\Data;
+namespace SpectroCoin\SCMerchantClient\Enums;
 
 if (!defined('ABSPATH')) {
 	die('Access denied.');
 }
 
-class SpectroCoinOrderStatusEnum
+class OrderStatusEnum
 {
 	public static $New = 1;
 	public static $Pending = 2;

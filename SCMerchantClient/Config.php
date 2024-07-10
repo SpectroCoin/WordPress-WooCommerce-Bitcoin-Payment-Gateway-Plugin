@@ -1,12 +1,12 @@
 <?php
 
-namespace SpectroCoin\Includes;
+namespace SpectroCoin\SCMerchantClient;
 
 if (!defined('ABSPATH')) {
 	die('Access denied.');
 }
 
-Class SCConfig{
+Class Config{
 	const SPECTROCOIN_REQUIRED_PHP_VERSION = '8.0';
 	const SPECTROCOIN_WP_VERSION = '6.0';
 

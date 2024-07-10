@@ -1,14 +1,14 @@
 <?php
 
-namespace SpectroCoin\SCMerchantClient\Messages;
+namespace SpectroCoin\SCMerchantClient\Requests;
 
-use SpectroCoin\SCMerchantClient\Components\SpectroCoinUtilities;
+use SpectroCoin\SCMerchantClient\Utils;
 
 if (!defined('ABSPATH')) {
 	die('Access denied.');
 }
 
-class SpectroCoinCreateOrderRequest
+class CreateOrderRequest
 {
 	private $orderId;
 	private $description;
@@ -65,7 +65,7 @@ class SpectroCoinCreateOrderRequest
 	 */
 	public function getPayAmount()
 	{
-		return SpectroCoinUtilities::spectrocoinFormatCurrency($this->payAmount == null ? 0.0 : $this->payAmount);
+		return Utils::spectrocoinFormatCurrency($this->payAmount == null ? 0.0 : $this->payAmount);
 	}
 
 	/**
@@ -81,7 +81,7 @@ class SpectroCoinCreateOrderRequest
 	 */
 	public function getReceiveAmount()
 	{
-		return SpectroCoinUtilities::spectrocoinFormatCurrency($this->receiveAmount == null ? 0.0 : $this->receiveAmount);
+		return Utils::spectrocoinFormatCurrency($this->receiveAmount == null ? 0.0 : $this->receiveAmount);
 	}
 
 	/**

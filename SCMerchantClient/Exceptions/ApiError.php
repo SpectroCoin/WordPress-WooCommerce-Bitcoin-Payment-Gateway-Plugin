@@ -1,12 +1,12 @@
 <?php
 
-namespace SpectroCoin\SCMerchantClient\Data;
+namespace SpectroCoin\SCMerchantClient\Exceptions;
 
 if (!defined('ABSPATH')) {
 	die('Access denied.');
 }
 
-class SpectroCoinApiError
+class ApiError
 {
 	private $code;
 	private $message;

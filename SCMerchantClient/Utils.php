@@ -1,12 +1,12 @@
 <?php
 
-namespace SpectroCoin\SCMerchantClient\Components;
+namespace SpectroCoin\SCMerchantClient;
 
 if (!defined('ABSPATH')) {
 	die('Access denied.');
 }
 
-class SpectroCoinUtilities
+class Utils
 {
 	/**
 	 * Formats currency amount with '0.0#######' format

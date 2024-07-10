@@ -2,13 +2,12 @@
 
 namespace SpectroCoin\SCMerchantClient;
 
-use SpectroCoin\SCMerchantClient\Components\SpectroCoinUtilities;
-use SpectroCoin\SCMerchantClient\Data\SpectroCoinApiError;
-use SpectroCoin\SCMerchantClient\Data\SpectroCoinOrderCallback;
-use SpectroCoin\SCMerchantClient\Data\SpectroCoinOrderStatusEnum;
-use SpectroCoin\SCMerchantClient\Messages\SpectroCoinCreateOrderRequest;
-use SpectroCoin\SCMerchantClient\Messages\SpectroCoinCreateOrderResponse;
-use SpectroCoin\Includes\SCConfig;
+use SpectroCoin\SCMerchantClient\Utils;
+use SpectroCoin\SCMerchantClient\Exceptions\ApiError;
+use SpectroCoin\SCMerchantClient\Handlers\OrderCallback;
+use SpectroCoin\SCMerchantClient\Requests\CreateOrderRequest;
+use SpectroCoin\SCMerchantClient\Responses\CreateOrderResponse;
+use SpectroCoin\SCMerchantClient\Config;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
@@ -54,7 +53,7 @@ class SCMerchantClient
 		$this->guzzle_client = new Client();
 		$this->encryption_key = hash('sha256', AUTH_KEY . SECURE_AUTH_KEY . LOGGED_IN_KEY . NONCE_KEY);
 		$this->access_token_transient_key = "spectrocoin_transient_key";
-		$this->public_spectrocoin_cert_location = SCConfig::PUBLIC_SPECTROCOIN_CERT_LOCATION;
+		$this->public_spectrocoin_cert_location = Config::PUBLIC_SPECTROCOIN_CERT_LOCATION;
 	}
 
 	/**
@@ -67,14 +66,14 @@ class SCMerchantClient
 	 * @return SpectroCoin_ApiError|SpectroCoin_CreateOrderResponse The response object with order details or an error object.
 	 * @throws GuzzleException If there's an error in the HTTP request.
 	 */
-	public function spectrocoinCreateOrder(SpectroCoinCreateOrderRequest $request)
+	public function spectrocoinCreateOrder(CreateOrderRequest $request)
 	{
 		$this->access_token_data = $this->spectrocoinGetAccessTokenData();
 		
 		if (!$this->access_token_data) {
-			return new SpectroCoinApiError('AuthError', 'Failed to obtain or refresh access token');
+			return new ApiError('AuthError', 'Failed to obtain or refresh access token');
 		}
-		else if ($this->access_token_data instanceof SpectroCoinApiError) {
+		else if ($this->access_token_data instanceof ApiError) {
 			return $this->access_token_data;
 		}
 
@@ -93,7 +92,7 @@ class SCMerchantClient
 
 		$sanitized_payload = $this->spectrocoinSanitizeOrderPayload($payload);
 		if (!$this->spectrocoinValidateOrderPayload($sanitized_payload)) {
-			return new SpectroCoinApiError(-1, 'Invalid order creation payload');
+			return new ApiError(-1, 'Invalid order creation payload');
 		}
 
 		$json_payload = json_encode($sanitized_payload);
@@ -109,7 +108,7 @@ class SCMerchantClient
 
 			$body = json_decode($response->getBody()->getContents(), true);
 
-			return new SpectroCoinCreateOrderResponse(
+			return new CreateOrderResponse(
 					$body['preOrderId'],
 					$body['orderId'],
 					$body['validUntil'],
@@ -128,18 +127,18 @@ class SCMerchantClient
 				$this->access_token_data = $this->spectrocoinRefreshAccessToken(time());
 
 				if (!$this->access_token_data) {
-					return new SpectroCoinApiError('AuthError', 'Failed to refresh access token');
+					return new ApiError('AuthError', 'Failed to refresh access token');
 				}
 
 				return $this->spectrocoinRetryCreateOrder($json_payload);
 			} else {
-				return new SpectroCoinApiError($e->getCode(), $e->getMessage());
+				return new ApiError($e->getCode(), $e->getMessage());
 			}
 		} catch (GuzzleException $e) {
-			return new SpectroCoinApiError($e->getCode(), $e->getMessage());
+			return new ApiError($e->getCode(), $e->getMessage());
 		}
 
-		return new SpectroCoinApiError('UnknownError', 'An unknown error occurred during order creation');
+		return new ApiError('UnknownError', 'An unknown error occurred during order creation');
 	}
 
 		/**
@@ -161,7 +160,7 @@ class SCMerchantClient
 
 			$body = json_decode($response->getBody()->getContents(), true);
 
-			return new SpectroCoinCreateOrderResponse(
+			return new CreateOrderResponse(
 				$body['preOrderId'],
 				$body['orderId'],
 				$body['validUntil'],
@@ -176,7 +175,7 @@ class SCMerchantClient
 			);
 
 		} catch (GuzzleException $e) {
-			return new SpectroCoinApiError($e->getCode(), $e->getMessage());
+			return new ApiError($e->getCode(), $e->getMessage());
 		}
 	}
 	
@@ -190,7 +189,7 @@ class SCMerchantClient
         $current_time = time();
 		$encrypted_access_token_data = get_transient($this->access_token_transient_key);
 		if ($encrypted_access_token_data) {
-			$access_token_data = json_decode(SpectroCoinUtilities::spectrocoinDecryptAuthData($encrypted_access_token_data, $this->encryption_key), true);
+			$access_token_data = json_decode(Utils::spectrocoinDecryptAuthData($encrypted_access_token_data, $this->encryption_key), true);
 			$this->access_token_data = $access_token_data;
 			if ($this->spectrocoinIsTokenValid($current_time)) {
 				return $this->access_token_data;
@@ -219,20 +218,20 @@ class SCMerchantClient
 	
 			$data = json_decode($response->getBody(), true);
 			if (!isset($data['access_token'], $data['expires_in'])) {
-				return new SpectroCoinApiError('Invalid access token response', 'No valid response received.');
+				return new ApiError('Invalid access token response', 'No valid response received.');
 			}
 	
 			delete_transient($this->access_token_transient_key);
 	
 			$data['expires_at'] = $current_time + $data['expires_in'];
-			$encrypted_access_token_data = SpectroCoinUtilities::spectrocoinEncryptAuthData(json_encode($data), $this->encryption_key);
+			$encrypted_access_token_data = Utils::spectrocoinEncryptAuthData(json_encode($data), $this->encryption_key);
 	
 			set_transient($this->access_token_transient_key, $encrypted_access_token_data, $data['expires_in']);
 	
 			$this->access_token_data = $data;
 			return $this->access_token_data;
 		} catch (GuzzleException $e) {
-			return new SpectroCoinApiError('Failed to refresh access token', $e->getMessage());
+			return new ApiError('Failed to refresh access token', $e->getMessage());
 		}
 	}
 
@@ -311,7 +310,7 @@ class SCMerchantClient
 			$sanitized_data = $this->spectrocoinSanitizeCallback($post_data);
 			$is_valid = $this->spectrocoinValidateCallback($sanitized_data);
 			if ($is_valid) {
-				$order_callback = new SpectroCoinOrderCallback($sanitized_data['userId'], $sanitized_data['merchantApiId'], $sanitized_data['merchantId'], $sanitized_data['apiId'], $sanitized_data['orderId'], $sanitized_data['payCurrency'], $sanitized_data['payAmount'], $sanitized_data['receiveCurrency'], $sanitized_data['receiveAmount'], $sanitized_data['receivedAmount'], $sanitized_data['description'], $sanitized_data['orderRequestId'], $sanitized_data['status'], $sanitized_data['sign']);
+				$order_callback = new OrderCallback($sanitized_data['userId'], $sanitized_data['merchantApiId'], $sanitized_data['merchantId'], $sanitized_data['apiId'], $sanitized_data['orderId'], $sanitized_data['payCurrency'], $sanitized_data['payAmount'], $sanitized_data['receiveCurrency'], $sanitized_data['receiveAmount'], $sanitized_data['receivedAmount'], $sanitized_data['description'], $sanitized_data['orderRequestId'], $sanitized_data['status'], $sanitized_data['sign']);
 				if ($this->spectrocoinValidateCallbackPayload($order_callback)) {
 					return $order_callback;
 				}
@@ -437,7 +436,7 @@ class SCMerchantClient
 	 * @param SpectroCoin_OrderCallback $order_callback
 	 * @return bool
 	 */
-	public function spectrocoinValidateCallbackPayload(SpectroCoinOrderCallback $order_callback)
+	public function spectrocoinValidateCallbackPayload(OrderCallback $order_callback)
 	{
 		if ($order_callback != null) {
 
