@@ -6,6 +6,7 @@ use SpectroCoin\SCMerchantClient\SCMerchantClient;
 use SpectroCoin\SCMerchantClient\Messages\SpectroCoinCreateOrderRequest;
 use SpectroCoin\SCMerchantClient\Data\SpectroCoinApiError;
 use WC_Payment_Gateway;
+use WC_Logger;
 use function SpectroCoin\spectrocoinAdminErrorNotice;
 use SpectroCoin\Includes\SCConfig;
 
