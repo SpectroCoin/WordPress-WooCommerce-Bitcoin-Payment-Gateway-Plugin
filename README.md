@@ -62,6 +62,8 @@ _Updated_: Class and some method names have been updated based on PSR-12 standar
 
 _Updated_: Composer class autoloading has been implemented.
 
+_Added_: _SCConfig.php_ file has been added to store plugin configuration.
+
 ### 1.5.0 (02/05/2024):
 
 _Added_: Compatibility with the new block-based checkout functionality introduced in WooCommerce 8.3.
