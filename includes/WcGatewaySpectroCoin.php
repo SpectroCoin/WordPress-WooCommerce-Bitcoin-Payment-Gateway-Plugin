@@ -599,12 +599,12 @@ class WCGatewaySpectrocoin extends WC_Payment_Gateway
 
 	/**
 	 * Check if currency is accepted by SpectroCoin
-	 * Function compares current currency with accepted currencies from acceptedCurrencies.JSON
+	 * Function compares current currency with accepted currencies from acceptedFiatCurrencies.JSON
 	 * @return bool
 	 */
 	private function spectrocoinCheckCurrency()
   	{	
-		$json_file = file_get_contents(plugin_dir_path( __FILE__ ) . '/../SCMerchantClient/data/acceptedCurrencies.JSON'); 
+		$json_file = file_get_contents(plugin_dir_path( __FILE__ ) . '/../SCMerchantClient/Data/acceptedFiatCurrencies.JSON'); 
 		$accepted_currencies = json_decode($json_file, true);
 		$current_currency_iso_code = get_woocommerce_currency();
 		if (in_array($current_currency_iso_code, $accepted_currencies)) {
