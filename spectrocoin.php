@@ -83,7 +83,7 @@ function spectrocoinRequirementsMet()
     }
 
     if (!$requirements_met) {
-        spectrocoinAdminErrorNotice($message);
+        displayAdminErrorNotice($message);
         spectrocoinDeactivatePlugin();
     }
 
@@ -95,7 +95,7 @@ function spectrocoinRequirementsMet()
  * @param string $message Error message
  * @param bool $allow_hyperlink Allow hyperlink in error message
  */
-function spectrocoinAdminErrorNotice($message, $allow_hyperlink = false) {
+function displayAdminErrorNotice($message, $allow_hyperlink = false) {
     static $displayed_messages = array();
 
     $allowed_html = $allow_hyperlink ? array(

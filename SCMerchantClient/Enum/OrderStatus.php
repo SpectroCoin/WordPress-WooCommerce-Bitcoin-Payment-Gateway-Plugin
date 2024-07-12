@@ -1,6 +1,6 @@
 <?php
 
-namespace SpectroCoin\SCMerchantClient\Enums;
+namespace SpectroCoin\SCMerchantClient\Enum;
 
 if (!defined('ABSPATH')) {
 	die('Access denied.');

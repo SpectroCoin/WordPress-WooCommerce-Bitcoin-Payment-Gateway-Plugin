@@ -1,6 +1,6 @@
 <?php
 
-namespace SpectroCoin\SCMerchantClient\Exceptions;
+namespace SpectroCoin\SCMerchantClient\Exception;
 
 if (!defined('ABSPATH')) {
 	die('Access denied.');
