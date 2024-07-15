@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace SpectroCoin\SCMerchantClient\Http;
 
+use InvalidArgumentException;
+
 if (!defined('ABSPATH')) {
     die('Access denied.');
 }
@@ -40,6 +42,14 @@ class CreateOrderResponse
         $this->depositAddress = $data['depositAddress'] ?? null;
         $this->memo = $data['memo'] ?? null;
         $this->redirectUrl = $data['redirectUrl'] ?? null;
+
+        $this->sanitize();
+
+        $validation = $this->validate();
+        if (is_array($validation)) {
+            $errorMessage = 'Invalid order creation payload. Failed fields: ' . implode(', ', $validation);
+            throw new InvalidArgumentException($errorMessage);
+        }
     }
 
     /**

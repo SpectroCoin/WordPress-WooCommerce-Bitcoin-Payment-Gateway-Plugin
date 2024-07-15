@@ -1,77 +1,87 @@
 <?php
 
-namespace SpectroCoin\SCMerchantClient;
+declare(strict_types=1);
 
+namespace SpectroCoin\SCMerchantClient;
 
 use SpectroCoin\SCMerchantClient\Config;
 use SpectroCoin\SCMerchantClient\Utils;
 use SpectroCoin\SCMerchantClient\Exception\ApiError;
 use SpectroCoin\SCMerchantClient\Http\CreateOrderRequest;
 use SpectroCoin\SCMerchantClient\Http\CreateOrderResponse;
-
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\RequestOptions;
-
 use InvalidArgumentException;
+use Exception;
 
 if (!defined('ABSPATH')) {
-	die('Access denied.');
+    die('Access denied.');
 }
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
 class SCMerchantClient
 {
+    private string $project_id;
+    private string $client_id;
+    private string $client_secret;
+    private string $encryption_key;
+    private string $access_token_transient_key;
+    protected Client $http_client;
 
-	private $project_id;
-	private $client_id;
-	private $client_secret;
-	
-	private $encryption_key;
-	private $access_token_transient_key;
-	protected $http_client;
+    /**
+     * Constructor
+     * 
+     * @param string $project_id
+     * @param string $client_id
+     * @param string $client_secret
+     */
+    public function __construct(string $project_id, string $client_id, string $client_secret)
+    {
+        $this->project_id = $project_id;
+        $this->client_id = $client_id;
+        $this->client_secret = $client_secret;
 
-	/**
-	 * @param $merchant_api_url
-	 * @param $project_id
-	 * @param $client_id
-	 * @param $client_secret
-	 * @param $auth_url
-	 */
-	function __construct($project_id, $client_id, $client_secret)
-	{
-		$this->project_id = $project_id;
-		$this->client_id = $client_id;
-		$this->client_secret = $client_secret;
+        $this->encryption_key = hash('sha256', AUTH_KEY . SECURE_AUTH_KEY . LOGGED_IN_KEY . NONCE_KEY);
+        $this->access_token_transient_key = "spectrocoin_transient_key";
+        $this->http_client = new Client();
+    }
 
-		$this->encryption_key = hash('sha256', AUTH_KEY . SECURE_AUTH_KEY . LOGGED_IN_KEY . NONCE_KEY);
-		$this->access_token_transient_key = "spectrocoin_transient_key";
-		$this->http_client = new Client();
-	}
+    /**
+     * Create an order
+     * 
+     * @param array $order_data
+     * @return CreateOrderResponse|ApiError|null
+     */
+    public function createOrder(array $order_data)
+    {
+        $access_token_data = $this->getAccessTokenData();
 
-	public function createOrder($order_data)
-	{
-		$access_token_data = $this->getAccessTokenData();
+        if (!$access_token_data || $access_token_data instanceof ApiError) {
+            return $access_token_data;
+        }
 
-		if (!$access_token_data || $access_token_data instanceof ApiError) {
-			return $access_token_data;
-		}
+        try {
+            $create_order_request = new CreateOrderRequest($order_data);
+        } catch (InvalidArgumentException $e) {
+            return new InvalidArgumentException($e->getMessage(), $e->getCode());
+        }
 
-		try {
-			$create_order_request = new CreateOrderRequest($order_data);
-		} catch (InvalidArgumentException $e) {
-			return new ApiError(-1, $e->getMessage());
-		}
+        $order_payload = $create_order_request->toArray();
+        $order_payload['projectId'] = $this->project_id;
 
-		$order_payload = $create_order_request->toArray();
-		$order_payload['projectId'] = $this->project_id;
+        return $this->sendCreateOrderRequest(json_encode($order_payload));
+    }
 
-		return $this->sendCreateOrderRequest(json_encode($order_payload));
-	}
-
-    private function sendCreateOrderRequest($order_payload)
+    /**
+     * Send create order request
+     * 
+     * @param string $order_payload
+     * @return CreateOrderResponse|ApiError
+     */
+    private function sendCreateOrderRequest(string $order_payload)
     {
         try {
             $response = $this->http_client->request('POST', Config::MERCHANT_API_URL . '/merchants/orders/create', [
@@ -98,76 +108,80 @@ class SCMerchantClient
                 $body['redirectUrl']
             );
 
-        } 
-        catch (GuzzleException $e) {
-            return new ApiError($e->getCode(), $e->getMessage());
-        }
-        return new ApiError('UnknownError', 'An unknown error occurred during order creation');
-    }
-	
-	   /**
-	 * Retrieves the current access token data, checking if it's still valid based on its expiration time. If the token is expired or not present, it attempts to refresh the token.
-	 * The function uses WordPress transients for token storage, providing a reliable and persistent storage mechanism within WordPress environments.
-	 *
-	 * @return array|null Returns the access token data array if the token is valid or has been refreshed successfully. Returns null if the token is not present and cannot be refreshed.
-	*/
-    public function getAccessTokenData(){
-        $current_time = time();
-		$encrypted_access_token_data = get_transient($this->access_token_transient_key);
-        if ($encrypted_access_token_data) {
-			$access_token_data = json_decode(Utils::DecryptAuthData($encrypted_access_token_data, $this->encryption_key), true);
-			if ($this->isTokenValid($access_token_data, $current_time)) {
-				return $access_token_data;
-			}
 		}
+		catch (InvalidArgumentException $e) {
+			return new InvalidArgumentException($e->getMessage(), $e->getCode());
+        } catch (GuzzleException $e) {
+            return new ApiError($e->getMessage(), $e->getCode());
+		} catch (Exception $e) {
+			return new Exception($e->getMessage(), $e->getCode());
+		}
+
+    }
+
+    /**
+     * Retrieves the current access token data
+     * 
+     * @return array|ApiError|null
+     */
+    public function getAccessTokenData()
+    {
+        $current_time = time();
+        $encrypted_access_token_data = get_transient($this->access_token_transient_key);
+        if ($encrypted_access_token_data) {
+            $access_token_data = json_decode(Utils::DecryptAuthData($encrypted_access_token_data, $this->encryption_key), true);
+            if ($this->isTokenValid($access_token_data, $current_time)) {
+                return $access_token_data;
+            }
+        }
         return $this->refreshAccessToken($current_time);
     }
 
     /**
-	 * Refreshes the access token by making a request to the SpectroCoin authorization server using client credentials. If successful, it updates the stored token data in WordPress transients.
-	 * This method ensures that the application always has a valid token for authentication with SpectroCoin services.
-	 *
-	 * @param int $current_time The current timestamp, used to calculate the new expiration time for the refreshed token.
-	 * @return array|null Returns the new access token data if the refresh operation is successful. Returns null if the operation fails due to a network error or invalid response from the server.
-	 * @throws GuzzleException Thrown if there is an error in the HTTP request to the SpectroCoin authorization server.
-	*/
-    public function refreshAccessToken($current_time) {
-		try {
-			$response = $this->http_client->post(Config::AUTH_URL, [
-				'form_params' => [
-					'grant_type' => 'client_credentials',
-					'client_id' => $this->client_id,
-					'client_secret' => $this->client_secret,
-				],
-			]);
-	
-			$access_token_data = json_decode($response->getBody(), true);
-			if (!isset($access_token_data['access_token'], $access_token_data['expires_in'])) {
-				return new ApiError('Invalid access token response', 'No valid response received.');
-			}
-	
-			delete_transient($this->access_token_transient_key);
-	
-			$access_token_data['expires_at'] = $current_time + $access_token_data['expires_in'];
-			$encrypted_access_token_data = Utils::EncryptAuthData(json_encode($access_token_data), $this->encryption_key);
-	
-			set_transient($this->access_token_transient_key, $encrypted_access_token_data, $access_token_data['expires_in']);
-	
-			return $access_token_data;
+     * Refreshes the access token
+     * 
+     * @param int $current_time
+     * @return array|ApiError|null
+     * @throws GuzzleException
+     */
+    public function refreshAccessToken(int $current_time)
+    {
+        try {
+            $response = $this->http_client->post(Config::AUTH_URL, [
+                'form_params' => [
+                    'grant_type' => 'client_credentials',
+                    'client_id' => $this->client_id,
+                    'client_secret' => $this->client_secret,
+                ],
+            ]);
 
-		} catch (GuzzleException $e) {
-			return new ApiError('Failed to refresh access token', $e->getMessage());
-		}
-	}
+            $access_token_data = json_decode((string) $response->getBody(), true);
+            if (!isset($access_token_data['access_token'], $access_token_data['expires_in'])) {
+                return new ApiError('Invalid access token response');
+            }
 
+            delete_transient($this->access_token_transient_key);
+
+            $access_token_data['expires_at'] = $current_time + $access_token_data['expires_in'];
+            $encrypted_access_token_data = Utils::EncryptAuthData(json_encode($access_token_data), $this->encryption_key);
+
+            set_transient($this->access_token_transient_key, $encrypted_access_token_data, $access_token_data['expires_in']);
+
+            return $access_token_data;
+
+        } catch (GuzzleException $e) {
+            return new ApiError($e->getMessage(), $e->getCode());
+        }
+    }
 
     /**
-	 * Checks if the current access token is valid by comparing the current time against the token's expiration time. A buffer can be applied to ensure the token is refreshed before it actually expires.
-	 *
-	 * @param int $current_time The current timestamp, typically obtained using `time()`.
-	 * @return bool Returns true if the token is valid (i.e., not expired), false otherwise.
-	*/
-    private function isTokenValid($access_token_data, $current_time)
+     * Checks if the current access token is valid
+     * 
+     * @param array $access_token_data
+     * @param int $current_time
+     * @return bool
+     */
+    private function isTokenValid(array $access_token_data, int $current_time): bool
     {
         return isset($access_token_data['expires_at']) && $current_time < $access_token_data['expires_at'];
     }

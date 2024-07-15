@@ -4,11 +4,15 @@ namespace SpectroCoin\Includes;
 
 use SpectroCoin\SCMerchantClient\SCMerchantClient;
 use SpectroCoin\SCMerchantClient\Exception\ApiError;
-use SpectroCoin\SCMerchantClient\Http\CreateOrderRequest;
 use SpectroCoin\SCMerchantClient\Config;
+use SpectroCoin\SCMerchantClient\Enum\OrderStatusEnum;
+
 use function SpectroCoin\displayAdminErrorNotice;
 use WC_Payment_Gateway;
 use WC_Logger;
+use Exception;
+use InvalidArgumentException;
+use SpectroCoin\SCMerchantClient\Http\OrderCallback;
 
 if (!defined('ABSPATH')) {
 	die('Access denied.');
@@ -221,7 +225,7 @@ class WCGatewaySpectrocoin extends WC_Payment_Gateway
 			return false;
 		}
 	
-		if (!$this->checkCurrency()) {
+		if (!$this->checkFiatCurrency()) {
 			$currency = esc_html(get_woocommerce_currency());
 			$message = "{$currency} currency is not accepted by SpectroCoin. Please change your currency in the WooCommerce settings.";
 			error_log("SpectroCoin Error: {$message}");
@@ -482,7 +486,7 @@ class WCGatewaySpectrocoin extends WC_Payment_Gateway
 	public function process_payment($order_id)
 	{
 		global $woocommerce;
-		$order = wc_get_order($order_id);
+		$order = new WC_Order($order_id);
 
 		$order_data = [
 			'orderId' => $order->get_id(),
@@ -496,27 +500,53 @@ class WCGatewaySpectrocoin extends WC_Payment_Gateway
 			'failureUrl' => $this->get_return_url($order)
 		];
 
-		
+
 		$response = $this->sc_merchant_client->createOrder($order_data);
 		$order->update_status('on-hold', __('Waiting for SpectroCoin payment', 'spectrocoin-accepting-bitcoin'));
 		if ($response instanceof ApiError) {
 			$error_message = "SpectroCoin error: Failed to create payment for order {$order_id}. Response message: {$response->getMessage()}. Response code: {$response->getCode()}";
-        	self::woocommerceLog($error_message);
+			$this->handleFailedOrder($order, $error_message);
+		}
+		else if ($response instanceof InvalidArgumentException){
+			$error_message = "SpectroCoin error: Failed to create payment for order {$order_id}. Response message: {$response->getMessage()}";
+			self::woocommerceLog($error_message);
 			$order->add_order_note($error_message);
-			wc_add_notice(__($error_message, 'spectrocoin-accepting-bitcoin'), 'error');
 			return array(
 				'result'   => 'on-hold',
 				'redirect' => ''
 			);
 		}
-		$preorder_url = $response->getRedirectUrl();
-        $order->add_order_note("SpectroCoin order has been created: " . $preorder_url);
-		wc_reduce_stock_levels($order_id);
-		$woocommerce->cart->empty_cart();
+		else if ($response instanceof Exception){
+			$error_message = "SpectroCoin error: Failed to create payment for order {$order_id}. Response message: {$response->getMessage()}";
+			self::woocommerceLog($error_message);
+			$order->add_order_note($error_message);
+			return array(
+				'result'   => 'on-hold',
+				'redirect' => ''
+			);
+		}
+	}
+
+	private function handleFailedOrder($order, $error_message){
+		$order->update_status('failed', __('Waiting for SpectroCoin payment', 'spectrocoin-accepting-bitcoin'));
+		self::woocommerceLog($error_message);
 		return array(
-			'result' => 'success',
-			'redirect' => $preorder_url
+			'result'   => 'on-hold',
+			'redirect' => ''
 		);
+	}
+
+	private function handleSuccessOrder($order, $error_message){
+
+		// TO-DO: Need to add additional configuration to choose what is ocmpleted order status Processing for physical goods, completed for digital goods
+
+		// $order->update_status('failed', __('Waiting for SpectroCoin payment', 'spectrocoin-accepting-bitcoin'));
+		// wc_reduce_stock_levels($order_id);
+		// $woocommerce->cart->empty_cart();
+		// return array(
+		// 	'result' => 'success',
+		// 	'redirect' => $response->getRedirectUrl()
+		// );
 	}
 
 
@@ -530,34 +560,35 @@ class WCGatewaySpectrocoin extends WC_Payment_Gateway
 	{
 		$expected_keys = ['userId', 'merchantApiId', 'merchantId', 'apiId', 'orderId', 'payCurrency', 'payAmount', 'receiveCurrency', 'receiveAmount', 'receivedAmount', 'description', 'orderRequestId', 'status', 'sign'];
 
-		$post_data = [];
+		$callback_data = [];
 		foreach ($expected_keys as $key) {
 			if (isset($_POST[$key])) {
-				$post_data[$key] = $_POST[$key];
+				$callback_data[$key] = $_POST[$key];
 			}
 		}
-		$callback = $this->sc_merchant_client->processCallback($post_data);
-		if ($callback) {
-			$order_id = $this->parseOrderId($callback->getOrderId());
-			$status = $callback->getStatus();
+		$order_callback = new OrderCallback($callback_data);
+
+		if ($order_callback) {
+			$order_id = $this->parseOrderId($order_callback->getOrderId());
+			$status = $order_callback->getStatus();
 
 			$order = wc_get_order($order_id);
 			if ($order) {
 				switch ($status) {
-					case (1): // new
-					case (2): // pending
-						$order->update_status('Pending payment');
-						break;
-					case (3): // paid
-						$order->update_status($this->order_status);
-						break;
-					case (4): // failed
+                    case OrderStatusEnum::New->value:
+                    case OrderStatusEnum::Pending->value:
+                        $order->update_status('Pending payment');
+                        break;
+                    case OrderStatusEnum::Paid->value:
+                        $order->update_status($this->order_status);
+                        break;
+                    case OrderStatusEnum::Failed->value:
                         $order->update_status('failed');
                         break;
-					case (5): // expired
-						$order->update_status($this->order_status);
-						break;
-				}
+                    case OrderStatusEnum::Expired->value:
+                        $order->update_status($this->order_status);
+                        break;
+                }
 				echo esc_html__('*ok*', 'spectrocoin-accepting-bitcoin');
 				exit;
 			} else {
@@ -565,9 +596,21 @@ class WCGatewaySpectrocoin extends WC_Payment_Gateway
 				echo esc_html__('order not found', 'spectrocoin-accepting-bitcoin');
 				exit;
 			}
-		} else {
+		} 
+		else if ($order_callback instanceof ApiError) {
+			self::woocommerceLog("Callback API error: {$order_callback->getMessage()}");
+			exit;
+		}
+		else if ($order_callback instanceof InvalidArgumentException) {
+			self::woocommerceLog("Error processing callback: {$order_callback->getMessage()}");
+			exit;
+		}
+		else if ($order_callback instanceof Exception) {
+			self::woocommerceLog("Error processing callback: {$order_callback->getMessage()}");
+			exit;
+		}
+		else {
 			self::woocommerceLog("Sent callback is invalid");
-			echo esc_html__('invalid callback format', 'spectrocoin-accepting-bitcoin');
 			exit;
 		}
 	}
@@ -587,7 +630,7 @@ class WCGatewaySpectrocoin extends WC_Payment_Gateway
 	 * Function compares current currency with accepted currencies from acceptedFiatCurrencies.JSON
 	 * @return bool
 	 */
-	private function checkCurrency()
+	private function checkFiatCurrency()
   	{	
 		$json_file = file_get_contents(plugin_dir_path( __FILE__ ) . '/../SCMerchantClient/Data/acceptedFiatCurrencies.JSON'); 
 		$accepted_currencies = json_decode($json_file, true);
@@ -600,16 +643,4 @@ class WCGatewaySpectrocoin extends WC_Payment_Gateway
 		}
 
 	}
-
-	/**
-	 * Generate random string
-	 * @param int $length
-	 * @return string
-	 */
-	private function randomStr($length)
-	{
-		return substr(md5(rand(1, pow(2, 16))), 0, $length);
-	}
-
-	
 }

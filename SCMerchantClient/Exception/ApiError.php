@@ -10,25 +10,17 @@ if (!defined('ABSPATH')) {
 
 class ApiError
 {
-	private int $code;
 	private string $message;
+	private int $code;
 
 	/**
-	 * @param int $code
 	 * @param string $message
+	 * @param int $code
 	 */
-	public function __construct(int $code, string $message)
+	public function __construct(string $message, int $code = 0)
 	{
-		$this->code = $code;
 		$this->message = $message;
-	}
-
-	/**
-	 * @return int|string
-	 */
-	public function getCode(): int
-	{
-		return $this->code;
+		$this->code = $code;
 	}
 
 	/**
@@ -38,4 +30,14 @@ class ApiError
 	{
 		return $this->message;
 	}
+
+	/**
+	 * @return int
+	 */
+	public function getCode(): int
+	{
+		return $this->code;
+	}
+
+
 }

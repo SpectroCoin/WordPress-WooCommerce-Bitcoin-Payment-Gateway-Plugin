@@ -6,6 +6,8 @@ namespace SpectroCoin\SCMerchantClient\Http;
 
 use SpectroCoin\SCMerchantClient\Utils;
 use SpectroCoin\SCMerchantClient\Config;
+
+use Exception;
 use InvalidArgumentException;
 
 if (!defined('ABSPATH')) {
@@ -62,7 +64,7 @@ class OrderCallback
         }
 
         if (!$this->validatePayloadSignature()) {
-            throw new InvalidArgumentException('Invalid payload signature.');
+            throw new Exception('Invalid payload signature.');
         }
     }
 
