@@ -1,29 +1,33 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SpectroCoin\SCMerchantClient\Http;
 
 if (!defined('ABSPATH')) {
-	die('Access denied.');
+    die('Access denied.');
 }
 
 class CreateOrderResponse
 {
-    private $preOrderId;
-    private $orderId;
-    private $validUntil;
-    private $payCurrencyCode;
-    private $payNetworkCode;
-    private $receiveCurrencyCode;
-    private $payAmount;
-    private $receiveAmount;
-    private $depositAddress;
-    private $memo;
-    private $redirectUrl;
+    private ?string $preOrderId;
+    private ?string $orderId;
+    private ?string $validUntil;
+    private ?string $payCurrencyCode;
+    private ?string $payNetworkCode;
+    private ?string $receiveCurrencyCode;
+    private ?float $payAmount;
+    private ?float $receiveAmount;
+    private ?string $depositAddress;
+    private ?string $memo;
+    private ?string $redirectUrl;
 
     /**
-     * @param $data
-    */
-    public function __construct($data)
+     * Constructor to initialize order response properties.
+     *
+     * @param array $data
+     */
+    public function __construct(array $data)
     {
         $this->preOrderId = $data['preOrderId'] ?? null;
         $this->orderId = $data['orderId'] ?? null;
@@ -38,6 +42,11 @@ class CreateOrderResponse
         $this->redirectUrl = $data['redirectUrl'] ?? null;
     }
 
+    /**
+     * Validate the data for create order API response.
+     *
+     * @return bool|array
+     */
     public function validate(): bool|array
     {
         $errors = [];
@@ -76,7 +85,12 @@ class CreateOrderResponse
         return empty($errors) ? true : $errors;
     }
 
-    public function sanitize()
+    /**
+     * Sanitize the data for create order API response.
+     *
+     * @return void
+     */
+    public function sanitize(): void
     {
         $this->preOrderId = sanitize_text_field($this->preOrderId);
         $this->orderId = sanitize_text_field($this->orderId);
@@ -91,16 +105,16 @@ class CreateOrderResponse
         $this->redirectUrl = filter_var($this->redirectUrl, FILTER_SANITIZE_URL);
     }
 
-    public function getPreOrderId() { return $this->preOrderId; }
-    public function getOrderId() { return $this->orderId; }
-    public function getValidUntil() { return $this->validUntil; }
-    public function getPayCurrencyCode() { return $this->payCurrencyCode; }
-    public function getPayNetworkCode() { return $this->payNetworkCode; }
-    public function getReceiveCurrencyCode() { return $this->receiveCurrencyCode; }
-    public function getPayAmount() { return $this->payAmount; }
-    public function getReceiveAmount() { return $this->receiveAmount; }
-    public function getDepositAddress() { return $this->depositAddress; }
-    public function getMemo() { return $this->memo; }
-    public function getRedirectUrl() { return $this->redirectUrl; }
+    public function getPreOrderId(): ?string { return $this->preOrderId; }
+    public function getOrderId(): ?string { return $this->orderId; }
+    public function getValidUntil(): ?string { return $this->validUntil; }
+    public function getPayCurrencyCode(): ?string { return $this->payCurrencyCode; }
+    public function getPayNetworkCode(): ?string { return $this->payNetworkCode; }
+    public function getReceiveCurrencyCode(): ?string { return $this->receiveCurrencyCode; }
+    public function getPayAmount(): ?float { return $this->payAmount; }
+    public function getReceiveAmount(): ?float { return $this->receiveAmount; }
+    public function getDepositAddress(): ?string { return $this->depositAddress; }
+    public function getMemo(): ?string { return $this->memo; }
+    public function getRedirectUrl(): ?string { return $this->redirectUrl; }
 }
 ?>

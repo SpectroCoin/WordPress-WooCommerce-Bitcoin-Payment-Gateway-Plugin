@@ -131,14 +131,14 @@ class CreateOrderRequest
         return json_encode($this->toArray());
     }
 
-    public function getOrderId(){ return $this->orderId; }
-    public function getDescription() { return $this->description; }
-    public function getPayAmount() { return Utils::formatCurrency($this->payAmount); }
-    public function getPayCurrencyCode() { return $this->payCurrencyCode; }
-    public function getReceiveAmount() { return Utils::formatCurrency($this->receiveAmount); }
-    public function getReceiveCurrencyCode() { return $this->receiveCurrencyCode; }
-    public function getCallbackUrl() { return $this->callbackUrl; }
-    public function getSuccessUrl() { return $this->successUrl; }
-    public function getFailureUrl()  { return $this->failureUrl; }
+    public function getOrderId(): ?string { return $this->orderId; }
+    public function getDescription(): ?string { return $this->description; }
+    public function getPayAmount(): ?float { return Utils::formatCurrency($this->payAmount); }
+    public function getPayCurrencyCode(): ?string { return $this->payCurrencyCode; }
+    public function getReceiveAmount(): ?float { return Utils::formatCurrency($this->receiveAmount); }
+    public function getReceiveCurrencyCode(): ?string { return $this->receiveCurrencyCode; }
+    public function getCallbackUrl(): ?string { return $this->callbackUrl; }
+    public function getSuccessUrl(): ?string { return $this->successUrl; }
+    public function getFailureUrl(): ?string  { return $this->failureUrl; }
 }
 ?>
