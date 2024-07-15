@@ -23,6 +23,13 @@ class CreateOrderRequest
     private ?string $successUrl;
     private ?string $failureUrl;
 
+    /**
+     * CreateOrderRequest constructor.
+     *
+     * @param array $data
+     *
+     * @throws InvalidArgumentException
+     */
     public function __construct(array $data) {
         $this->orderId = $data['orderId'] ?? null;
         $this->description = $data['description'] ?? null;
@@ -43,47 +50,49 @@ class CreateOrderRequest
         }
     }
 
-    /**
-     * Data validation for create order API request
-     * @return bool|array
-     */
+/**
+ * Data validation for create order API request.
+ *
+ * @return bool|array True if validation passes, otherwise an array of error messages.
+ */
     private function validate(): bool|array
     {
         $errors = [];
 
-        if (!isset($this->orderId) || empty($this->orderId)) {
+        if (empty($this->getOrderId())) {
             $errors[] = 'orderId';
         }
-        if (!isset($this->description) || empty($this->description)) {
+        if (empty($this->getDescription())) {
             $errors[] = 'description';
         }
-        if (!isset($this->payAmount) || !is_numeric($this->payAmount)) {
+        if (!is_numeric($this->getPayAmount())) {
             $errors[] = 'payAmount';
         }
-        if (!isset($this->payCurrencyCode) || strlen($this->payCurrencyCode) !== 3) {
+        if (strlen($this->getPayCurrencyCode()) !== 3) {
             $errors[] = 'payCurrencyCode';
         }
-        if (!isset($this->receiveAmount) || !is_numeric($this->receiveAmount)) {
+        if (!is_numeric($this->getReceiveAmount())) {
             $errors[] = 'receiveAmount';
         }
-        if (!isset($this->receiveCurrencyCode) || strlen($this->receiveCurrencyCode) !== 3) {
+        if (strlen($this->getReceiveCurrencyCode()) !== 3) {
             $errors[] = 'receiveCurrencyCode';
         }
-        if (!isset($this->callbackUrl) || !filter_var($this->callbackUrl, FILTER_VALIDATE_URL)) {
+        if (!filter_var($this->getCallbackUrl(), FILTER_VALIDATE_URL)) {
             $errors[] = 'callbackUrl';
         }
-        if (!isset($this->successUrl) || !filter_var($this->successUrl, FILTER_VALIDATE_URL)) {
+        if (!filter_var($this->getSuccessUrl(), FILTER_VALIDATE_URL)) {
             $errors[] = 'successUrl';
         }
-        if (!isset($this->failureUrl) || !filter_var($this->failureUrl, FILTER_VALIDATE_URL)) {
+        if (!filter_var($this->getFailureUrl(), FILTER_VALIDATE_URL)) {
             $errors[] = 'failureUrl';
         }
-        if (($this->payAmount <= 0) && ($this->receiveAmount <= 0)) {
+        if (($this->getPayAmount() <= 0) && ($this->getReceiveAmount() <= 0)) {
             $errors[] = 'payAmount or receiveAmount must be greater than zero';
         }
 
         return empty($errors) ? true : $errors;
     }
+
 
     /**
      * Sanitize input data.
@@ -104,7 +113,7 @@ class CreateOrderRequest
     }
 
     /**
-     * Convert object to array.
+     * Convert CreateOrderRequest object to array.
      *
      * @return array
      */
@@ -123,7 +132,7 @@ class CreateOrderRequest
     }
 
     /**
-     * Convert CreateOrderRequest object to JSON.
+     * Convert CreateOrderRequest array to JSON.
      *
      * @return string|false
      */

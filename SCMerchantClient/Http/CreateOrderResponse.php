@@ -45,40 +45,40 @@ class CreateOrderResponse
     /**
      * Validate the data for create order API response.
      *
-     * @return bool|array
+     * @return bool|array True if validation passes, otherwise an array of error messages.
      */
     public function validate(): bool|array
     {
         $errors = [];
 
-        if (!isset($this->preOrderId) || empty($this->preOrderId)) {
+        if (empty($this->getPreOrderId())) {
             $errors[] = 'preOrderId is empty';
         }
-        if (!isset($this->orderId) || empty($this->orderId)) {
+        if (empty($this->getOrderId())) {
             $errors[] = 'orderId is empty';
         }
-        if (!isset($this->validUntil) || empty($this->validUntil)) {
+        if (empty($this->getValidUntil())) {
             $errors[] = 'validUntil is empty';
         }
-        if (!isset($this->payCurrencyCode) || strlen($this->payCurrencyCode) !== 3) {
+        if (strlen($this->getPayCurrencyCode()) !== 3) {
             $errors[] = 'payCurrencyCode is not 3 characters long';
         }
-        if (!isset($this->payNetworkCode) || empty($this->payNetworkCode)) {
+        if (empty($this->getPayNetworkCode())) {
             $errors[] = 'payNetworkCode is empty';
         }
-        if (!isset($this->receiveCurrencyCode) || strlen($this->receiveCurrencyCode) !== 3) {
+        if (strlen($this->getReceiveCurrencyCode()) !== 3) {
             $errors[] = 'receiveCurrencyCode is not 3 characters long';
         }
-        if (!isset($this->payAmount) || !is_numeric($this->payAmount) || $this->payAmount <= 0) {
+        if (!is_numeric($this->getPayAmount()) || $this->getPayAmount() <= 0) {
             $errors[] = 'payAmount is not a valid positive number';
         }
-        if (!isset($this->receiveAmount) || !is_numeric($this->receiveAmount) || $this->receiveAmount <= 0) {
+        if (!is_numeric($this->getReceiveAmount()) || $this->getReceiveAmount() <= 0) {
             $errors[] = 'receiveAmount is not a valid positive number';
         }
-        if (!isset($this->depositAddress) || empty($this->depositAddress)) {
+        if (empty($this->getDepositAddress())) {
             $errors[] = 'depositAddress is empty';
         }
-        if (!isset($this->redirectUrl) || !filter_var($this->redirectUrl, FILTER_VALIDATE_URL)) {
+        if (!filter_var($this->getRedirectUrl(), FILTER_VALIDATE_URL)) {
             $errors[] = 'redirectUrl is not a valid URL';
         }
 

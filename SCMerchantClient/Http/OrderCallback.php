@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SpectroCoin\SCMerchantClient\Http;
 
 use SpectroCoin\SCMerchantClient\Utils;
@@ -7,27 +9,34 @@ use SpectroCoin\SCMerchantClient\Config;
 use InvalidArgumentException;
 
 if (!defined('ABSPATH')) {
-	die('Access denied.');
+    die('Access denied.');
 }
 
 class OrderCallback
 {
-    private $userId;
-    private $merchantApiId;
-    private $merchantId;
-    private $apiId;
-    private $orderId;
-    private $payCurrency;
-    private $payAmount;
-    private $receiveCurrency;
-    private $receiveAmount;
-    private $receivedAmount;
-    private $description;
-    private $orderRequestId;
-    private $status;
-    private $sign;
+    private ?string $userId;
+    private ?string $merchantApiId;
+    private ?string $merchantId;
+    private ?string $apiId;
+    private ?string $orderId;
+    private ?string $payCurrency;
+    private ?float $payAmount;
+    private ?string $receiveCurrency;
+    private ?float $receiveAmount;
+    private ?float $receivedAmount;
+    private ?string $description;
+    private ?int $orderRequestId;
+    private ?int $status;
+    private ?string $sign;
 
-    public function __construct($data)
+    /**
+     * Constructor for OrderCallback.
+     *
+     * @param array $data The data for initializing the callback.
+     *
+     * @throws InvalidArgumentException If the payload is invalid.
+     */
+    public function __construct(array $data)
     {
         $this->userId = $data['userId'] ?? null;
         $this->merchantApiId = $data['merchantApiId'] ?? null;
@@ -46,14 +55,23 @@ class OrderCallback
 
         $this->sanitize();
 
-        $validation = $this->validate();
-        if (is_array($validation)) {
-            $errorMessage = 'Invalid order callback payload. Failed fields: ' . implode(', ', $validation);
+        $validation_result = $this->validate();
+        if (is_array($validation_result)) {
+            $errorMessage = 'Invalid order callback payload. Failed fields: ' . implode(', ', $validation_result);
             throw new InvalidArgumentException($errorMessage);
+        }
+
+        if (!$this->validatePayloadSignature()) {
+            throw new InvalidArgumentException('Invalid payload signature.');
         }
     }
 
-    public function sanitize()
+    /**
+     * Sanitize the input data.
+     *
+     * @return void
+     */
+    public function sanitize(): void
     {
         $this->userId = sanitize_text_field($this->userId);
         $this->merchantApiId = sanitize_text_field($this->merchantApiId);
@@ -71,85 +89,95 @@ class OrderCallback
         $this->sign = sanitize_text_field($this->sign);
     }
 
-    private function validate()
+    /**
+     * Validate the input data.
+     *
+     * @return bool|array True if validation passes, otherwise an array of error messages.
+     */
+    private function validate(): bool|array
     {
         $errors = [];
 
-        if (!isset($this->userId) || empty($this->userId)) {
+        if (empty($this->getUserId())) {
             $errors[] = 'userId is empty';
         }
-        if (!isset($this->merchantApiId) || empty($this->merchantApiId)) {
+        if (empty($this->getMerchantApiId())) {
             $errors[] = 'merchantApiId is empty';
         }
-        if (!isset($this->merchantId) || empty($this->merchantId)) {
+        if (empty($this->getMerchantId())) {
             $errors[] = 'merchantId is empty';
         }
-        if (!isset($this->apiId) || empty($this->apiId)) {
+        if (empty($this->getApiId())) {
             $errors[] = 'apiId is empty';
         }
-        if (!isset($this->orderId) || empty($this->orderId)) {
+        if (empty($this->getOrderId())) {
             $errors[] = 'orderId is empty';
         }
-        if (!isset($this->payCurrency) || strlen($this->payCurrency) !== 3) {
+        if (strlen($this->getPayCurrency()) !== 3) {
             $errors[] = 'payCurrency is not 3 characters long';
         }
-        if (!isset($this->payAmount) || !is_numeric($this->payAmount) || $this->payAmount <= 0) {
+        if (!is_numeric($this->getPayAmount()) || $this->getPayAmount() <= 0) {
             $errors[] = 'payAmount is not a valid positive number';
         }
-        if (!isset($this->receiveCurrency) || strlen($this->receiveCurrency) !== 3) {
+        if (strlen($this->getReceiveCurrency()) !== 3) {
             $errors[] = 'receiveCurrency is not 3 characters long';
         }
-        if (!isset($this->receiveAmount) || !is_numeric($this->receiveAmount) || $this->receiveAmount <= 0) {
+        if (!is_numeric($this->getReceiveAmount()) || $this->getReceiveAmount() <= 0) {
             $errors[] = 'receiveAmount is not a valid positive number';
         }
         if (!isset($this->receivedAmount)) {
             $errors[] = 'receivedAmount is not set';
-        } elseif ($this->status == 6) {
-            if (!is_numeric($this->receivedAmount)) {
+        } elseif ($this->getStatus() == 6) {
+            if (!is_numeric($this->getReceivedAmount())) {
                 $errors[] = 'receivedAmount is not a valid number';
             }
         } else {
-            if (!is_numeric($this->receivedAmount) || $this->receivedAmount < 0) {
+            if (!is_numeric($this->getReceivedAmount()) || $this->getReceivedAmount() < 0) {
                 $errors[] = 'receivedAmount is not a valid non-negative number';
             }
         }
-        if (!isset($this->description) || empty($this->description)) {
+        if (empty($this->getDescription())) {
             $errors[] = 'description is empty';
         }
-        if (!isset($this->orderRequestId) || !is_numeric($this->orderRequestId) || $this->orderRequestId <= 0) {
+        if (!is_numeric($this->getOrderRequestId()) || $this->getOrderRequestId() <= 0) {
             $errors[] = 'orderRequestId is not a valid positive number';
         }
-        if (!isset($this->status) || !is_numeric($this->status) || $this->status <= 0) {
+        if (!is_numeric($this->getStatus()) || $this->getStatus() <= 0) {
             $errors[] = 'status is not a valid positive number';
         }
-        if (!isset($this->sign) || empty($this->sign)) {
+        if (empty($this->getSign())) {
             $errors[] = 'sign is empty';
         }
 
         return empty($errors) ? true : $errors;
     }
 
-    public function validatePayloadSignature()
+    /**
+     * Validate the payload signature.
+     *
+     * @return bool True if the signature is valid, otherwise false.
+     */
+    public function validatePayloadSignature(): bool
     {
-        $payload = array(
-            'merchantId' => $this->merchantId,
-            'apiId' => $this->apiId,
-            'orderId' => $this->orderId,
-            'payCurrency' => $this->payCurrency,
-            'payAmount' => $this->payAmount,
-            'receiveCurrency' => $this->receiveCurrency,
-            'receiveAmount' => $this->receiveAmount,
-            'receivedAmount' => $this->receivedAmount,
-            'description' => $this->description,
-            'orderRequestId' => $this->orderRequestId,
-            'status' => $this->status,
-        );
+        $payload = [
+            'merchantId' => $this->getMerchantId(),
+            'apiId' => $this->getApiId(),
+            'orderId' => $this->getOrderId(),
+            'payCurrency' => $this->getPayCurrency(),
+            'payAmount' => $this->getPayAmount(),
+            'receiveCurrency' => $this->getReceiveCurrency(),
+            'receiveAmount' => $this->getReceiveAmount(),
+            'receivedAmount' => $this->getReceivedAmount(),
+            'description' => $this->getDescription(),
+            'orderRequestId' => $this->getOrderRequestId(),
+            'status' => $this->getStatus(),
+        ];
 
         $data = http_build_query($payload);
         $decoded_signature = base64_decode($this->sign);
         $public_key = file_get_contents(Config::PUBLIC_SPECTROCOIN_CERT_LOCATION);
         $public_key_pem = openssl_pkey_get_public($public_key);
-        return openssl_verify($data, $decoded_signature, $public_key_pem, OPENSSL_ALGO_SHA1);
+        return openssl_verify($data, $decoded_signature, $public_key_pem, OPENSSL_ALGO_SHA1) === 1;
     }
 
     public function getUserId() { return $this->userId; }
@@ -167,4 +195,4 @@ class OrderCallback
     public function getStatus() { return $this->status; }
     public function getSign() { return $this->sign; }
 }
-?>
+
