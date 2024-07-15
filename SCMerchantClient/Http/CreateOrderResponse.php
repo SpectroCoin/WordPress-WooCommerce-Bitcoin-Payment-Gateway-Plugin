@@ -38,38 +38,44 @@ class CreateOrderResponse
         $this->redirectUrl = $data['redirectUrl'] ?? null;
     }
 
-    /**
-     * Data validation for create order API response
-     * @return bool
-    */
-    public function validate()
+    public function validate(): bool|array
     {
-        return isset(
-            $this->preOrderId,
-            $this->orderId,
-            $this->validUntil,
-            $this->payCurrencyCode,
-            $this->payNetworkCode,
-            $this->receiveCurrencyCode,
-            $this->payAmount,
-            $this->receiveAmount,
-            $this->depositAddress,
-            $this->redirectUrl
-        ) &&
-        !empty($this->orderId) &&
-        !empty($this->preOrderId) &&
-        !empty($this->validUntil) &&
-        strlen($this->payCurrencyCode) === 3 &&
-        strlen($this->receiveCurrencyCode) === 3 &&
-        is_numeric($this->payAmount) &&
-        is_numeric($this->receiveAmount) &&
-        filter_var($this->depositAddress, FILTER_SANITIZE_STRING) &&
-        filter_var($this->redirectUrl, FILTER_VALIDATE_URL);
+        $errors = [];
+
+        if (!isset($this->preOrderId) || empty($this->preOrderId)) {
+            $errors[] = 'preOrderId is empty';
+        }
+        if (!isset($this->orderId) || empty($this->orderId)) {
+            $errors[] = 'orderId is empty';
+        }
+        if (!isset($this->validUntil) || empty($this->validUntil)) {
+            $errors[] = 'validUntil is empty';
+        }
+        if (!isset($this->payCurrencyCode) || strlen($this->payCurrencyCode) !== 3) {
+            $errors[] = 'payCurrencyCode is not 3 characters long';
+        }
+        if (!isset($this->payNetworkCode) || empty($this->payNetworkCode)) {
+            $errors[] = 'payNetworkCode is empty';
+        }
+        if (!isset($this->receiveCurrencyCode) || strlen($this->receiveCurrencyCode) !== 3) {
+            $errors[] = 'receiveCurrencyCode is not 3 characters long';
+        }
+        if (!isset($this->payAmount) || !is_numeric($this->payAmount) || $this->payAmount <= 0) {
+            $errors[] = 'payAmount is not a valid positive number';
+        }
+        if (!isset($this->receiveAmount) || !is_numeric($this->receiveAmount) || $this->receiveAmount <= 0) {
+            $errors[] = 'receiveAmount is not a valid positive number';
+        }
+        if (!isset($this->depositAddress) || empty($this->depositAddress)) {
+            $errors[] = 'depositAddress is empty';
+        }
+        if (!isset($this->redirectUrl) || !filter_var($this->redirectUrl, FILTER_VALIDATE_URL)) {
+            $errors[] = 'redirectUrl is not a valid URL';
+        }
+
+        return empty($errors) ? true : $errors;
     }
 
-    /**
-     * Data sanitization for create order API response
-    */
     public function sanitize()
     {
         $this->preOrderId = sanitize_text_field($this->preOrderId);

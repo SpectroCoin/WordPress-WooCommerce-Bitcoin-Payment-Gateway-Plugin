@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SpectroCoin\SCMerchantClient\Exception;
 
 if (!defined('ABSPATH')) {
@@ -8,31 +10,31 @@ if (!defined('ABSPATH')) {
 
 class ApiError
 {
-	private $code;
-	private $message;
+	private int $code;
+	private string $message;
 
 	/**
-	 * @param $code
-	 * @param $message
+	 * @param int $code
+	 * @param string $message
 	 */
-	function __construct($code, $message)
+	public function __construct(int $code, string $message)
 	{
 		$this->code = $code;
 		$this->message = $message;
 	}
 
 	/**
-	 * @return Integer
+	 * @return int|string
 	 */
-	public function getCode()
+	public function getCode(): int
 	{
 		return $this->code;
 	}
 
 	/**
-	 * @return String
+	 * @return string
 	 */
-	public function getMessage()
+	public function getMessage(): string
 	{
 		return $this->message;
 	}

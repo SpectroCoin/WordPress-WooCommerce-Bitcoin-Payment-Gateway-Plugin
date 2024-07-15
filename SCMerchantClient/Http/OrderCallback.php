@@ -71,51 +71,59 @@ class OrderCallback
         $this->sign = sanitize_text_field($this->sign);
     }
 
-    public function validate()
+    private function validate()
     {
         $errors = [];
 
         if (!isset($this->userId) || empty($this->userId)) {
-            $errors[] = 'userId';
+            $errors[] = 'userId is empty';
         }
         if (!isset($this->merchantApiId) || empty($this->merchantApiId)) {
-            $errors[] = 'merchantApiId';
+            $errors[] = 'merchantApiId is empty';
         }
         if (!isset($this->merchantId) || empty($this->merchantId)) {
-            $errors[] = 'merchantId';
+            $errors[] = 'merchantId is empty';
         }
         if (!isset($this->apiId) || empty($this->apiId)) {
-            $errors[] = 'apiId';
+            $errors[] = 'apiId is empty';
         }
         if (!isset($this->orderId) || empty($this->orderId)) {
-            $errors[] = 'orderId';
+            $errors[] = 'orderId is empty';
         }
         if (!isset($this->payCurrency) || strlen($this->payCurrency) !== 3) {
-            $errors[] = 'payCurrency';
+            $errors[] = 'payCurrency is not 3 characters long';
         }
         if (!isset($this->payAmount) || !is_numeric($this->payAmount) || $this->payAmount <= 0) {
-            $errors[] = 'payAmount';
+            $errors[] = 'payAmount is not a valid positive number';
         }
         if (!isset($this->receiveCurrency) || strlen($this->receiveCurrency) !== 3) {
-            $errors[] = 'receiveCurrency';
+            $errors[] = 'receiveCurrency is not 3 characters long';
         }
         if (!isset($this->receiveAmount) || !is_numeric($this->receiveAmount) || $this->receiveAmount <= 0) {
-            $errors[] = 'receiveAmount';
+            $errors[] = 'receiveAmount is not a valid positive number';
         }
-        if (!isset($this->receivedAmount) || !is_numeric($this->receivedAmount)) {
-            $errors[] = 'receivedAmount';
+        if (!isset($this->receivedAmount)) {
+            $errors[] = 'receivedAmount is not set';
+        } elseif ($this->status == 6) {
+            if (!is_numeric($this->receivedAmount)) {
+                $errors[] = 'receivedAmount is not a valid number';
+            }
+        } else {
+            if (!is_numeric($this->receivedAmount) || $this->receivedAmount < 0) {
+                $errors[] = 'receivedAmount is not a valid non-negative number';
+            }
         }
         if (!isset($this->description) || empty($this->description)) {
-            $errors[] = 'description';
+            $errors[] = 'description is empty';
         }
         if (!isset($this->orderRequestId) || !is_numeric($this->orderRequestId) || $this->orderRequestId <= 0) {
-            $errors[] = 'orderRequestId';
+            $errors[] = 'orderRequestId is not a valid positive number';
         }
         if (!isset($this->status) || !is_numeric($this->status) || $this->status <= 0) {
-            $errors[] = 'status';
+            $errors[] = 'status is not a valid positive number';
         }
         if (!isset($this->sign) || empty($this->sign)) {
-            $errors[] = 'sign';
+            $errors[] = 'sign is empty';
         }
 
         return empty($errors) ? true : $errors;

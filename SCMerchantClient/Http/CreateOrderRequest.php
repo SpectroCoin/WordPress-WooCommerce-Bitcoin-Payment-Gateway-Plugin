@@ -1,5 +1,7 @@
 <?php
 
+declare (strict_types = 1);
+
 namespace SpectroCoin\SCMerchantClient\Http;
 
 use SpectroCoin\SCMerchantClient\Utils;
@@ -11,15 +13,15 @@ if (!defined('ABSPATH')) {
 
 class CreateOrderRequest
 {
-    private $orderId;
-    private $description;
-    private $payAmount;
-    private $payCurrencyCode;
-    private $receiveAmount;
-    private $receiveCurrencyCode;
-    private $callbackUrl;
-    private $successUrl;
-    private $failureUrl;
+    private ?string $orderId;
+    private ?string $description;
+    private ?float $payAmount;
+    private ?string $payCurrencyCode;
+    private ?float $receiveAmount;
+    private ?string $receiveCurrencyCode;
+    private ?string $callbackUrl;
+    private ?string $successUrl;
+    private ?string $failureUrl;
 
     public function __construct(array $data) {
         $this->orderId = $data['orderId'] ?? null;
@@ -45,77 +47,67 @@ class CreateOrderRequest
      * Data validation for create order API request
      * @return bool|array
      */
-    private function validate()
+    private function validate(): bool|array
     {
         $errors = [];
 
-        if (!isset($this->userId) || empty($this->userId)) {
-            $errors[] = 'userId is empty';
-        }
-        if (!isset($this->merchantApiId) || empty($this->merchantApiId)) {
-            $errors[] = 'merchantApiId is empty';
-        }
-        if (!isset($this->merchantId) || empty($this->merchantId)) {
-            $errors[] = 'merchantId is empty';
-        }
-        if (!isset($this->apiId) || empty($this->apiId)) {
-            $errors[] = 'apiId is empty';
-        }
         if (!isset($this->orderId) || empty($this->orderId)) {
-            $errors[] = 'orderId is empty';
-        }
-        if (!isset($this->payCurrency) || strlen($this->payCurrency) !== 3) {
-            $errors[] = 'payCurrency is not 3 characters long';
-        }
-        if (!isset($this->payAmount) || !is_numeric($this->payAmount) || $this->payAmount <= 0) {
-            $errors[] = 'payAmount is not a valid positive number';
-        }
-        if (!isset($this->receiveCurrency) || strlen($this->receiveCurrency) !== 3) {
-            $errors[] = 'receiveCurrency is not 3 characters long';
-        }
-        if (!isset($this->receiveAmount) || !is_numeric($this->receiveAmount) || $this->receiveAmount <= 0) {
-            $errors[] = 'receiveAmount is not a valid positive number';
-        }
-        if (!isset($this->receivedAmount)) {
-            $errors[] = 'receivedAmount is not set';
-        } elseif ($this->status == 6) {
-            if (!is_numeric($this->receivedAmount)) {
-                $errors[] = 'receivedAmount is not a valid number';
-            }
-        } else {
-            if (!is_numeric($this->receivedAmount) || $this->receivedAmount < 0) {
-                $errors[] = 'receivedAmount is not a valid non-negative number';
-            }
+            $errors[] = 'orderId';
         }
         if (!isset($this->description) || empty($this->description)) {
-            $errors[] = 'description is empty';
+            $errors[] = 'description';
         }
-        if (!isset($this->orderRequestId) || !is_numeric($this->orderRequestId) || $this->orderRequestId <= 0) {
-            $errors[] = 'orderRequestId is not a valid positive number';
+        if (!isset($this->payAmount) || !is_numeric($this->payAmount)) {
+            $errors[] = 'payAmount';
         }
-        if (!isset($this->status) || !is_numeric($this->status) || $this->status <= 0) {
-            $errors[] = 'status is not a valid positive number';
+        if (!isset($this->payCurrencyCode) || strlen($this->payCurrencyCode) !== 3) {
+            $errors[] = 'payCurrencyCode';
         }
-        if (!isset($this->sign) || empty($this->sign)) {
-            $errors[] = 'sign is empty';
+        if (!isset($this->receiveAmount) || !is_numeric($this->receiveAmount)) {
+            $errors[] = 'receiveAmount';
+        }
+        if (!isset($this->receiveCurrencyCode) || strlen($this->receiveCurrencyCode) !== 3) {
+            $errors[] = 'receiveCurrencyCode';
+        }
+        if (!isset($this->callbackUrl) || !filter_var($this->callbackUrl, FILTER_VALIDATE_URL)) {
+            $errors[] = 'callbackUrl';
+        }
+        if (!isset($this->successUrl) || !filter_var($this->successUrl, FILTER_VALIDATE_URL)) {
+            $errors[] = 'successUrl';
+        }
+        if (!isset($this->failureUrl) || !filter_var($this->failureUrl, FILTER_VALIDATE_URL)) {
+            $errors[] = 'failureUrl';
+        }
+        if (($this->payAmount <= 0) && ($this->receiveAmount <= 0)) {
+            $errors[] = 'payAmount or receiveAmount must be greater than zero';
         }
 
         return empty($errors) ? true : $errors;
     }
 
-    private function sanitize()
+    /**
+     * Sanitize input data.
+     *
+     * @return void
+     */
+    private function sanitize(): void
     {
-        $this->orderId = sanitize_text_field($this->orderId);
-        $this->description = sanitize_text_field($this->description);
-        $this->payAmount = filter_var($this->payAmount, FILTER_SANITIZE_NUMBER_, FILTER_FLAG_ALLOW_FRACTION);
-        $this->payCurrencyCode = sanitize_text_field($this->payCurrencyCode);
-        $this->receiveAmount = filter_var($this->receiveAmount, FILTER_SANITIZE_NUMBER_, FILTER_FLAG_ALLOW_FRACTION);
-        $this->receiveCurrencyCode = sanitize_text_field($this->receiveCurrencyCode);
+        $this->orderId = sanitize_text_field((string) $this->orderId);
+        $this->description = sanitize_text_field((string) $this->description);
+        $this->payAmount = filter_var($this->payAmount, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
+        $this->payCurrencyCode = sanitize_text_field((string) $this->payCurrencyCode);
+        $this->receiveAmount = filter_var($this->receiveAmount, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
+        $this->receiveCurrencyCode = sanitize_text_field((string) $this->receiveCurrencyCode);
         $this->callbackUrl = filter_var($this->callbackUrl, FILTER_SANITIZE_URL);
         $this->successUrl = filter_var($this->successUrl, FILTER_SANITIZE_URL);
         $this->failureUrl = filter_var($this->failureUrl, FILTER_SANITIZE_URL);
     }
 
+    /**
+     * Convert object to array.
+     *
+     * @return array
+     */
     public function toArray() {
         return [
             'orderId' => $this->getOrderId(),
@@ -130,6 +122,11 @@ class CreateOrderRequest
         ];
     }
 
+    /**
+     * Convert CreateOrderRequest object to JSON.
+     *
+     * @return string|false
+     */
     public function toJson() {
         return json_encode($this->toArray());
     }

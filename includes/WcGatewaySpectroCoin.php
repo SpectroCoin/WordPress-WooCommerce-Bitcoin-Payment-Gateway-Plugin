@@ -486,7 +486,7 @@ class WCGatewaySpectrocoin extends WC_Payment_Gateway
 
 		$order_data = [
 			'orderId' => $order->get_id(),
-			'description' => "Order #{$order_id}", # TODO: It could be amde configurable in admin
+			'description' => "Order #{$order_id}", # TODO: It could be configurable in admin
 			'payAmount' => null,
 			'payCurrencyCode' => self::$pay_currency,
 			'receiveAmount' => $order->get_total(),
@@ -496,7 +496,7 @@ class WCGatewaySpectrocoin extends WC_Payment_Gateway
 			'failureUrl' => $this->get_return_url($order)
 		];
 
-
+		
 		$response = $this->sc_merchant_client->createOrder($order_data);
 		$order->update_status('on-hold', __('Waiting for SpectroCoin payment', 'spectrocoin-accepting-bitcoin'));
 		if ($response instanceof ApiError) {
