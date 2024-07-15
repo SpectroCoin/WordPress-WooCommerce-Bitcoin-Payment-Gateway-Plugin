@@ -510,20 +510,12 @@ class WCGatewaySpectrocoin extends WC_Payment_Gateway
 		else if ($response instanceof InvalidArgumentException){
 			$error_message = "SpectroCoin error: Failed to create payment for order {$order_id}. Response message: {$response->getMessage()}";
 			self::woocommerceLog($error_message);
-			$order->add_order_note($error_message);
-			return array(
-				'result'   => 'on-hold',
-				'redirect' => ''
-			);
+			$this->handleFailedOrder($order, $error_message);
 		}
 		else if ($response instanceof Exception){
 			$error_message = "SpectroCoin error: Failed to create payment for order {$order_id}. Response message: {$response->getMessage()}";
 			self::woocommerceLog($error_message);
-			$order->add_order_note($error_message);
-			return array(
-				'result'   => 'on-hold',
-				'redirect' => ''
-			);
+			$this->handleFailedOrder($order, $error_message);
 		}
 	}
 
@@ -531,7 +523,7 @@ class WCGatewaySpectrocoin extends WC_Payment_Gateway
 		$order->update_status('failed', __('Waiting for SpectroCoin payment', 'spectrocoin-accepting-bitcoin'));
 		self::woocommerceLog($error_message);
 		return array(
-			'result'   => 'on-hold',
+			'result'   => 'failed',
 			'redirect' => ''
 		);
 	}
