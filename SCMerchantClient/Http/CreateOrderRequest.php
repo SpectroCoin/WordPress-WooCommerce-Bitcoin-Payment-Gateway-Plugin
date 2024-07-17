@@ -5,6 +5,7 @@ declare (strict_types = 1);
 namespace SpectroCoin\SCMerchantClient\Http;
 
 use SpectroCoin\SCMerchantClient\Utils;
+
 use InvalidArgumentException;
 
 if (!defined('ABSPATH')) {
@@ -31,17 +32,15 @@ class CreateOrderRequest
      * @throws InvalidArgumentException
      */
     public function __construct(array $data) {
-        $this->orderId = $data['orderId'] ?? null;
-        $this->description = $data['description'] ?? null;
-        $this->payAmount = $data['payAmount'] ?? null;
-        $this->payCurrencyCode = $data['payCurrencyCode'] ?? null;
-        $this->receiveAmount = $data['receiveAmount'] ?? null;
-        $this->receiveCurrencyCode = $data['receiveCurrencyCode'] ?? null;
-        $this->callbackUrl = $data['callbackUrl'] ?? null;
-        $this->successUrl = $data['successUrl'] ?? null;
-        $this->failureUrl = $data['failureUrl'] ?? null;
-
-        $this->sanitize();
+        $this->orderId = isset($data['orderId']) ? sanitize_text_field((string)$data['orderId']) : null;
+        $this->description = isset($data['description']) ? sanitize_text_field((string)$data['description']) : null;
+        $this->payAmount = isset($data['payAmount']) ? Utils::sanitizeFloat($data['payAmount']) : null;
+        $this->payCurrencyCode = isset($data['payCurrencyCode']) ? sanitize_text_field((string)$data['payCurrencyCode']) : null;
+        $this->receiveAmount = isset($data['receiveAmount']) ? Utils::sanitizeFloat($data['receiveAmount']) : null;
+        $this->receiveCurrencyCode = isset($data['receiveCurrencyCode']) ? sanitize_text_field((string)$data['receiveCurrencyCode']) : null;
+        $this->callbackUrl = isset($data['callbackUrl']) ? Utils::sanitizeUrl($data['callbackUrl']) : null;
+        $this->successUrl = isset($data['successUrl']) ? Utils::sanitizeUrl($data['successUrl']) : null;
+        $this->failureUrl = isset($data['failureUrl']) ? Utils::sanitizeUrl($data['failureUrl']) : null;
 
         $validation = $this->validate();
         if (is_array($validation)) {
@@ -93,31 +92,12 @@ class CreateOrderRequest
         return empty($errors) ? true : $errors;
     }
 
-
-    /**
-     * Sanitize input data.
-     *
-     * @return void
-     */
-    private function sanitize(): void
-    {
-        $this->orderId = sanitize_text_field((string) $this->orderId);
-        $this->description = sanitize_text_field((string) $this->description);
-        $this->payAmount = filter_var($this->payAmount, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
-        $this->payCurrencyCode = sanitize_text_field((string) $this->payCurrencyCode);
-        $this->receiveAmount = filter_var($this->receiveAmount, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
-        $this->receiveCurrencyCode = sanitize_text_field((string) $this->receiveCurrencyCode);
-        $this->callbackUrl = filter_var($this->callbackUrl, FILTER_SANITIZE_URL);
-        $this->successUrl = filter_var($this->successUrl, FILTER_SANITIZE_URL);
-        $this->failureUrl = filter_var($this->failureUrl, FILTER_SANITIZE_URL);
-    }
-
     /**
      * Convert CreateOrderRequest object to array.
      *
      * @return array
      */
-    public function toArray() {
+    public function toArray(): array {
         return [
             'orderId' => $this->getOrderId(),
             'description' => $this->getDescription(),
@@ -136,7 +116,7 @@ class CreateOrderRequest
      *
      * @return string|false
      */
-    public function toJson() {
+    public function toJson(): string|false {
         return json_encode($this->toArray());
     }
 

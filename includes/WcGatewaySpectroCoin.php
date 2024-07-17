@@ -6,10 +6,11 @@ use SpectroCoin\SCMerchantClient\SCMerchantClient;
 use SpectroCoin\SCMerchantClient\Exception\ApiError;
 use SpectroCoin\SCMerchantClient\Config;
 use SpectroCoin\SCMerchantClient\Enum\OrderStatusEnum;
-
 use function SpectroCoin\displayAdminErrorNotice;
+
 use WC_Payment_Gateway;
 use WC_Logger;
+use WC_Order;
 use Exception;
 use InvalidArgumentException;
 use SpectroCoin\SCMerchantClient\Http\OrderCallback;
@@ -63,11 +64,11 @@ class WCGatewaySpectrocoin extends WC_Payment_Gateway
 		
 		$this->id = 'spectrocoin';
 		$this->has_fields = false;
-		$this->order_button_text = esc_html__('Pay with SpectroCoin', 'spectrocoin-accepting-bitcoin');
 		$this->method_title = esc_html__('SpectroCoin', 'spectrocoin-accepting-bitcoin');
 		$this->method_description = esc_html__('Take payments via SpectroCoin. Accept more than 30 cryptocurrencies, such as ETH, BTC, and USDT.', 'spectrocoin');
-		$this->supports = array('products');
 
+		$this->order_button_text = esc_html__('Pay with SpectroCoin', 'spectrocoin-accepting-bitcoin');
+		$this->supports = array('products');
 		$this->title = $this->get_option('title');
 		$this->description = $this->get_option('description');
 		$this->client_id = $this->get_option('client_id');
@@ -489,17 +490,16 @@ class WCGatewaySpectrocoin extends WC_Payment_Gateway
 		$order = new WC_Order($order_id);
 
 		$order_data = [
-			'orderId' => $order->get_id(),
+			'orderId' => (string)$order->get_id(),
 			'description' => "Order #{$order_id}", # TODO: It could be configurable in admin
 			'payAmount' => null,
 			'payCurrencyCode' => self::$pay_currency,
-			'receiveAmount' => $order->get_total(),
+			'receiveAmount' => (float)$order->get_total(),
 			'receiveCurrencyCode' => $order->get_currency(),
 			'callbackUrl' => get_site_url(null, '?wc-api=' . self::$callback_name),
 			'successUrl' => $this->get_return_url($order),
 			'failureUrl' => $this->get_return_url($order)
 		];
-
 
 		$response = $this->sc_merchant_client->createOrder($order_data);
 		$order->update_status('on-hold', __('Waiting for SpectroCoin payment', 'spectrocoin-accepting-bitcoin'));
@@ -509,36 +509,34 @@ class WCGatewaySpectrocoin extends WC_Payment_Gateway
 		}
 		else if ($response instanceof InvalidArgumentException){
 			$error_message = "SpectroCoin error: Failed to create payment for order {$order_id}. Response message: {$response->getMessage()}";
-			self::woocommerceLog($error_message);
 			$this->handleFailedOrder($order, $error_message);
 		}
 		else if ($response instanceof Exception){
 			$error_message = "SpectroCoin error: Failed to create payment for order {$order_id}. Response message: {$response->getMessage()}";
-			self::woocommerceLog($error_message);
 			$this->handleFailedOrder($order, $error_message);
 		}
+		$this->handleSuccessOrder($order, $error_message);
 	}
 
 	private function handleFailedOrder($order, $error_message){
-		$order->update_status('failed', __('Waiting for SpectroCoin payment', 'spectrocoin-accepting-bitcoin'));
+		$order->update_status('failed', __($error_message, 'spectrocoin-accepting-bitcoin'));
 		self::woocommerceLog($error_message);
+		wc_add_notice(_($error_message, 'spectrocoin-accepting-bitcoin'), 'error');
 		return array(
 			'result'   => 'failed',
 			'redirect' => ''
 		);
 	}
 
-	private function handleSuccessOrder($order, $error_message){
-
-		// TO-DO: Need to add additional configuration to choose what is ocmpleted order status Processing for physical goods, completed for digital goods
-
-		// $order->update_status('failed', __('Waiting for SpectroCoin payment', 'spectrocoin-accepting-bitcoin'));
-		// wc_reduce_stock_levels($order_id);
-		// $woocommerce->cart->empty_cart();
-		// return array(
-		// 	'result' => 'success',
-		// 	'redirect' => $response->getRedirectUrl()
-		// );
+	private function handleSuccessOrder($order){
+		global $woocommerce;
+		$order->update_status('success');
+		wc_reduce_stock_levels($order_id);
+		$woocommerce->cart->empty_cart();
+		return array(
+			'result' => 'success',
+			'redirect' => $response->getRedirectUrl()
+		);
 	}
 
 

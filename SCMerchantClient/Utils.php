@@ -23,7 +23,6 @@ class Utils
         return (float)number_format($amount, $decimals, '.', '');
     }
 
-
     /**
      * Encrypts the given data using the given encryption key.
      *
@@ -35,7 +34,7 @@ class Utils
     {
         $iv = openssl_random_pseudo_bytes(openssl_cipher_iv_length('aes-256-cbc'));
         $encryptedData = openssl_encrypt($data, 'aes-256-cbc', $encryptionKey, 0, $iv);
-        return base64_encode($encryptedData . '::' . $iv); // Store $iv with encrypted data
+        return base64_encode($encryptedData . '::' . $iv);
     }
 
     /**
@@ -58,8 +57,38 @@ class Utils
      */
     public static function generateEncryptionKey(): string
     {
-        $key = openssl_random_pseudo_bytes(32); // 256 bits
-        return base64_encode($key); // Encode to base64 for easy storage
+        $key = openssl_random_pseudo_bytes(32);
+        return base64_encode($key);
+    }
+
+    /**
+     * Sanitize float values.
+     *
+     * @param mixed $value The value to sanitize.
+     * @return float|null The sanitized float value or `null` if the sanitization fails.
+     */
+    public static function sanitizeFloat($value): ?float
+    {
+        if ($value === null) {
+            return null;
+        }
+        $sanitized = filter_var($value, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
+        return $sanitized === false ? null : (float) $sanitized;
+    }
+
+    /**
+     * Sanitize URL values.
+     *
+     * @param mixed $value
+     * @return string|null
+     */
+    public static function sanitizeUrl($value): ?string
+    {
+        if ($value === null) {
+            return null;
+        }
+        $sanitized = filter_var($value, FILTER_SANITIZE_URL);
+        return $sanitized === false ? null : $sanitized;
     }
 }
 ?>
