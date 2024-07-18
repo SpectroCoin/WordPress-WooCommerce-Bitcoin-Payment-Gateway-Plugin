@@ -16,8 +16,6 @@ class CreateOrderRequest
 {
     private ?string $orderId;
     private ?string $description;
-    private ?float $payAmount;
-    private ?string $payCurrencyCode;
     private ?float $receiveAmount;
     private ?string $receiveCurrencyCode;
     private ?string $callbackUrl;
@@ -34,8 +32,6 @@ class CreateOrderRequest
     public function __construct(array $data) {
         $this->orderId = isset($data['orderId']) ? sanitize_text_field((string)$data['orderId']) : null;
         $this->description = isset($data['description']) ? sanitize_text_field((string)$data['description']) : null;
-        $this->payAmount = isset($data['payAmount']) ? Utils::sanitizeFloat($data['payAmount']) : null;
-        $this->payCurrencyCode = isset($data['payCurrencyCode']) ? sanitize_text_field((string)$data['payCurrencyCode']) : null;
         $this->receiveAmount = isset($data['receiveAmount']) ? Utils::sanitizeFloat($data['receiveAmount']) : null;
         $this->receiveCurrencyCode = isset($data['receiveCurrencyCode']) ? sanitize_text_field((string)$data['receiveCurrencyCode']) : null;
         $this->callbackUrl = isset($data['callbackUrl']) ? Utils::sanitizeUrl($data['callbackUrl']) : null;
@@ -57,32 +53,29 @@ class CreateOrderRequest
     private function validate(): bool|array
     {
         $errors = [];
-
+    
         if (empty($this->getOrderId())) {
-            $errors[] = 'orderId';
+            $errors[] = 'orderId is required';
         }
         if (empty($this->getDescription())) {
-            $errors[] = 'description';
+            $errors[] = 'description is required';
         }
-        if (strlen($this->getPayCurrencyCode()) !== 3) {
-            $errors[] = 'payCurrencyCode';
+        if ($this->getReceiveAmount() === null || $this->getReceiveAmount() <= 0) {
+            $errors[] = 'receiveAmount must be greater than zero';
         }
-        if (strlen($this->getReceiveCurrencyCode()) !== 3) {
-            $errors[] = 'receiveCurrencyCode';
+        if (empty($this->getReceiveCurrencyCode()) || strlen($this->getReceiveCurrencyCode()) !== 3) {
+            $errors[] = 'receiveCurrencyCode must be 3 characters long';
         }
-        if (!filter_var($this->getCallbackUrl(), FILTER_VALIDATE_URL)) {
-            $errors[] = 'callbackUrl';
+        if (empty($this->getCallbackUrl()) || !filter_var($this->getCallbackUrl(), FILTER_VALIDATE_URL)) {
+            $errors[] = 'invalid callbackUrl';
         }
-        if (!filter_var($this->getSuccessUrl(), FILTER_VALIDATE_URL)) {
-            $errors[] = 'successUrl';
+        if (empty($this->getSuccessUrl()) || !filter_var($this->getSuccessUrl(), FILTER_VALIDATE_URL)) {
+            $errors[] = 'invalid successUrl';
         }
-        if (!filter_var($this->getFailureUrl(), FILTER_VALIDATE_URL)) {
-            $errors[] = 'failureUrl';
+        if (empty($this->getFailureUrl()) || !filter_var($this->getFailureUrl(), FILTER_VALIDATE_URL)) {
+            $errors[] = 'invalid failureUrl';
         }
-        if (($this->getPayAmount() <= 0) && ($this->getReceiveAmount() <= 0)) {
-            $errors[] = 'payAmount or receiveAmount must be greater than zero';
-        }
-
+    
         return empty($errors) ? true : $errors;
     }
 
@@ -95,8 +88,6 @@ class CreateOrderRequest
         return [
             'orderId' => $this->getOrderId(),
             'description' => $this->getDescription(),
-            'payAmount' => $this->getPayAmount(),
-            'payCurrencyCode' => $this->getPayCurrencyCode(),
             'receiveAmount' => $this->getReceiveAmount(),
             'receiveCurrencyCode' => $this->getReceiveCurrencyCode(),
             'callbackUrl' => $this->getCallbackUrl(),
@@ -116,8 +107,6 @@ class CreateOrderRequest
 
     public function getOrderId(): ?string { return $this->orderId; }
     public function getDescription(): ?string { return $this->description; }
-    public function getPayAmount(): ?float { return $this->payAmount !== null ? Utils::formatCurrency($this->payAmount) : null; }
-    public function getPayCurrencyCode(): ?string { return $this->payCurrencyCode; }
     public function getReceiveAmount(): ?float { return $this->receiveAmount !== null ? Utils::formatCurrency($this->receiveAmount) : null; }
     public function getReceiveCurrencyCode(): ?string { return $this->receiveCurrencyCode; }
     public function getCallbackUrl(): ?string { return $this->callbackUrl; }

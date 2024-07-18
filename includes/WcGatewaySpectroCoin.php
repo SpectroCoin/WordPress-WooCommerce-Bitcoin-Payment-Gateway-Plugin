@@ -36,8 +36,6 @@ class WCGatewaySpectrocoin extends WC_Payment_Gateway
     public static $log_enabled = true;
     /** @var WC_Logger Logger instance */
     public static $log = false;
-    /** @var String pay currency */
-    private static $pay_currency = 'BTC';
     /** @var String */
     private static $callback_name = 'spectrocoin_callback';
     /** @var SCMerchantClient */
@@ -459,7 +457,7 @@ class WCGatewaySpectrocoin extends WC_Payment_Gateway
 			'order_status' => array(
 				'title' => esc_html__('Order status', 'spectrocoin-accepting-bitcoin'),
 				'desc_tip' => true,
-				'description' => esc_html__('Order status after payment has been received or when a test callback was using test mode. Custom order statuses will appear in the list.', 'spectrocoin-accepting-bitcoin'),
+				'description' => esc_html__('Order status after payment has been received. Custom order statuses will appear in the list.', 'spectrocoin-accepting-bitcoin'),
 				'type' => 'select',
 				'default' => 'completed',
 				'options' => $this->all_order_statuses
@@ -496,8 +494,6 @@ class WCGatewaySpectrocoin extends WC_Payment_Gateway
 		$order_data = [
 			'orderId' => (string)$order->get_id(),
 			'description' => "Order #{$order_id}",
-			'payAmount' => null,
-			'payCurrencyCode' => self::$pay_currency,
 			'receiveAmount' => (float)$order->get_total(),
 			'receiveCurrencyCode' => $order->get_currency(),
 			'callbackUrl' => 'http://localhost.com',

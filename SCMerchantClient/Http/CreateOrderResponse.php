@@ -66,14 +66,8 @@ class CreateOrderResponse
         if (empty($this->getOrderId())) {
             $errors[] = 'orderId is empty';
         }
-        if (empty($this->getValidUntil())) {
-            $errors[] = 'validUntil is empty';
-        }
         if (strlen($this->getPayCurrencyCode()) !== 3) {
             $errors[] = 'payCurrencyCode is not 3 characters long';
-        }
-        if (empty($this->getPayNetworkCode())) {
-            $errors[] = 'payNetworkCode is empty';
         }
         if (strlen($this->getReceiveCurrencyCode()) !== 3) {
             $errors[] = 'receiveCurrencyCode is not 3 characters long';
@@ -83,9 +77,6 @@ class CreateOrderResponse
         }
         if (!is_numeric($this->getReceiveAmount()) || $this->getReceiveAmount() <= 0) {
             $errors[] = 'receiveAmount is not a valid positive number';
-        }
-        if (empty($this->getDepositAddress())) {
-            $errors[] = 'depositAddress is empty';
         }
         if (!filter_var($this->getRedirectUrl(), FILTER_VALIDATE_URL)) {
             $errors[] = 'redirectUrl is not a valid URL';
