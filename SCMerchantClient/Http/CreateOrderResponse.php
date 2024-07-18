@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace SpectroCoin\SCMerchantClient\Http;
 
 use InvalidArgumentException;
+use SpectroCoin\SCMerchantClient\Utils;
 
 if (!defined('ABSPATH')) {
     die('Access denied.');
@@ -31,19 +32,17 @@ class CreateOrderResponse
      */
     public function __construct(array $data)
     {
-        $this->preOrderId = $data['preOrderId'] ?? null;
-        $this->orderId = $data['orderId'] ?? null;
-        $this->validUntil = $data['validUntil'] ?? null;
-        $this->payCurrencyCode = $data['payCurrencyCode'] ?? null;
-        $this->payNetworkCode = $data['payNetworkCode'] ?? null;
-        $this->receiveCurrencyCode = $data['receiveCurrencyCode'] ?? null;
-        $this->payAmount = $data['payAmount'] ?? null;
-        $this->receiveAmount = $data['receiveAmount'] ?? null;
-        $this->depositAddress = $data['depositAddress'] ?? null;
-        $this->memo = $data['memo'] ?? null;
-        $this->redirectUrl = $data['redirectUrl'] ?? null;
-
-        $this->sanitize();
+        $this->preOrderId = isset($data['preOrderId']) ? sanitize_text_field((string)$data['preOrderId']) : null;
+        $this->orderId = isset($data['orderId']) ? sanitize_text_field((string)$data['orderId']) : null;
+        $this->validUntil = isset($data['validUntil']) ? sanitize_text_field((string)$data['validUntil']) : null;
+        $this->payCurrencyCode = isset($data['payCurrencyCode']) ? sanitize_text_field((string)$data['payCurrencyCode']) : null;
+        $this->payNetworkCode = isset($data['payNetworkCode']) ? sanitize_text_field((string)$data['payNetworkCode']) : null;
+        $this->receiveCurrencyCode = isset($data['receiveCurrencyCode']) ? sanitize_text_field((string)$data['receiveCurrencyCode']) : null;
+        $this->payAmount = isset($data['payAmount']) ? Utils::sanitizeFloat($data['payAmount']) : null;
+        $this->receiveAmount = isset($data['receiveAmount']) ? Utils::sanitizeFloat($data['receiveAmount']) : null;
+        $this->depositAddress = isset($data['depositAddress']) ? sanitize_text_field((string)$data['depositAddress']) : null;
+        $this->memo = isset($data['memo']) ? sanitize_text_field((string)$data['memo']) : null;
+        $this->redirectUrl = isset($data['redirectUrl']) ? Utils::sanitizeUrl($data['redirectUrl']) : null;
 
         $validation = $this->validate();
         if (is_array($validation)) {
@@ -93,26 +92,6 @@ class CreateOrderResponse
         }
 
         return empty($errors) ? true : $errors;
-    }
-
-    /**
-     * Sanitize the data for create order API response.
-     *
-     * @return void
-     */
-    public function sanitize(): void
-    {
-        $this->preOrderId = sanitize_text_field($this->preOrderId);
-        $this->orderId = sanitize_text_field($this->orderId);
-        $this->validUntil = sanitize_text_field($this->validUntil);
-        $this->payCurrencyCode = sanitize_text_field($this->payCurrencyCode);
-        $this->payNetworkCode = sanitize_text_field($this->payNetworkCode);
-        $this->receiveCurrencyCode = sanitize_text_field($this->receiveCurrencyCode);
-        $this->payAmount = filter_var($this->payAmount, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
-        $this->receiveAmount = filter_var($this->receiveAmount, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
-        $this->depositAddress = sanitize_text_field($this->depositAddress);
-        $this->memo = sanitize_text_field($this->memo);
-        $this->redirectUrl = filter_var($this->redirectUrl, FILTER_SANITIZE_URL);
     }
 
     public function getPreOrderId(): ?string { return $this->preOrderId; }

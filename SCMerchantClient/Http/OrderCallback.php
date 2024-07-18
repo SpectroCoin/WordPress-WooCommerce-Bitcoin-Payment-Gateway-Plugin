@@ -6,7 +6,6 @@ namespace SpectroCoin\SCMerchantClient\Http;
 
 use SpectroCoin\SCMerchantClient\Utils;
 use SpectroCoin\SCMerchantClient\Config;
-
 use Exception;
 use InvalidArgumentException;
 
@@ -40,22 +39,20 @@ class OrderCallback
      */
     public function __construct(array $data)
     {
-        $this->userId = $data['userId'] ?? null;
-        $this->merchantApiId = $data['merchantApiId'] ?? null;
-        $this->merchantId = $data['merchantId'] ?? null;
-        $this->apiId = $data['apiId'] ?? null;
-        $this->orderId = $data['orderId'] ?? null;
-        $this->payCurrency = $data['payCurrency'] ?? null;
-        $this->payAmount = $data['payAmount'] ?? null;
-        $this->receiveCurrency = $data['receiveCurrency'] ?? null;
-        $this->receiveAmount = $data['receiveAmount'] ?? null;
-        $this->receivedAmount = $data['receivedAmount'] ?? null;
-        $this->description = $data['description'] ?? null;
-        $this->orderRequestId = $data['orderRequestId'] ?? null;
-        $this->status = $data['status'] ?? null;
-        $this->sign = $data['sign'] ?? null;
-
-        $this->sanitize();
+        $this->userId = isset($data['userId']) ? sanitize_text_field((string)$data['userId']) : null;
+        $this->merchantApiId = isset($data['merchantApiId']) ? sanitize_text_field((string)$data['merchantApiId']) : null;
+        $this->merchantId = isset($data['merchantId']) ? sanitize_text_field((string)$data['merchantId']) : null;
+        $this->apiId = isset($data['apiId']) ? sanitize_text_field((string)$data['apiId']) : null;
+        $this->orderId = isset($data['orderId']) ? sanitize_text_field((string)$data['orderId']) : null;
+        $this->payCurrency = isset($data['payCurrency']) ? sanitize_text_field((string)$data['payCurrency']) : null;
+        $this->payAmount = isset($data['payAmount']) ? Utils::sanitizeFloat($data['payAmount']) : null;
+        $this->receiveCurrency = isset($data['receiveCurrency']) ? sanitize_text_field((string)$data['receiveCurrency']) : null;
+        $this->receiveAmount = isset($data['receiveAmount']) ? Utils::sanitizeFloat($data['receiveAmount']) : null;
+        $this->receivedAmount = isset($data['receivedAmount']) ? Utils::sanitizeFloat($data['receivedAmount']) : null;
+        $this->description = isset($data['description']) ? sanitize_text_field((string)$data['description']) : null;
+        $this->orderRequestId = isset($data['orderRequestId']) ? filter_var($data['orderRequestId'], FILTER_SANITIZE_NUMBER_INT) : null;
+        $this->status = isset($data['status']) ? filter_var($data['status'], FILTER_SANITIZE_NUMBER_INT) : null;
+        $this->sign = isset($data['sign']) ? sanitize_text_field((string)$data['sign']) : null;
 
         $validation_result = $this->validate();
         if (is_array($validation_result)) {
@@ -66,29 +63,6 @@ class OrderCallback
         if (!$this->validatePayloadSignature()) {
             throw new Exception('Invalid payload signature.');
         }
-    }
-
-    /**
-     * Sanitize the input data.
-     *
-     * @return void
-     */
-    public function sanitize(): void
-    {
-        $this->userId = sanitize_text_field($this->userId);
-        $this->merchantApiId = sanitize_text_field($this->merchantApiId);
-        $this->merchantId = sanitize_text_field($this->merchantId);
-        $this->apiId = sanitize_text_field($this->apiId);
-        $this->orderId = sanitize_text_field($this->orderId);
-        $this->payCurrency = sanitize_text_field($this->payCurrency);
-        $this->payAmount = filter_var($this->payAmount, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
-        $this->receiveCurrency = sanitize_text_field($this->receiveCurrency);
-        $this->receiveAmount = filter_var($this->receiveAmount, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
-        $this->receivedAmount = filter_var($this->receivedAmount, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
-        $this->description = sanitize_text_field($this->description);
-        $this->orderRequestId = filter_var($this->orderRequestId, FILTER_SANITIZE_NUMBER_INT);
-        $this->status = sanitize_text_field($this->status);
-        $this->sign = sanitize_text_field($this->sign);
     }
 
     /**
@@ -197,4 +171,4 @@ class OrderCallback
     public function getStatus() { return $this->status; }
     public function getSign() { return $this->sign; }
 }
-
+?>

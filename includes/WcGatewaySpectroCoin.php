@@ -3,17 +3,21 @@
 namespace SpectroCoin\Includes;
 
 use SpectroCoin\SCMerchantClient\SCMerchantClient;
-use SpectroCoin\SCMerchantClient\Exception\ApiError;
 use SpectroCoin\SCMerchantClient\Config;
 use SpectroCoin\SCMerchantClient\Enum\OrderStatusEnum;
+use SpectroCoin\SCMerchantClient\Exception\ApiError;
+use SpectroCoin\SCMerchantClient\Exception\GenericError;
 use function SpectroCoin\displayAdminErrorNotice;
+use SpectroCoin\SCMerchantClient\Http\OrderCallback;
 
 use WC_Payment_Gateway;
 use WC_Logger;
 use WC_Order;
+
 use Exception;
 use InvalidArgumentException;
-use SpectroCoin\SCMerchantClient\Http\OrderCallback;
+
+use GuzzleHttp\Exception\GuzzleException;
 
 if (!defined('ABSPATH')) {
 	die('Access denied.');
@@ -491,54 +495,47 @@ class WCGatewaySpectrocoin extends WC_Payment_Gateway
 
 		$order_data = [
 			'orderId' => (string)$order->get_id(),
-			'description' => "Order #{$order_id}", # TODO: It could be configurable in admin
+			'description' => "Order #{$order_id}",
 			'payAmount' => null,
 			'payCurrencyCode' => self::$pay_currency,
 			'receiveAmount' => (float)$order->get_total(),
 			'receiveCurrencyCode' => $order->get_currency(),
-			'callbackUrl' => get_site_url(null, '?wc-api=' . self::$callback_name),
-			'successUrl' => $this->get_return_url($order),
-			'failureUrl' => $this->get_return_url($order)
+			'callbackUrl' => 'http://localhost.com',
+			'successUrl' => 'http://localhost.com',
+			'failureUrl' => 'http://localhost.com'
 		];
 
 		$response = $this->sc_merchant_client->createOrder($order_data);
 		$order->update_status('on-hold', __('Waiting for SpectroCoin payment', 'spectrocoin-accepting-bitcoin'));
-		if ($response instanceof ApiError) {
-			$error_message = "SpectroCoin error: Failed to create payment for order {$order_id}. Response message: {$response->getMessage()}. Response code: {$response->getCode()}";
-			$this->handleFailedOrder($order, $error_message);
-		}
-		else if ($response instanceof InvalidArgumentException){
+
+		if ($response instanceof ApiError || $response instanceof GenericError) {
 			$error_message = "SpectroCoin error: Failed to create payment for order {$order_id}. Response message: {$response->getMessage()}";
-			$this->handleFailedOrder($order, $error_message);
+			return $this->handleFailedOrder($order, $error_message);
 		}
-		else if ($response instanceof Exception){
-			$error_message = "SpectroCoin error: Failed to create payment for order {$order_id}. Response message: {$response->getMessage()}";
-			$this->handleFailedOrder($order, $error_message);
-		}
-		$this->handleSuccessOrder($order, $error_message);
+
+		return $this->handleSuccessOrder($order_id, $response->getRedirectUrl());
 	}
 
 	private function handleFailedOrder($order, $error_message){
 		$order->update_status('failed', __($error_message, 'spectrocoin-accepting-bitcoin'));
 		self::woocommerceLog($error_message);
-		wc_add_notice(_($error_message, 'spectrocoin-accepting-bitcoin'), 'error');
+		wc_add_notice(_('An error occurred while processing your order via SpectroCoin. Please inform the store owner and if possible use a different payment option. Sorry for the inconvenience.', 'spectrocoin-accepting-bitcoin'), 'error');
 		return array(
 			'result'   => 'failed',
 			'redirect' => ''
 		);
 	}
 
-	private function handleSuccessOrder($order){
+	private function handleSuccessOrder($order_id, $redirect_url){
 		global $woocommerce;
 		$order->update_status('success');
 		wc_reduce_stock_levels($order_id);
 		$woocommerce->cart->empty_cart();
 		return array(
 			'result' => 'success',
-			'redirect' => $response->getRedirectUrl()
+			'redirect' => $redirect_url
 		);
 	}
-
 
 	/**
 	 * Used to process callbacks from SpectroCoin
@@ -587,7 +584,7 @@ class WCGatewaySpectrocoin extends WC_Payment_Gateway
 				exit;
 			}
 		} 
-		else if ($order_callback instanceof ApiError) {
+		else if ($order_callback instanceof GuzzleException) {
 			self::woocommerceLog("Callback API error: {$order_callback->getMessage()}");
 			exit;
 		}
@@ -617,20 +614,12 @@ class WCGatewaySpectrocoin extends WC_Payment_Gateway
 
 	/**
 	 * Check if currency is accepted by SpectroCoin
-	 * Function compares current currency with accepted currencies from acceptedFiatCurrencies.JSON
+	 * Function compares current currency with accepted currencies from Config class
 	 * @return bool
 	 */
-	private function checkFiatCurrency()
-  	{	
-		$json_file = file_get_contents(plugin_dir_path( __FILE__ ) . '/../SCMerchantClient/Data/acceptedFiatCurrencies.JSON'); 
-		$accepted_currencies = json_decode($json_file, true);
+	private function checkFiatCurrency(): bool
+	{
 		$current_currency_iso_code = get_woocommerce_currency();
-		if (in_array($current_currency_iso_code, $accepted_currencies)) {
-		    return true;
-		} 
-		else {
-		    return false;
-		}
-
+		return in_array($current_currency_iso_code, Config::ACCEPTED_FIAT_CURRENCIES);
 	}
 }

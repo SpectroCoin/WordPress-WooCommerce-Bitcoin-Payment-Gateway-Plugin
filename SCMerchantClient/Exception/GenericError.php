@@ -3,10 +3,10 @@
 namespace SpectroCoin\SCMerchantClient\Exception;
 
 if (!defined('ABSPATH')) {
-	die('Access denied.');
+    die('Access denied.');
 }
 
-class ApiError extends GenericError
+class GenericError extends \Exception
 {
     /**
      * @param string $message

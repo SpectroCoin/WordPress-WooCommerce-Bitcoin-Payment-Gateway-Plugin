@@ -64,14 +64,8 @@ class CreateOrderRequest
         if (empty($this->getDescription())) {
             $errors[] = 'description';
         }
-        if (!is_numeric($this->getPayAmount())) {
-            $errors[] = 'payAmount';
-        }
         if (strlen($this->getPayCurrencyCode()) !== 3) {
             $errors[] = 'payCurrencyCode';
-        }
-        if (!is_numeric($this->getReceiveAmount())) {
-            $errors[] = 'receiveAmount';
         }
         if (strlen($this->getReceiveCurrencyCode()) !== 3) {
             $errors[] = 'receiveCurrencyCode';
@@ -122,9 +116,9 @@ class CreateOrderRequest
 
     public function getOrderId(): ?string { return $this->orderId; }
     public function getDescription(): ?string { return $this->description; }
-    public function getPayAmount(): ?float { return Utils::formatCurrency($this->payAmount); }
+    public function getPayAmount(): ?float { return $this->payAmount !== null ? Utils::formatCurrency($this->payAmount) : null; }
     public function getPayCurrencyCode(): ?string { return $this->payCurrencyCode; }
-    public function getReceiveAmount(): ?float { return Utils::formatCurrency($this->receiveAmount); }
+    public function getReceiveAmount(): ?float { return $this->receiveAmount !== null ? Utils::formatCurrency($this->receiveAmount) : null; }
     public function getReceiveCurrencyCode(): ?string { return $this->receiveCurrencyCode; }
     public function getCallbackUrl(): ?string { return $this->callbackUrl; }
     public function getSuccessUrl(): ?string { return $this->successUrl; }

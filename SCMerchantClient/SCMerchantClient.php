@@ -7,14 +7,18 @@ namespace SpectroCoin\SCMerchantClient;
 use SpectroCoin\SCMerchantClient\Config;
 use SpectroCoin\SCMerchantClient\Utils;
 use SpectroCoin\SCMerchantClient\Exception\ApiError;
+use SpectroCoin\SCMerchantClient\Exception\GenericError;
 use SpectroCoin\SCMerchantClient\Http\CreateOrderRequest;
 use SpectroCoin\SCMerchantClient\Http\CreateOrderResponse;
+
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\RequestOptions;
+
 use InvalidArgumentException;
 use Exception;
+use RuntimeException;
 
 if (!defined('ABSPATH')) {
     die('Access denied.');
@@ -53,7 +57,7 @@ class SCMerchantClient
      * Create an order
      * 
      * @param array $order_data
-     * @return CreateOrderResponse|ApiError|null
+     * @return CreateOrderResponse|ApiError|GenericError|null
      */
     public function createOrder(array $order_data)
     {
@@ -66,7 +70,7 @@ class SCMerchantClient
         try {
             $create_order_request = new CreateOrderRequest($order_data);
         } catch (InvalidArgumentException $e) {
-            return new InvalidArgumentException($e->getMessage(), $e->getCode());
+            return new GenericError($e->getMessage(), $e->getCode());
         }
 
         $order_payload = $create_order_request->toArray();
@@ -79,7 +83,7 @@ class SCMerchantClient
      * Send create order request
      * 
      * @param string $order_payload
-     * @return CreateOrderResponse|ApiError
+     * @return CreateOrderResponse|ApiError|GenericError
      */
     private function sendCreateOrderRequest(string $order_payload)
     {
@@ -94,29 +98,32 @@ class SCMerchantClient
 
             $body = json_decode($response->getBody()->getContents(), true);
 
-            return new CreateOrderResponse(
-                $body['preOrderId'],
-                $body['orderId'],
-                $body['validUntil'],
-                $body['payCurrencyCode'],
-                $body['payNetworkCode'],
-                $body['receiveCurrencyCode'],
-                $body['payAmount'],
-                $body['receiveAmount'],
-                $body['depositAddress'],
-                $body['memo'],
-                $body['redirectUrl']
-            );
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                throw new RuntimeException('Failed to parse JSON response: ' . json_last_error_msg());
+            }
 
-		}
-		catch (InvalidArgumentException $e) {
-			return new InvalidArgumentException($e->getMessage(), $e->getCode());
+            $responseData = [
+                'preOrderId' => $body['preOrderId'] ?? null,
+                'orderId' => $body['orderId'] ?? null,
+                'validUntil' => $body['validUntil'] ?? null,
+                'payCurrencyCode' => $body['payCurrencyCode'] ?? null,
+                'payNetworkCode' => $body['payNetworkCode'] ?? null,
+                'receiveCurrencyCode' => $body['receiveCurrencyCode'] ?? null,
+                'payAmount' => $body['payAmount'] ?? null,
+                'receiveAmount' => $body['receiveAmount'] ?? null,
+                'depositAddress' => $body['depositAddress'] ?? null,
+                'memo' => $body['memo'] ?? null,
+                'redirectUrl' => $body['redirectUrl'] ?? null
+            ];
+
+            return new CreateOrderResponse($responseData);
+        } catch (InvalidArgumentException $e) {
+            return new GenericError($e->getMessage(), $e->getCode());
         } catch (GuzzleException $e) {
             return new ApiError($e->getMessage(), $e->getCode());
-		} catch (Exception $e) {
-			return new Exception($e->getMessage(), $e->getCode());
-		}
-
+        } catch (Exception $e) {
+            return new GenericError($e->getMessage(), $e->getCode());
+        }
     }
 
     /**
