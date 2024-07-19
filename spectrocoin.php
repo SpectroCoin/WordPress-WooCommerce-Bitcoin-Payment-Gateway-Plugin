@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 /*
 Plugin Name: SpectroCoin Bitcoin Payment Gateway
 Author:      SpectroCoin
@@ -22,7 +24,6 @@ use SpectroCoin\Includes\SpectroCoinGateway;
 use SpectroCoin\Includes\SpectroCoinLogger;
 use SpectroCoin\Includes\SpectroCoinBlocksIntegration;
 use SpectroCoin\SCMerchantClient\Config;
-
 use Automattic\WooCommerce\Blocks\Payments\PaymentMethodRegistry;
 use Automattic\WooCommerce\Utilities\FeaturesUtil;
 
@@ -35,12 +36,12 @@ require_once __DIR__ . '/vendor/autoload.php';
 /**
  * Initialize plugin
  */
-function spectrocoinInitPlugin()
+function spectrocoinInitPlugin(): void
 {
     if (isRequirementsMet()) {
         load_plugin_textdomain('spectrocoin-accepting-bitcoin', false, dirname(plugin_basename(__FILE__)) . '/languages');
 
-        if (class_exists('SpectroCoin\Includes\SpectroCoinGateway')) {
+        if (class_exists(SpectroCoinGateway::class)) {
             add_filter('woocommerce_payment_gateways', '\SpectroCoin\spectrocoinGatewayClass');
             add_filter('plugin_action_links', '\SpectroCoin\addCustomLinksLeft', 10, 2);
             add_filter('plugin_row_meta', '\SpectroCoin\addCustomLinksRight', 10, 2);
@@ -54,7 +55,7 @@ function spectrocoinInitPlugin()
  * Checks if the system requirements are met
  * @return bool True if system requirements are met, false if not
  */
-function isRequirementsMet()
+function isRequirementsMet(): bool
 {
     $requirements_met = true;
     $message = '';
@@ -94,7 +95,7 @@ function isRequirementsMet()
 /**
  * Handle plugin deactivation
  */
-function deactivatePlugin()
+function deactivatePlugin(): void
 {
     deactivate_plugins(plugin_basename(__FILE__));
 }
@@ -102,16 +103,16 @@ function deactivatePlugin()
 /**
  * Gateway class initialization
  */
-function spectrocoinGatewayClass($methods)
+function spectrocoinGatewayClass(array $methods): array
 {
-    $methods[] = 'SpectroCoin\Includes\SpectroCoinGateway';
+    $methods[] = SpectroCoinGateway::class;
     return $methods;
 }
 
 /**
  * Get payment settings url
  */
-function getSpectrocoinSettingsUrl()
+function getSpectrocoinSettingsUrl(): string
 {
     $checkout_url = get_admin_url(null, 'admin.php?page=wc-settings&tab=checkout&section=spectrocoin');
     return esc_url($checkout_url);
@@ -120,7 +121,7 @@ function getSpectrocoinSettingsUrl()
 /**
  * Add custom links to plugin page
  */
-function addCustomLinksLeft($links, $file)
+function addCustomLinksLeft(array $links, string $file): array
 {
     if (strpos($file, 'spectrocoin') !== false) {
         $settings_url = getSpectrocoinSettingsUrl();
@@ -133,13 +134,13 @@ function addCustomLinksLeft($links, $file)
 /**
  * Add custom links to plugin page
  */
-function addCustomLinksRight($plugin_meta, $file)
+function addCustomLinksRight(array $plugin_meta, string $file): array
 {
     if (strpos($file, 'spectrocoin') !== false) {
-        $custom_links = array(
+        $custom_links = [
             'community-support' => '<a target = "_blank" href="https://wordpress.org/support/plugin/spectrocoin-accepting-bitcoin/">' . esc_html__('Community support', 'spectrocoin-accepting-bitcoin') . '</a>',
             'rate-us' => '<a target = "_blank" href="https://wordpress.org/support/plugin/spectrocoin-accepting-bitcoin/reviews/#new-post">' . esc_html__('Rate us', 'spectrocoin-accepting-bitcoin') . '</a>',
-        );
+        ];
         $plugin_meta = array_merge($plugin_meta, $custom_links);
     }
     return $plugin_meta;
@@ -148,36 +149,39 @@ function addCustomLinksRight($plugin_meta, $file)
 /**
  * Enqueue admin styles
  */
-function EnqueueAdminStyles()
+function EnqueueAdminStyles(): void
 {
     $current_screen = get_current_screen();
     if ($current_screen->base === 'woocommerce_page_wc-settings' && isset($_GET['section']) && $_GET['section'] === 'spectrocoin') {
-        wp_enqueue_style('spectrocoin-payment-settings-css', esc_url(plugin_dir_url(__FILE__)) . 'assets/style/settings.css', array(), '1.0.0');
+        wp_enqueue_style('spectrocoin-payment-settings-css', esc_url(plugin_dir_url(__FILE__)) . 'assets/style/settings.css', [], '1.0.0');
     }
 }
 
-function declareBlocksCompatibility() {
-    if (class_exists('Automattic\WooCommerce\Utilities\FeaturesUtil'))
+function declareBlocksCompatibility(): void
+{
+    if (class_exists(FeaturesUtil::class)) {
         FeaturesUtil::declare_compatibility('cart_checkout_blocks', __FILE__, true);
+    }
 }
 
-add_action( 'woocommerce_blocks_loaded', '\SpectroCoin\registerOrderApprovalPaymentMethodType' );
+add_action('woocommerce_blocks_loaded', '\SpectroCoin\registerOrderApprovalPaymentMethodType');
 
-add_action('before_woocommerce_init', function(){
-    if ( class_exists( FeaturesUtil::class ) ) {
-        FeaturesUtil::declare_compatibility( 'custom_order_tables', __FILE__, true);
+add_action('before_woocommerce_init', function () {
+    if (class_exists(FeaturesUtil::class)) {
+        FeaturesUtil::declare_compatibility('custom_order_tables', __FILE__, true);
     }
 });
 
-function registerOrderApprovalPaymentMethodType() {
-    if ( ! class_exists( 'Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodType' ) ) {
+function registerOrderApprovalPaymentMethodType(): void
+{
+    if (!class_exists('Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodType')) {
         return;
     }
 
     add_action(
         'woocommerce_blocks_payment_method_type_registration',
-        function( PaymentMethodRegistry $payment_method_registry ) {
-            $payment_method_registry->register( new SpectroCoinBlocksIntegration );
+        function (PaymentMethodRegistry $payment_method_registry): void {
+            $payment_method_registry->register(new SpectroCoinBlocksIntegration);
         }
     );
 }

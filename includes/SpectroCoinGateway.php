@@ -1,5 +1,7 @@
 <?php
 
+declare (strict_types=1);
+
 namespace SpectroCoin\Includes;
 
 use SpectroCoin\SCMerchantClient\SCMerchantClient;
@@ -519,7 +521,65 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 	 * If callback is valid, then order status is updated.
 	 * If callback is invalid, then error message is logged and order fails.
 	 */
-	public function callback()
+	public function callback(): void
+	{
+		try {
+			$order_callback = $this->initCallbackFromPost();
+
+			if (!$order_callback) {
+				$this->wc_logger->log('error', "Sent callback is invalid");
+				echo esc_html__('Invalid callback', 'spectrocoin-accepting-bitcoin');
+				exit;
+			}
+
+			$order_id = $this->parseOrderId($order_callback->getOrderId());
+			$status = $order_callback->getStatus();
+
+			$order = wc_get_order($order_id);
+			if ($order) {
+				switch ($status) {
+					case OrderStatusEnum::New->value:
+					case OrderStatusEnum::Pending->value:
+						$order->update_status('Pending payment');
+						break;
+					case OrderStatusEnum::Paid->value:
+						$order->update_status($this->order_status);
+						break;
+					case OrderStatusEnum::Failed->value:
+						$order->update_status('failed');
+						break;
+					case OrderStatusEnum::Expired->value:
+						$order->update_status($this->order_status);
+						break;
+				}
+				echo esc_html__('*ok*', 'spectrocoin-accepting-bitcoin');
+				exit;
+			} else {
+				$this->wc_logger->log('error', "Order '{$order_id}' not found!");
+				echo esc_html__('order not found', 'spectrocoin-accepting-bitcoin');
+				exit;
+			}
+		} catch (GuzzleException $e) {
+			$this->wc_logger->log('error', "Callback API error: {$e->getMessage()}");
+			echo esc_html__('Callback API error', 'spectrocoin-accepting-bitcoin');
+			exit;
+		} catch (InvalidArgumentException $e) {
+			$this->wc_logger->log('error', "Error processing callback: {$e->getMessage()}");
+			echo esc_html__('Error processing callback', 'spectrocoin-accepting-bitcoin');
+			exit;
+		} catch (Exception $e) {
+			$this->wc_logger->log('error', "Error processing callback: {$e->getMessage()}");
+			echo esc_html__('Error processing callback', 'spectrocoin-accepting-bitcoin');
+			exit;
+		}
+	}
+
+	/**
+	 * Initializes the callback data from POST request.
+	 * 
+	 * @return OrderCallback|null Returns an OrderCallback object if data is valid, null otherwise.
+	 */
+	private function initCallbackFromPost(): ?OrderCallback
 	{
 		$expected_keys = ['userId', 'merchantApiId', 'merchantId', 'apiId', 'orderId', 'payCurrency', 'payAmount', 'receiveCurrency', 'receiveAmount', 'receivedAmount', 'description', 'orderRequestId', 'status', 'sign'];
 
@@ -529,53 +589,13 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 				$callback_data[$key] = $_POST[$key];
 			}
 		}
-		$order_callback = new OrderCallback($callback_data);
 
-		if ($order_callback) {
-			$order_id = $this->parseOrderId($order_callback->getOrderId());
-			$status = $order_callback->getStatus();
+		if (empty($callback_data)) {
+			$this->wc_logger->log('error', "No data received in callback");
+			return null;
+		}
 
-			$order = wc_get_order($order_id);
-			if ($order) {
-				switch ($status) {
-                    case OrderStatusEnum::New->value:
-                    case OrderStatusEnum::Pending->value:
-                        $order->update_status('Pending payment');
-                        break;
-                    case OrderStatusEnum::Paid->value:
-                        $order->update_status($this->order_status);
-                        break;
-                    case OrderStatusEnum::Failed->value:
-                        $order->update_status('failed');
-                        break;
-                    case OrderStatusEnum::Expired->value:
-                        $order->update_status($this->order_status);
-                        break;
-                }
-				echo esc_html__('*ok*', 'spectrocoin-accepting-bitcoin');
-				exit;
-			} else {
-				$this->wc_logger->log('',"Order '{$order_id}' not found!");
-				echo esc_html__('order not found', 'spectrocoin-accepting-bitcoin');
-				exit;
-			}
-		} 
-		else if ($order_callback instanceof GuzzleException) {
-			$this->wc_logger->log('error',"Callback API error: {$order_callback->getMessage()}");
-			exit;
-		}
-		else if ($order_callback instanceof InvalidArgumentException) {
-			$this->wc_logger->log('error',"Error processing callback: {$order_callback->getMessage()}");
-			exit;
-		}
-		else if ($order_callback instanceof Exception) {
-			$this->wc_logger->log('error',"Error processing callback: {$order_callback->getMessage()}");
-			exit;
-		}
-		else {
-			$this->wc_logger->log('error',"Sent callback is invalid");
-			exit;
-		}
+		return new OrderCallback($callback_data);
 	}
 
 	/**
