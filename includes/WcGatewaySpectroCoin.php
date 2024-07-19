@@ -509,23 +509,22 @@ class WCGatewaySpectrocoin extends WC_Payment_Gateway
 			return $this->handleFailedOrder($order, $error_message);
 		}
 
-		return $this->handleSuccessOrder($order_id, $response->getRedirectUrl());
+		return $this->handleSuccessOrder($order, $response->getRedirectUrl());
 	}
 
-	private function handleFailedOrder($order, $error_message){
+	private function handleFailedOrder(WC_Order $order, string $error_message){
 		$order->update_status('failed', __($error_message, 'spectrocoin-accepting-bitcoin'));
 		self::woocommerceLog($error_message);
-		wc_add_notice(_('An error occurred while processing your order via SpectroCoin. Please inform the store owner and if possible use a different payment option. Sorry for the inconvenience.', 'spectrocoin-accepting-bitcoin'), 'error');
 		return array(
 			'result'   => 'failed',
 			'redirect' => ''
 		);
 	}
 
-	private function handleSuccessOrder($order_id, $redirect_url){
+	private function handleSuccessOrder(WC_Order $order, string $redirect_url){
 		global $woocommerce;
 		$order->update_status('success');
-		wc_reduce_stock_levels($order_id);
+		wc_reduce_stock_levels($order->get_id());
 		$woocommerce->cart->empty_cart();
 		return array(
 			'result' => 'success',

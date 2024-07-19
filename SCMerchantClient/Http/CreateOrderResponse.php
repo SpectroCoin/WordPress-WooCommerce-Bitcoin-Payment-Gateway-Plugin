@@ -66,14 +66,8 @@ class CreateOrderResponse
         if (empty($this->getOrderId())) {
             $errors[] = 'orderId is empty';
         }
-        if (strlen($this->getPayCurrencyCode()) !== 3) {
-            $errors[] = 'payCurrencyCode is not 3 characters long';
-        }
         if (strlen($this->getReceiveCurrencyCode()) !== 3) {
             $errors[] = 'receiveCurrencyCode is not 3 characters long';
-        }
-        if (!is_numeric($this->getPayAmount()) || $this->getPayAmount() <= 0) {
-            $errors[] = 'payAmount is not a valid positive number';
         }
         if (!is_numeric($this->getReceiveAmount()) || $this->getReceiveAmount() <= 0) {
             $errors[] = 'receiveAmount is not a valid positive number';
