@@ -493,10 +493,6 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 		return $this->handleSuccessOrder($order, $response->getRedirectUrl());
 	}
 
-	private function retryCreateOrder(){
-		
-	}
-
 	private function handleFailedOrder(WC_Order $order, string $error_message){
 		$order->update_status('failed', __($error_message, 'spectrocoin-accepting-bitcoin'));
 		$this->wc_logger->log('error', $error_message);

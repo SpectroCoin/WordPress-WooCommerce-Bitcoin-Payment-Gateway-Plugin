@@ -22,7 +22,6 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 namespace SpectroCoin;
 
 use SpectroCoin\Includes\SpectroCoinGateway;
-use SpectroCoin\Includes\SpectroCoinLogger;
 use SpectroCoin\Includes\SpectroCoinBlocksIntegration;
 use SpectroCoin\SCMerchantClient\Config;
 use Automattic\WooCommerce\Blocks\Payments\PaymentMethodRegistry;
