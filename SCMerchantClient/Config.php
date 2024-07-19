@@ -28,5 +28,6 @@ class Config
 
     // Optional configuration based on CMS:
     const SPECTROCOIN_REQUIRED_PHP_VERSION = '8.0';
-    const SPECTROCOIN_WP_VERSION = '6.0';
+    const SPECTROCOIN_WP_VERSION = '6.0';    
+    const CALLBACK_NAME = 'spectrocoin_callback';
 }

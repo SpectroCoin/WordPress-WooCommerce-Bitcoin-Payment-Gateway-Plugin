@@ -7,7 +7,7 @@ use SpectroCoin\SCMerchantClient\Config;
 use SpectroCoin\SCMerchantClient\Enum\OrderStatusEnum;
 use SpectroCoin\SCMerchantClient\Exception\ApiError;
 use SpectroCoin\SCMerchantClient\Exception\GenericError;
-use function SpectroCoin\displayAdminErrorNotice;
+use SpectroCoin\Includes\SpectroCoinLogger;
 use SpectroCoin\SCMerchantClient\Http\OrderCallback;
 
 use WC_Payment_Gateway;
@@ -29,15 +29,9 @@ if (!in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
 /**
  * WC_Gateway_Spectrocoin Class.
  */
-class WCGatewaySpectrocoin extends WC_Payment_Gateway
+class SpectroCoinGateway extends WC_Payment_Gateway
 {
-	
-    /** @var bool Whether or not logging is enabled */
-    public static $log_enabled = true;
-    /** @var WC_Logger Logger instance */
-    public static $log = false;
-    /** @var String */
-    private static $callback_name = 'spectrocoin_callback';
+
     /** @var SCMerchantClient */
     private $sc_merchant_client;
     public $id;
@@ -58,6 +52,7 @@ class WCGatewaySpectrocoin extends WC_Payment_Gateway
     private $all_order_statuses;
 
 	public $spectroCoinBlocksGateway;
+	private $wc_logger;
 	/**
 	 * Constructor for the gateway.
 	 */
@@ -82,6 +77,7 @@ class WCGatewaySpectrocoin extends WC_Payment_Gateway
         add_action('woocommerce_update_options_payment_gateways_' . $this->id, array($this, 'process_admin_options'));
         $this->initializeSCClient();
 		$this->init_settings();
+		$this->wc_logger = new WC_Logger();
 		$this->form_fields = $this->generateFormFields();
 	}
 
@@ -108,9 +104,10 @@ class WCGatewaySpectrocoin extends WC_Payment_Gateway
             $this->client_id,
             $this->client_secret,
         );
-        add_action('woocommerce_api_' . self::$callback_name, array($this, 'callback'));
+        add_action('woocommerce_api_' . CONFIG::CALLBACK_NAME , array($this, 'callback'));
 		
 	}
+
 	/**
 	 * Reloads settings from database.
 	 */
@@ -133,7 +130,7 @@ class WCGatewaySpectrocoin extends WC_Payment_Gateway
 
 		if (empty($this->client_id)) {
 			if ($display_notice) {
-				displayAdminErrorNotice('Client ID is empty');
+				SpectroCoinLogger::displayAdminErrorNotice('Client ID is empty');
 				error_log('SpectroCoin Error: Client ID is empty');
 			}
 			$is_valid = false;
@@ -141,7 +138,7 @@ class WCGatewaySpectrocoin extends WC_Payment_Gateway
 
 		if (empty($this->project_id)) {
 			if ($display_notice) {
-				displayAdminErrorNotice('Project ID is empty');
+				SpectroCoinLogger::displayAdminErrorNotice('Project ID is empty');
 				error_log('SpectroCoin Error: Project ID is empty');
 			}
 			$is_valid = false;
@@ -149,7 +146,7 @@ class WCGatewaySpectrocoin extends WC_Payment_Gateway
 
 		if (empty($this->client_secret)) {
 			if ($display_notice) {
-				displayAdminErrorNotice('Client Secret is empty');
+				SpectroCoinLogger::displayAdminErrorNotice('Client Secret is empty');
 				error_log('SpectroCoin Error: Client Secret is empty');
 			}
 			$is_valid = false;
@@ -158,7 +155,7 @@ class WCGatewaySpectrocoin extends WC_Payment_Gateway
 		$this->title = sanitize_text_field($this->get_option('title'));
 		if (empty($this->title)) {
 			if ($display_notice) {
-				displayAdminErrorNotice('Title cannot be empty');
+				SpectroCoinLogger::displayAdminErrorNotice('Title cannot be empty');
 				error_log('SpectroCoin Error: Title cannot be empty');
 			}
 			$is_valid = false;
@@ -169,7 +166,7 @@ class WCGatewaySpectrocoin extends WC_Payment_Gateway
 		$this->enabled = sanitize_text_field($this->get_option('enabled'));
 		if (!in_array($this->enabled, ['yes', 'no'])) {
 			if ($display_notice) {
-				displayAdminErrorNotice('Invalid value for enabled status');
+				SpectroCoinLogger::displayAdminErrorNotice('Invalid value for enabled status');
 				error_log('SpectroCoin Error: Invalid value for enabled status');
 			}
 			$is_valid = false;
@@ -178,7 +175,7 @@ class WCGatewaySpectrocoin extends WC_Payment_Gateway
 		$this->order_status = sanitize_text_field($this->get_option('order_status'));
 		if (!array_key_exists($this->order_status, $this->all_order_statuses)) {
 			if ($display_notice) {
-				displayAdminErrorNotice('Invalid order status');
+				SpectroCoinLogger::displayAdminErrorNotice('Invalid order status');
 				error_log('SpectroCoin Error: Invalid order status');
 			}
 			$is_valid = false;
@@ -186,7 +183,7 @@ class WCGatewaySpectrocoin extends WC_Payment_Gateway
 
 		if (!in_array(sanitize_text_field($this->get_option('display_logo')), ['yes', 'no'])) {
 			if ($display_notice) {
-				displayAdminErrorNotice('Invalid value for display logo status');
+				SpectroCoinLogger::displayAdminErrorNotice('Invalid value for display logo status');
 				error_log('SpectroCoin Error: Invalid value for display logo status');
 			}
 			$is_valid = false;
@@ -194,7 +191,7 @@ class WCGatewaySpectrocoin extends WC_Payment_Gateway
 
 		if (!in_array(sanitize_text_field($this->get_option('test_mode')), ['yes', 'no'])) {
 			if ($display_notice) {
-				displayAdminErrorNotice('Invalid value for test mode');
+				SpectroCoinLogger::displayAdminErrorNotice('Invalid value for test mode');
 				error_log('SpectroCoin Error: Invalid value for test mode');
 			}
 			$is_valid = false;
@@ -202,19 +199,6 @@ class WCGatewaySpectrocoin extends WC_Payment_Gateway
 		return $is_valid;
 	}
 
-	/**
-	 * Logging method. Logs messages to WooCommerce log if logging is enabled.
-	 * @param string $message
-	 */
-	public static function woocommerceLog($message)
-	{
-		if (self::$log_enabled) {
-			if (empty(self::$log)) {
-				self::$log = new WC_Logger();
-			}
-			self::$log->add('spectrocoin', $message);
-		}
-	}
 	/**
 	 * Function to toggle the display of the SpectroCoin payment option
 	 * The payment method will be displayed when the following conditions are met:
@@ -234,7 +218,7 @@ class WCGatewaySpectrocoin extends WC_Payment_Gateway
 			error_log("SpectroCoin Error: {$message}");
 			
 			$settings_link = esc_url(admin_url('admin.php?page=wc-settings&tab=general'));
-			displayAdminErrorNotice("{$message} <a href='{$settings_link}'>WooCommerce settings</a>.", true);
+			SpectroCoinLogger::displayAdminErrorNotice("{$message} <a href='{$settings_link}'>WooCommerce settings</a>.", true);
 			return false;
 		}
 	
@@ -488,7 +472,6 @@ class WCGatewaySpectrocoin extends WC_Payment_Gateway
 	 */
 	public function process_payment($order_id)
 	{
-		global $woocommerce;
 		$order = new WC_Order($order_id);
 
 		$order_data = [
@@ -514,7 +497,7 @@ class WCGatewaySpectrocoin extends WC_Payment_Gateway
 
 	private function handleFailedOrder(WC_Order $order, string $error_message){
 		$order->update_status('failed', __($error_message, 'spectrocoin-accepting-bitcoin'));
-		self::woocommerceLog($error_message);
+		$this->wc_logger->log('error', $error_message);
 		return array(
 			'result'   => 'failed',
 			'redirect' => ''
@@ -574,25 +557,25 @@ class WCGatewaySpectrocoin extends WC_Payment_Gateway
 				echo esc_html__('*ok*', 'spectrocoin-accepting-bitcoin');
 				exit;
 			} else {
-				self::woocommerceLog("Order '{$order_id}' not found!");
+				$this->wc_logger->log('',"Order '{$order_id}' not found!");
 				echo esc_html__('order not found', 'spectrocoin-accepting-bitcoin');
 				exit;
 			}
 		} 
 		else if ($order_callback instanceof GuzzleException) {
-			self::woocommerceLog("Callback API error: {$order_callback->getMessage()}");
+			$this->wc_logger->log('error',"Callback API error: {$order_callback->getMessage()}");
 			exit;
 		}
 		else if ($order_callback instanceof InvalidArgumentException) {
-			self::woocommerceLog("Error processing callback: {$order_callback->getMessage()}");
+			$this->wc_logger->log('error',"Error processing callback: {$order_callback->getMessage()}");
 			exit;
 		}
 		else if ($order_callback instanceof Exception) {
-			self::woocommerceLog("Error processing callback: {$order_callback->getMessage()}");
+			$this->wc_logger->log('error',"Error processing callback: {$order_callback->getMessage()}");
 			exit;
 		}
 		else {
-			self::woocommerceLog("Sent callback is invalid");
+			$this->wc_logger->log('error',"Sent callback is invalid");
 			exit;
 		}
 	}

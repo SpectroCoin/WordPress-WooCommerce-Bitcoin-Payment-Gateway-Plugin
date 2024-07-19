@@ -2,19 +2,20 @@
 
 namespace SpectroCoin\Includes;
 
-use SpectroCoin\Includes\WCGatewaySpectrocoin;
+use SpectroCoin\Includes\SpectroCoinGateway;
+
 use Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodType;
 
 if (!defined('ABSPATH')) {
 	die('Access denied.');
 }
 
-final class WCGatewaySpectrocoinBlocksIntegration extends AbstractPaymentMethodType {
+final class SpectroCoinBlocksIntegration extends AbstractPaymentMethodType {
     private $gateway;
     protected $name = 'spectrocoin';
 
     public function initialize() {
-        $this->gateway = new WCGatewaySpectrocoin();
+        $this->gateway = new SpectroCoinGateway();
     }
 
     public function is_active() {

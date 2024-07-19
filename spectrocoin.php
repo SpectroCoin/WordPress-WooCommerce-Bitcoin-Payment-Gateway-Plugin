@@ -18,8 +18,9 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
 namespace SpectroCoin;
 
-use SpectroCoin\Includes\WCGatewaySpectroCoin;
-use SpectroCoin\Includes\WCGatewaySpectrocoinBlocksIntegration;
+use SpectroCoin\Includes\SpectroCoinGateway;
+use SpectroCoin\Includes\SpectroCoinLogger;
+use SpectroCoin\Includes\SpectroCoinBlocksIntegration;
 use SpectroCoin\SCMerchantClient\Config;
 
 use Automattic\WooCommerce\Blocks\Payments\PaymentMethodRegistry;
@@ -39,7 +40,7 @@ function spectrocoinInitPlugin()
     if (spectrocoinRequirementsMet()) {
         load_plugin_textdomain('spectrocoin-accepting-bitcoin', false, dirname(plugin_basename(__FILE__)) . '/languages');
 
-        if (class_exists('SpectroCoin\Includes\WCGatewaySpectroCoin')) {
+        if (class_exists('SpectroCoin\Includes\SpectroCoinGateway')) {
             add_filter('woocommerce_payment_gateways', '\SpectroCoin\spectrocoinGatewayClass');
             add_filter('plugin_action_links', '\SpectroCoin\spectrocoinAddCustomLinksLeft', 10, 2);
             add_filter('plugin_row_meta', '\SpectroCoin\spectrocoinAddCustomLinksRight', 10, 2);
@@ -83,49 +84,11 @@ function spectrocoinRequirementsMet()
     }
 
     if (!$requirements_met) {
-        displayAdminErrorNotice($message);
+        SpectroCoinLogger::displayAdminErrorNotice($message);
         spectrocoinDeactivatePlugin();
     }
 
     return $requirements_met;
-}
-
-/**
- * Display error message in admin settings
- * @param string $message Error message
- * @param bool $allow_hyperlink Allow hyperlink in error message
- */
-function displayAdminErrorNotice($message, $allow_hyperlink = false) {
-    static $displayed_messages = array();
-
-    $allowed_html = $allow_hyperlink ? array(
-        'a' => array(
-            'href' => array(),
-            'title' => array(),
-            'target' => array(),
-        ),
-    ) : array();
-
-    $processed_message = wp_kses($message, $allowed_html);
-
-    $current_page = isset($_GET['section']) ? sanitize_text_field($_GET['section']) : '';
-
-    if (!empty($processed_message) && !in_array($processed_message, $displayed_messages) && $current_page == "spectrocoin") {
-        array_push($displayed_messages, $processed_message);
-        ?>
-        <div class="notice notice-error">
-            <p><?php echo __("SpectroCoin Error: ", 'spectrocoin-accepting-bitcoin') . $processed_message; // Using $processed_message directly ?></p>
-        </div>
-        <script type="text/javascript">
-            document.addEventListener("DOMContentLoaded", function() {
-                var notices = document.querySelectorAll('.notice-error');
-                notices.forEach(function(notice) {
-                    notice.style.display = 'block';
-                });
-            });
-        </script>
-        <?php
-    }
 }
 
 /**
@@ -214,7 +177,7 @@ function spectrocoinRegisterOrderApprovalPaymentMethodType() {
     add_action(
         'woocommerce_blocks_payment_method_type_registration',
         function( PaymentMethodRegistry $payment_method_registry ) {
-            $payment_method_registry->register( new WCGatewaySpectrocoinBlocksIntegration );
+            $payment_method_registry->register( new SpectroCoinBlocksIntegration );
         }
     );
 }
