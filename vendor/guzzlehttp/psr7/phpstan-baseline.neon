@@ -1,0 +1,246 @@
+parameters:
+	ignoreErrors:
+		-
+			message: "#^Unreachable statement \\- code above always terminates\\.$#"
+			count: 1
+			path: src/AppendStream.php
+
+		-
+			message: "#^Unreachable statement \\- code above always terminates\\.$#"
+			count: 1
+			path: src/CachingStream.php
+
+		-
+			message: "#^Unreachable statement \\- code above always terminates\\.$#"
+			count: 1
+			path: src/DroppingStream.php
+
+		-
+			message: "#^Access to an undefined property GuzzleHttp\\\\Psr7\\\\FnStream\\:\\:\\$_fn___toString\\.$#"
+			count: 1
+			path: src/FnStream.php
+
+		-
+			message: "#^Access to an undefined property GuzzleHttp\\\\Psr7\\\\FnStream\\:\\:\\$_fn_close\\.$#"
+			count: 1
+			path: src/FnStream.php
+
+		-
+			message: "#^Access to an undefined property GuzzleHttp\\\\Psr7\\\\FnStream\\:\\:\\$_fn_detach\\.$#"
+			count: 1
+			path: src/FnStream.php
+
+		-
+			message: "#^Access to an undefined property GuzzleHttp\\\\Psr7\\\\FnStream\\:\\:\\$_fn_eof\\.$#"
+			count: 1
+			path: src/FnStream.php
+
+		-
+			message: "#^Access to an undefined property GuzzleHttp\\\\Psr7\\\\FnStream\\:\\:\\$_fn_getContents\\.$#"
+			count: 1
+			path: src/FnStream.php
+
+		-
+			message: "#^Access to an undefined property GuzzleHttp\\\\Psr7\\\\FnStream\\:\\:\\$_fn_getMetadata\\.$#"
+			count: 1
+			path: src/FnStream.php
+
+		-
+			message: "#^Access to an undefined property GuzzleHttp\\\\Psr7\\\\FnStream\\:\\:\\$_fn_getSize\\.$#"
+			count: 1
+			path: src/FnStream.php
+
+		-
+			message: "#^Access to an undefined property GuzzleHttp\\\\Psr7\\\\FnStream\\:\\:\\$_fn_isReadable\\.$#"
+			count: 1
+			path: src/FnStream.php
+
+		-
+			message: "#^Access to an undefined property GuzzleHttp\\\\Psr7\\\\FnStream\\:\\:\\$_fn_isSeekable\\.$#"
+			count: 1
+			path: src/FnStream.php
+
+		-
+			message: "#^Access to an undefined property GuzzleHttp\\\\Psr7\\\\FnStream\\:\\:\\$_fn_isWritable\\.$#"
+			count: 1
+			path: src/FnStream.php
+
+		-
+			message: "#^Access to an undefined property GuzzleHttp\\\\Psr7\\\\FnStream\\:\\:\\$_fn_read\\.$#"
+			count: 1
+			path: src/FnStream.php
+
+		-
+			message: "#^Access to an undefined property GuzzleHttp\\\\Psr7\\\\FnStream\\:\\:\\$_fn_rewind\\.$#"
+			count: 1
+			path: src/FnStream.php
+
+		-
+			message: "#^Access to an undefined property GuzzleHttp\\\\Psr7\\\\FnStream\\:\\:\\$_fn_seek\\.$#"
+			count: 1
+			path: src/FnStream.php
+
+		-
+			message: "#^Access to an undefined property GuzzleHttp\\\\Psr7\\\\FnStream\\:\\:\\$_fn_tell\\.$#"
+			count: 1
+			path: src/FnStream.php
+
+		-
+			message: "#^Access to an undefined property GuzzleHttp\\\\Psr7\\\\FnStream\\:\\:\\$_fn_write\\.$#"
+			count: 1
+			path: src/FnStream.php
+
+		-
+			message: "#^Unreachable statement \\- code above always terminates\\.$#"
+			count: 1
+			path: src/FnStream.php
+
+		-
+			message: "#^Unreachable statement \\- code above always terminates\\.$#"
+			count: 1
+			path: src/InflateStream.php
+
+		-
+			message: "#^Unreachable statement \\- code above always terminates\\.$#"
+			count: 1
+			path: src/LazyOpenStream.php
+
+		-
+			message: "#^Unreachable statement \\- code above always terminates\\.$#"
+			count: 1
+			path: src/LimitStream.php
+
+		-
+			message: "#^Parameter \\#1 \\$haystack of function substr_count expects string, string\\|null given\\.$#"
+			count: 1
+			path: src/Message.php
+
+		-
+			message: "#^Parameter \\#2 \\$subject of function preg_match expects string, string\\|null given\\.$#"
+			count: 1
+			path: src/Message.php
+
+		-
+			message: "#^Parameter \\#2 \\$subject of function preg_match_all expects string, string\\|null given\\.$#"
+			count: 1
+			path: src/Message.php
+
+		-
+			message: "#^Variable \\$headerLines in PHPDoc tag @var does not match assigned variable \\$count\\.$#"
+			count: 1
+			path: src/Message.php
+
+		-
+			message: "#^Unreachable statement \\- code above always terminates\\.$#"
+			count: 1
+			path: src/MultipartStream.php
+
+		-
+			message: "#^Unreachable statement \\- code above always terminates\\.$#"
+			count: 1
+			path: src/NoSeekStream.php
+
+		-
+			message: "#^Unreachable statement \\- code above always terminates\\.$#"
+			count: 1
+			path: src/PumpStream.php
+
+		-
+			message: "#^Method GuzzleHttp\\\\Psr7\\\\ServerRequest\\:\\:normalizeNestedFileSpec\\(\\) should return array\\<Psr\\\\Http\\\\Message\\\\UploadedFileInterface\\> but returns array\\<int\\|string, array\\<Psr\\\\Http\\\\Message\\\\UploadedFileInterface\\>\\|Psr\\\\Http\\\\Message\\\\UploadedFileInterface\\>\\.$#"
+			count: 1
+			path: src/ServerRequest.php
+
+		-
+			message: "#^Offset 'size' on array\\{0\\: int, 1\\: int, 2\\: int, 3\\: int, 4\\: int, 5\\: int, 6\\: int, 7\\: int, \\.\\.\\.\\} in isset\\(\\) always exists and is not nullable\\.$#"
+			count: 1
+			path: src/Stream.php
+
+		-
+			message: "#^Property GuzzleHttp\\\\Psr7\\\\Stream\\:\\:\\$stream \\(resource\\) in isset\\(\\) is not nullable\\.$#"
+			count: 10
+			path: src/Stream.php
+
+		-
+			message: "#^Property GuzzleHttp\\\\Psr7\\\\Stream\\:\\:\\$uri \\(string\\|null\\) does not accept mixed\\.$#"
+			count: 1
+			path: src/Stream.php
+
+		-
+			message: "#^Unreachable statement \\- code above always terminates\\.$#"
+			count: 1
+			path: src/Stream.php
+
+		-
+			message: "#^Method GuzzleHttp\\\\Psr7\\\\StreamWrapper\\:\\:getResource\\(\\) should return resource but returns resource\\|false\\.$#"
+			count: 1
+			path: src/StreamWrapper.php
+
+		-
+			message: "#^Method GuzzleHttp\\\\Psr7\\\\UploadedFile\\:\\:isStringNotEmpty\\(\\) has parameter \\$param with no type specified\\.$#"
+			count: 1
+			path: src/UploadedFile.php
+
+		-
+			message: "#^Cannot cast mixed to int\\.$#"
+			count: 1
+			path: src/Uri.php
+
+		-
+			message: "#^Method GuzzleHttp\\\\Psr7\\\\Uri\\:\\:filterPath\\(\\) should return string but returns string\\|null\\.$#"
+			count: 1
+			path: src/Uri.php
+
+		-
+			message: "#^Method GuzzleHttp\\\\Psr7\\\\Uri\\:\\:filterQueryAndFragment\\(\\) should return string but returns string\\|null\\.$#"
+			count: 1
+			path: src/Uri.php
+
+		-
+			message: "#^Method GuzzleHttp\\\\Psr7\\\\Uri\\:\\:filterUserInfoComponent\\(\\) should return string but returns string\\|null\\.$#"
+			count: 1
+			path: src/Uri.php
+
+		-
+			message: "#^Parameter \\#1 \\$callback of function array_map expects \\(callable\\(int\\<0, 65535\\>\\|string\\)\\: mixed\\)\\|null, 'urldecode' given\\.$#"
+			count: 1
+			path: src/Uri.php
+
+		-
+			message: "#^Parameter \\#1 \\$path of method Psr\\\\Http\\\\Message\\\\UriInterface\\:\\:withPath\\(\\) expects string, string\\|null given\\.$#"
+			count: 3
+			path: src/UriNormalizer.php
+
+		-
+			message: "#^Parameter \\#1 \\$query of method Psr\\\\Http\\\\Message\\\\UriInterface\\:\\:withQuery\\(\\) expects string, string\\|null given\\.$#"
+			count: 2
+			path: src/UriNormalizer.php
+
+		-
+			message: "#^Strict comparison using \\=\\=\\= between '' and non\\-falsy\\-string will always evaluate to false\\.$#"
+			count: 1
+			path: src/UriResolver.php
+
+		-
+			message: "#^Method GuzzleHttp\\\\Psr7\\\\Utils\\:\\:tryGetContents\\(\\) should return string but returns string\\|false\\.$#"
+			count: 1
+			path: src/Utils.php
+
+		-
+			message: "#^Parameter \\#1 \\$source of class GuzzleHttp\\\\Psr7\\\\PumpStream constructor expects callable\\(int\\)\\: \\(string\\|false\\|null\\), Closure\\(\\)\\: mixed given\\.$#"
+			count: 1
+			path: src/Utils.php
+
+		-
+			message: "#^Unreachable statement \\- code above always terminates\\.$#"
+			count: 1
+			path: src/Utils.php
+
+		-
+			message: "#^Variable \\$contents might not be defined\\.$#"
+			count: 1
+			path: src/Utils.php
+
+		-
+			message: "#^Variable \\$handle might not be defined\\.$#"
+			count: 1
+			path: src/Utils.php

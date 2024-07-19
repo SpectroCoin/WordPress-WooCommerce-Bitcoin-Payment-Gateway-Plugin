@@ -1,0 +1,7 @@
+parameters:
+	ignoreErrors:
+		-
+			message: "#^Dead catch \\- GuzzleHttp\\\\Promise\\\\RejectionException is never thrown in the try block\\.$#"
+			count: 1
+			path: src/Utils.php
+
