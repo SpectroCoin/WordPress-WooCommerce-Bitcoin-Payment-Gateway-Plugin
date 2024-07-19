@@ -31,8 +31,6 @@ if (!in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
  */
 class SpectroCoinGateway extends WC_Payment_Gateway
 {
-
-    /** @var SCMerchantClient */
     private $sc_merchant_client;
     public $id;
     public $has_fields;
@@ -53,6 +51,7 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 
 	public $spectroCoinBlocksGateway;
 	private $wc_logger;
+	
 	/**
 	 * Constructor for the gateway.
 	 */
@@ -94,7 +93,6 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 		return $saved;
 	}
 	
-
 	/**
 	 * Initializes the SpectroCoin API client if credentials are valid.
 	 */
