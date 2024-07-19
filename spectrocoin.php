@@ -86,7 +86,7 @@ function isRequirementsMet(): bool
     }
 
     if (!$requirements_met) {
-        SpectroCoinLogger::displayAdminErrorNotice($message);
+        SpectroCoinGateway::displayAdminErrorNotice($message);
         deactivatePlugin();
     }
 

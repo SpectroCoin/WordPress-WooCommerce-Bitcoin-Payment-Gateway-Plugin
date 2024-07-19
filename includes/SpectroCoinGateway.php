@@ -128,7 +128,7 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 
 		if (empty($this->client_id)) {
 			if ($display_notice) {
-				SpectroCoinLogger::displayAdminErrorNotice('Client ID is empty');
+				$this->displayAdminErrorNotice('Client ID is empty');
 				error_log('SpectroCoin Error: Client ID is empty');
 			}
 			$is_valid = false;
@@ -136,7 +136,7 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 
 		if (empty($this->project_id)) {
 			if ($display_notice) {
-				SpectroCoinLogger::displayAdminErrorNotice('Project ID is empty');
+				$this->displayAdminErrorNotice('Project ID is empty');
 				error_log('SpectroCoin Error: Project ID is empty');
 			}
 			$is_valid = false;
@@ -144,7 +144,7 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 
 		if (empty($this->client_secret)) {
 			if ($display_notice) {
-				SpectroCoinLogger::displayAdminErrorNotice('Client Secret is empty');
+				$this->displayAdminErrorNotice('Client Secret is empty');
 				error_log('SpectroCoin Error: Client Secret is empty');
 			}
 			$is_valid = false;
@@ -153,7 +153,7 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 		$this->title = sanitize_text_field($this->get_option('title'));
 		if (empty($this->title)) {
 			if ($display_notice) {
-				SpectroCoinLogger::displayAdminErrorNotice('Title cannot be empty');
+				$this->displayAdminErrorNotice('Title cannot be empty');
 				error_log('SpectroCoin Error: Title cannot be empty');
 			}
 			$is_valid = false;
@@ -164,7 +164,7 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 		$this->enabled = sanitize_text_field($this->get_option('enabled'));
 		if (!in_array($this->enabled, ['yes', 'no'])) {
 			if ($display_notice) {
-				SpectroCoinLogger::displayAdminErrorNotice('Invalid value for enabled status');
+				$this->displayAdminErrorNotice('Invalid value for enabled status');
 				error_log('SpectroCoin Error: Invalid value for enabled status');
 			}
 			$is_valid = false;
@@ -173,7 +173,7 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 		$this->order_status = sanitize_text_field($this->get_option('order_status'));
 		if (!array_key_exists($this->order_status, $this->all_order_statuses)) {
 			if ($display_notice) {
-				SpectroCoinLogger::displayAdminErrorNotice('Invalid order status');
+				$this->displayAdminErrorNotice('Invalid order status');
 				error_log('SpectroCoin Error: Invalid order status');
 			}
 			$is_valid = false;
@@ -181,7 +181,7 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 
 		if (!in_array(sanitize_text_field($this->get_option('display_logo')), ['yes', 'no'])) {
 			if ($display_notice) {
-				SpectroCoinLogger::displayAdminErrorNotice('Invalid value for display logo status');
+				$this->displayAdminErrorNotice('Invalid value for display logo status');
 				error_log('SpectroCoin Error: Invalid value for display logo status');
 			}
 			$is_valid = false;
@@ -189,7 +189,7 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 
 		if (!in_array(sanitize_text_field($this->get_option('test_mode')), ['yes', 'no'])) {
 			if ($display_notice) {
-				SpectroCoinLogger::displayAdminErrorNotice('Invalid value for test mode');
+				$this->displayAdminErrorNotice('Invalid value for test mode');
 				error_log('SpectroCoin Error: Invalid value for test mode');
 			}
 			$is_valid = false;
@@ -216,7 +216,7 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 			error_log("SpectroCoin Error: {$message}");
 			
 			$settings_link = esc_url(admin_url('admin.php?page=wc-settings&tab=general'));
-			SpectroCoinLogger::displayAdminErrorNotice("{$message} <a href='{$settings_link}'>WooCommerce settings</a>.", true);
+			$this->displayAdminErrorNotice("{$message} <a href='{$settings_link}'>WooCommerce settings</a>.", true);
 			return false;
 		}
 	
@@ -620,4 +620,42 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 		$current_currency_iso_code = get_woocommerce_currency();
 		return in_array($current_currency_iso_code, Config::ACCEPTED_FIAT_CURRENCIES);
 	}
+
+	/**
+     * Display error message in admin settings
+     * @param string $message Error message
+     * @param bool $allow_hyperlink Allow hyperlink in error message
+     */
+    public static function displayAdminErrorNotice($message, $allow_hyperlink = false) {
+        static $displayed_messages = array();
+
+        $allowed_html = $allow_hyperlink ? array(
+            'a' => array(
+                'href' => array(),
+                'title' => array(),
+                'target' => array(),
+            ),
+        ) : array();
+
+        $processed_message = wp_kses($message, $allowed_html);
+
+        $current_page = isset($_GET['section']) ? sanitize_text_field($_GET['section']) : '';
+
+        if (!empty($processed_message) && !in_array($processed_message, $displayed_messages) && $current_page == "spectrocoin") {
+            array_push($displayed_messages, $processed_message);
+            ?>
+            <div class="notice notice-error">
+                <p><?php echo __("SpectroCoin Error: ", 'spectrocoin-accepting-bitcoin') . $processed_message; // Using $processed_message directly ?></p>
+            </div>
+            <script type="text/javascript">
+                document.addEventListener("DOMContentLoaded", function() {
+                    var notices = document.querySelectorAll('.notice-error');
+                    notices.forEach(function(notice) {
+                        notice.style.display = 'block';
+                    });
+                });
+            </script>
+            <?php
+        }
+    }
 }
