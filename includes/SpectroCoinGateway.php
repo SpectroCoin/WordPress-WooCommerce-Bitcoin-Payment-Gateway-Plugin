@@ -28,9 +28,7 @@ if (!defined('ABSPATH')) {
 if (!in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_option('active_plugins')))) {
 	return;
 }
-/**
- * WC_Gateway_Spectrocoin Class.
- */
+
 class SpectroCoinGateway extends WC_Payment_Gateway
 {
     private $sc_merchant_client;
@@ -493,6 +491,10 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 		}
 
 		return $this->handleSuccessOrder($order, $response->getRedirectUrl());
+	}
+
+	private function retryCreateOrder(){
+		
 	}
 
 	private function handleFailedOrder(WC_Order $order, string $error_message){
