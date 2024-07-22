@@ -139,9 +139,7 @@ class OrderCallback
             'orderRequestId' => $this->getOrderRequestId(),
             'status' => $this->getStatus(),
         ];
-        $wc_logger = new WC_Logger;
         $data = http_build_query($payload);
-        $wc_logger->log("debug", "Data: " . $data);
         $decoded_signature = base64_decode($this->sign);
         $public_key = file_get_contents(Config::PUBLIC_SPECTROCOIN_CERT_LOCATION);
         $public_key_pem = openssl_pkey_get_public($public_key);
@@ -157,7 +155,7 @@ class OrderCallback
     public function getPayAmount() { return Utils::formatCurrency($this->payAmount); }
     public function getReceiveCurrency() { return $this->receiveCurrency; }
     public function getReceiveAmount() { return Utils::formatCurrency($this->receiveAmount); }
-    public function getReceivedAmount() { return $this->receivedAmount; }
+    public function getReceivedAmount() { return Utils::formatCurrency($this->receivedAmount); }
     public function getDescription() { return $this->description; }
     public function getOrderRequestId() { return $this->orderRequestId; }
     public function getStatus() { return $this->status; }

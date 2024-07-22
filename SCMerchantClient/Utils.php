@@ -18,9 +18,7 @@ class Utils
      */
     public static function formatCurrency(float $amount): float
     {
-        $decimals = strlen(substr(strrchr(rtrim(sprintf('%.8f', $amount), '0'), "."), 1));
-        $decimals = $decimals < 1 ? 1 : $decimals;
-        return (float)number_format($amount, $decimals, '.', '');
+        return (float)number_format($amount, 8, '.', '');
     }
 
     /**
