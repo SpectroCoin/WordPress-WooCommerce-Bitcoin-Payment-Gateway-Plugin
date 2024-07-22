@@ -40,11 +40,10 @@ final class SpectroCoinBlocksIntegration extends AbstractPaymentMethodType {
     }
 
     public function get_payment_method_data(): array {
-        $checkout_icon_url = plugins_url('/assets/images/spectrocoin-logo.svg', __DIR__);
         return [
             'title' => $this->gateway->title,
             'description' => $this->gateway->description,
-            'checkout_icon' => $checkout_icon_url,
+            'checkout_icon' => $this->gateway->isDisplayLogoEnabled() ? plugins_url('/assets/images/spectrocoin-logo.svg', __DIR__) : '',
         ];
     }
 }

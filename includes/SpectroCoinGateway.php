@@ -30,30 +30,24 @@ if (!in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get
 
 class SpectroCoinGateway extends WC_Payment_Gateway
 {
-    private $sc_merchant_client;
     public $id;
     public $has_fields;
-
     public $order_button_text;
     public $method_title;
     public $method_description;
     public $supports;
     public $title;
     public $description;
-    protected $client_id;
-    protected $project_id;
-    protected $client_secret;
-    protected $order_status;
-
 	public $form_fields = array();
-    private $all_order_statuses;
 
-	public $spectroCoinBlocksGateway;
-	private $wc_logger;
+	private SCMerchantClient $sc_merchant_client;
+    protected string $client_id;
+    protected string $project_id;
+    protected string $client_secret;
+    protected string $order_status;
+    private array $all_order_statuses;
+	private WC_Logger $wc_logger;
 	
-	/**
-	 * Constructor for the gateway.
-	 */
 	public function __construct()
 	{
 		
@@ -82,7 +76,7 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 	/**
 	 * Function which is called when SpectroCoin settings is saved.
 	 */
-	public function process_admin_options() {
+	public function process_admin_options(): bool {
 		$saved = parent::process_admin_options();
 		if ($saved) {
 			$this->reloadSettings();
@@ -95,7 +89,7 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 	/**
 	 * Initializes the SpectroCoin API client if credentials are valid.
 	 */
-    private function initializeSCClient() {
+    private function initializeSCClient(): void {
         $this->sc_merchant_client = new SCMerchantClient(
 			$this->project_id,
             $this->client_id,
@@ -108,7 +102,7 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 	/**
 	 * Reloads settings from database.
 	 */
-	private function reloadSettings() {
+	private function reloadSettings(): void {
 		$this->title = $this->get_option('title');
 		$this->description = $this->get_option('description');
 		$this->project_id = $this->get_option('project_id');
@@ -122,7 +116,7 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 	 * @param bool $display_notice If true, then error notices will be displayed Default = true.
 	 * @return bool
 	 */
-	public function validateSettings($display_notice = true){
+	public function validateSettings(bool $display_notice = true): bool {
 		$is_valid = true;
 
 		if (empty($this->client_id)) {
@@ -186,7 +180,7 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 			$is_valid = false;
 		}
 
-		if (!in_array(sanitize_text_field($this->get_option('test_mode')), ['yes', 'no'])) {
+		if (!in_array(sanitize_text_field($this->get_option('hide_from_checkout')), ['yes', 'no'])) {
 			if ($display_notice) {
 				$this->displayAdminErrorNotice('Invalid value for test mode');
 				$this->wc_logger->log('warning', 'SpectroCoin settings validation warning: Invalid value for test mode');
@@ -199,12 +193,13 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 	/**
 	 * Function to toggle the display of the SpectroCoin payment option
 	 * The payment method will be displayed when the following conditions are met:
-	 * 1. The SpectroCoin plugin is enabled
-	 * 2. The SpectroCoin plugin is configured with valid credentials
-	 * 3. The currency is accepted by SpectroCoin
+	 * 1. The SpectroCoin plugin is enabled.
+	 * 2. The SpectroCoin plugin is configured with valid credentials.
+	 * 3. The FIAT currency is accepted by SpectroCoin. Accepted currencies are: "EUR", "USD", "PLN", "CHF", "SEK", "GBP", "AUD", "CAD", "CZK", "DKK", "NOK".
+	 * 4. The "hide from checkout" admin option is disabled or the current user is an admin.
 	 * @return bool
 	 */
-	public function is_available() {
+	public function is_available(): bool {
 		if (!function_exists('is_plugin_active') || !is_plugin_active(Config::getPluginFolderName() . '/spectrocoin.php') || $this->enabled !== 'yes') {
 			return false;
 		}
@@ -231,54 +226,41 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 			return false;
 		}
 	
-		if ($this->isTestModeEnabled() && !current_user_can('manage_options')) {
+		if ($this->isHideFromCheckoutEnabled() && !current_user_can('manage_options')) {
 			return false;
 		}
 
 		return true;
 	}
 	
-
 	/**
-	 * Check if display logo is enabled.
+	 * Check if "display logo" admin option is enabled.
 	 * @return bool
 	 */
-	public function isDisplayLogoEnabled()
+	public function isDisplayLogoEnabled(): bool
 	{
-		$display_logo = $this->get_option('display_logo');
-		return $display_logo === 'yes';
-	}
-
-	/**
-	 * Get gateway icon.
-	 * @return string
-	 */
-	public function get_icon()
-	{
-		$display_logo = $this->isDisplayLogoEnabled();
-
-		if ($display_logo) {
-			$icon = plugins_url('/../assets/images/spectrocoin-logo.svg', __FILE__);
-			$icon_html = '<img src="' . esc_attr($icon) . '" alt="' . esc_attr__('SpectroCoin logo', 'spectrocoin-accepting-bitcoin') . '" />';
-			return apply_filters('woocommerce_gateway_icon', $icon_html, $this->id);
-		} else {
-			return '';
+		if ($this->get_option('display_logo') == "yes"){
+			return true;
 		}
+		return false;
 	}
 
 	/**
-	 * Check if test mode is enabled.
+	 * Check if "hide from checkout" admin option enabled.
 	 * @return bool
 	 */
-	public function isTestModeEnabled()
+	public function isHideFromCheckoutEnabled(): bool
 	{
-		return $this->get_option('test_mode');
+		if ($this->get_option('hide_from_checkout') == "yes"){
+			return true;
+		}
+		return false;
 	}
 
 	/**
 	 * Generate admin settings form.
 	 */
-	public function admin_options()
+	public function admin_options(): void
 	{
 		?>
 		<div class="header">
@@ -400,8 +382,9 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 
 	/**
 	 * Initialize Gateway Settings Form Fields.
+	 * @return array
 	 */
-	public function generateFormFields()
+	public function generateFormFields(): array
 	{
 		return array(
 			'enabled' => array(
@@ -451,7 +434,7 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 				'label' => esc_html__('Enable', 'spectrocoin-accepting-bitcoin'),
 				'default' => 'yes'
 			),
-			'test_mode' => array(
+			'hide_from_checkout' => array(
 				'title' => esc_html__('Hide from checkout', 'spectrocoin-accepting-bitcoin'),
 				'description' => esc_html__('When enabled SpectroCoin payment option will be visible only for admin user.', 'spectrocoin-accepting-bitcoin'),
 				'desc_tip' => true,
@@ -467,7 +450,7 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 	 * @param  int $order_id
 	 * @return array
 	 */
-	public function process_payment($order_id)
+	public function process_payment($order_id): array
 	{
 		$order = new WC_Order($order_id);
 
@@ -492,7 +475,14 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 		return $this->handleSuccessOrder($order, $response->getRedirectUrl());
 	}
 
-	private function handleFailedOrder(WC_Order $order, string $error_message){
+	/**
+	 * Handles the failure of an order by updating the order status and logging the error.
+	 *
+	 * @param WC_Order $order The order that failed.
+	 * @param string $error_message The error message describing the failure.
+	 * @return array An array containing the result status and redirect URL.
+	 */
+	private function handleFailedOrder(WC_Order $order, string $error_message): array {
 		$order->update_status('failed', __($error_message, 'spectrocoin-accepting-bitcoin'));
 		$this->wc_logger->log('error', $error_message);
 		return array(
@@ -501,7 +491,14 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 		);
 	}
 
-	private function handleSuccessOrder(WC_Order $order, string $redirect_url){
+	/**
+	 * Handles the success of an order by updating the order status, reducing stock levels, and emptying the cart.
+	 *
+	 * @param WC_Order $order The order that was successful.
+	 * @param string $redirect_url The URL to redirect to after the order is successful.
+	 * @return array An array containing the result status and redirect URL.
+	 */
+	private function handleSuccessOrder(WC_Order $order, string $redirect_url): array {
 		global $woocommerce;
 		$order->update_status('success');
 		wc_reduce_stock_levels($order->get_id());
@@ -525,6 +522,7 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 
 			if (!$order_callback) {
 				$this->wc_logger->log('error', "Sent callback is invalid");
+				http_response_code(400); // Bad Request
 				echo esc_html__('Invalid callback', 'spectrocoin-accepting-bitcoin');
 				exit;
 			}
@@ -549,23 +547,28 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 						$order->update_status($this->order_status);
 						break;
 				}
+				http_response_code(200); // OK
 				echo esc_html__('*ok*', 'spectrocoin-accepting-bitcoin');
 				exit;
 			} else {
 				$this->wc_logger->log('error', "Order '{$order_id}' not found!");
-				echo esc_html__('order not found', 'spectrocoin-accepting-bitcoin');
+				http_response_code(404); // Not Found
+				echo esc_html__("Order '{$order_id}' not found!", 'spectrocoin-accepting-bitcoin');
 				exit;
 			}
 		} catch (GuzzleException $e) {
 			$this->wc_logger->log('error', "Callback API error: {$e->getMessage()}");
+			http_response_code(500); // Internal Server Error
 			echo esc_html__('Callback API error', 'spectrocoin-accepting-bitcoin');
 			exit;
 		} catch (InvalidArgumentException $e) {
 			$this->wc_logger->log('error', "Error processing callback: {$e->getMessage()}");
+			http_response_code(400); // Bad Request
 			echo esc_html__('Error processing callback', 'spectrocoin-accepting-bitcoin');
 			exit;
 		} catch (Exception $e) {
 			$this->wc_logger->log('error', "Error processing callback: {$e->getMessage()}");
+			http_response_code(500); // Internal Server Error
 			echo esc_html__('Error processing callback', 'spectrocoin-accepting-bitcoin');
 			exit;
 		}
@@ -600,7 +603,7 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 	 * @param string $order_id
 	 * @return string
 	 */
-	private function parseOrderId($order_id)
+	private function parseOrderId(string $order_id): string
 	{
 		return explode('-', $order_id)[0];
 	}
@@ -621,7 +624,7 @@ class SpectroCoinGateway extends WC_Payment_Gateway
      * @param string $message Error message
      * @param bool $allow_hyperlink Allow hyperlink in error message
      */
-    public static function displayAdminErrorNotice($message, $allow_hyperlink = false) {
+    public static function displayAdminErrorNotice(string $message, bool $allow_hyperlink = false): void {
         static $displayed_messages = array();
 
         $allowed_html = $allow_hyperlink ? array(
