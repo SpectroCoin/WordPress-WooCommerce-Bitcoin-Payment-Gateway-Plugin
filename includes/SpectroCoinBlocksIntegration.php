@@ -47,5 +47,4 @@ final class SpectroCoinBlocksIntegration extends AbstractPaymentMethodType {
         ];
     }
 }
-
 ?>

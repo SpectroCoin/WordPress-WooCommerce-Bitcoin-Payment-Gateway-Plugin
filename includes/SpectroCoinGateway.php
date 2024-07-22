@@ -459,9 +459,9 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 			'description' => "Order #{$order_id}",
 			'receiveAmount' => (float)$order->get_total(),
 			'receiveCurrencyCode' => $order->get_currency(),
-			'callbackUrl' => 'http://localhost.com',
-			'successUrl' => 'http://localhost.com',
-			'failureUrl' => 'http://localhost.com'
+			'callbackUrl' => get_site_url(null, '?wc-api=' . Config::CALLBACK_NAME),
+			'successUrl' => $this->get_return_url($order),
+			'failureUrl' => $this->get_return_url($order)
 		];
 
 		$response = $this->sc_merchant_client->createOrder($order_data);
