@@ -9,6 +9,8 @@ use SpectroCoin\SCMerchantClient\Config;
 use Exception;
 use InvalidArgumentException;
 
+use WC_Logger;
+
 if (!defined('ABSPATH')) {
     die('Access denied.');
 }
@@ -26,8 +28,8 @@ class OrderCallback
     private ?float $receiveAmount;
     private ?float $receivedAmount;
     private ?string $description;
-    private ?int $orderRequestId;
-    private ?int $status;
+    private ?string $orderRequestId;
+    private ?string $status;
     private ?string $sign;
 
     /**
@@ -50,8 +52,8 @@ class OrderCallback
         $this->receiveAmount = isset($data['receiveAmount']) ? Utils::sanitizeFloat($data['receiveAmount']) : null;
         $this->receivedAmount = isset($data['receivedAmount']) ? Utils::sanitizeFloat($data['receivedAmount']) : null;
         $this->description = isset($data['description']) ? sanitize_text_field((string)$data['description']) : null;
-        $this->orderRequestId = isset($data['orderRequestId']) ? filter_var($data['orderRequestId'], FILTER_SANITIZE_NUMBER_INT) : null;
-        $this->status = isset($data['status']) ? filter_var($data['status'], FILTER_SANITIZE_NUMBER_INT) : null;
+        $this->orderRequestId = isset($data['orderRequestId']) ? sanitize_text_field((string)$data['orderRequestId']) : null;
+        $this->status = isset($data['status']) ? sanitize_text_field((string)$data['status']) : null;
         $this->sign = isset($data['sign']) ? sanitize_text_field((string)$data['sign']) : null;
 
         $validation_result = $this->validate();
@@ -89,6 +91,9 @@ class OrderCallback
         if (empty($this->getOrderId())) {
             $errors[] = 'orderId is empty';
         }
+        if (empty($this->getStatus())){
+            $errors[] = 'status is empty';
+        }
         if (strlen($this->getPayCurrency()) !== 3) {
             $errors[] = 'payCurrency is not 3 characters long';
         }
@@ -103,26 +108,12 @@ class OrderCallback
         }
         if (!isset($this->receivedAmount)) {
             $errors[] = 'receivedAmount is not set';
-        } elseif ($this->getStatus() == 6) {
-            if (!is_numeric($this->getReceivedAmount())) {
-                $errors[] = 'receivedAmount is not a valid number';
-            }
-        } else {
-            if (!is_numeric($this->getReceivedAmount()) || $this->getReceivedAmount() < 0) {
-                $errors[] = 'receivedAmount is not a valid non-negative number';
-            }
-        }
-        if (empty($this->getDescription())) {
-            $errors[] = 'description is empty';
         }
         if (!is_numeric($this->getOrderRequestId()) || $this->getOrderRequestId() <= 0) {
             $errors[] = 'orderRequestId is not a valid positive number';
         }
-        if (!is_numeric($this->getStatus()) || $this->getStatus() <= 0) {
-            $errors[] = 'status is not a valid positive number';
-        }
         if (empty($this->getSign())) {
-            $errors[] = 'sign is empty';
+            $errors[] = 'signature is empty';
         }
 
         return empty($errors) ? true : $errors;
@@ -148,8 +139,9 @@ class OrderCallback
             'orderRequestId' => $this->getOrderRequestId(),
             'status' => $this->getStatus(),
         ];
-
+        $wc_logger = new WC_Logger;
         $data = http_build_query($payload);
+        $wc_logger->log("debug", "Data: " . $data);
         $decoded_signature = base64_decode($this->sign);
         $public_key = file_get_contents(Config::PUBLIC_SPECTROCOIN_CERT_LOCATION);
         $public_key_pem = openssl_pkey_get_public($public_key);

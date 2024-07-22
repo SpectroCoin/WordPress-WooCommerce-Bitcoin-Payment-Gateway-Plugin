@@ -465,47 +465,21 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 		];
 
 		$response = $this->sc_merchant_client->createOrder($order_data);
-		$order->update_status('on-hold', __('Waiting for SpectroCoin payment', 'spectrocoin-accepting-bitcoin'));
 
 		if ($response instanceof ApiError || $response instanceof GenericError) {
 			$error_message = "SpectroCoin error: Failed to create payment for order {$order_id}. Response message: {$response->getMessage()}";
-			return $this->handleFailedOrder($order, $error_message);
+			$order->update_status('failed', __($error_message, 'spectrocoin-accepting-bitcoin'));
+			$this->wc_logger->log('error', $error_message);
+			return array(
+				'result'   => 'failed',
+				'redirect' => ''
+			);
 		}
 
-		return $this->handleSuccessOrder($order, $response->getRedirectUrl());
-	}
-
-	/**
-	 * Handles the failure of an order by updating the order status and logging the error.
-	 *
-	 * @param WC_Order $order The order that failed.
-	 * @param string $error_message The error message describing the failure.
-	 * @return array An array containing the result status and redirect URL.
-	 */
-	private function handleFailedOrder(WC_Order $order, string $error_message): array {
-		$order->update_status('failed', __($error_message, 'spectrocoin-accepting-bitcoin'));
-		$this->wc_logger->log('error', $error_message);
-		return array(
-			'result'   => 'failed',
-			'redirect' => ''
-		);
-	}
-
-	/**
-	 * Handles the success of an order by updating the order status, reducing stock levels, and emptying the cart.
-	 *
-	 * @param WC_Order $order The order that was successful.
-	 * @param string $redirect_url The URL to redirect to after the order is successful.
-	 * @return array An array containing the result status and redirect URL.
-	 */
-	private function handleSuccessOrder(WC_Order $order, string $redirect_url): array {
-		global $woocommerce;
-		$order->update_status('success');
-		wc_reduce_stock_levels($order->get_id());
-		$woocommerce->cart->empty_cart();
+		$order->update_status('pending', __('Waiting for SpectroCoin payment', 'spectrocoin-accepting-bitcoin'));
 		return array(
 			'result' => 'success',
-			'redirect' => $redirect_url
+			'redirect' => $this->$response->getRedirectUrl()
 		);
 	}
 
@@ -518,6 +492,7 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 	public function callback(): void
 	{
 		try {
+			global $woocommerce;
 			$order_callback = $this->initCallbackFromPost();
 
 			if (!$order_callback) {
@@ -527,7 +502,7 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 				exit;
 			}
 
-			$order_id = $this->parseOrderId($order_callback->getOrderId());
+			$order_id = explode('-', ($order_callback->getOrderId()))[0];
 			$status = $order_callback->getStatus();
 
 			$order = wc_get_order($order_id);
@@ -535,9 +510,11 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 				switch ($status) {
 					case OrderStatusEnum::New->value:
 					case OrderStatusEnum::Pending->value:
-						$order->update_status('Pending payment');
+						$order->update_status('pending');
 						break;
 					case OrderStatusEnum::Paid->value:
+						$woocommerce->cart->empty_cart();
+						$order->payment_complete();
 						$order->update_status($this->order_status);
 						break;
 					case OrderStatusEnum::Failed->value:
@@ -594,18 +571,8 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 			$this->wc_logger->log('error', "No data received in callback");
 			return null;
 		}
-
+		$this->wc_logger->log('debug', "Callback data: " . json_encode($callback_data));
 		return new OrderCallback($callback_data);
-	}
-
-	/**
-	 * Parse order id from SpectroCoin callback
-	 * @param string $order_id
-	 * @return string
-	 */
-	private function parseOrderId(string $order_id): string
-	{
-		return explode('-', $order_id)[0];
 	}
 
 	/**

@@ -105,12 +105,12 @@ class CreateOrderRequest
         return json_encode($this->toArray());
     }
 
-    public function getOrderId(): ?string { return $this->orderId; }
-    public function getDescription(): ?string { return $this->description; }
-    public function getReceiveAmount(): ?float { return $this->receiveAmount !== null ? Utils::formatCurrency($this->receiveAmount) : null; }
-    public function getReceiveCurrencyCode(): ?string { return $this->receiveCurrencyCode; }
-    public function getCallbackUrl(): ?string { return $this->callbackUrl; }
-    public function getSuccessUrl(): ?string { return $this->successUrl; }
-    public function getFailureUrl(): ?string  { return $this->failureUrl; }
+    public function getOrderId() { return $this->orderId; }
+    public function getDescription() { return $this->description; }
+    public function getReceiveAmount() { return $this->receiveAmount !== null ? Utils::formatCurrency($this->receiveAmount) : null; }
+    public function getReceiveCurrencyCode() { return $this->receiveCurrencyCode; }
+    public function getCallbackUrl() { return $this->callbackUrl; }
+    public function getSuccessUrl() { return $this->successUrl; }
+    public function getFailureUrl() { return $this->failureUrl; }
 }
 ?>

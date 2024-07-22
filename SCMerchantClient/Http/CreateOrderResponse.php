@@ -79,16 +79,16 @@ class CreateOrderResponse
         return empty($errors) ? true : $errors;
     }
 
-    public function getPreOrderId(): ?string { return $this->preOrderId; }
-    public function getOrderId(): ?string { return $this->orderId; }
-    public function getValidUntil(): ?string { return $this->validUntil; }
-    public function getPayCurrencyCode(): ?string { return $this->payCurrencyCode; }
-    public function getPayNetworkCode(): ?string { return $this->payNetworkCode; }
-    public function getReceiveCurrencyCode(): ?string { return $this->receiveCurrencyCode; }
-    public function getPayAmount(): ?float { return $this->payAmount; }
-    public function getReceiveAmount(): ?float { return $this->receiveAmount; }
-    public function getDepositAddress(): ?string { return $this->depositAddress; }
-    public function getMemo(): ?string { return $this->memo; }
-    public function getRedirectUrl(): ?string { return $this->redirectUrl; }
+    public function getPreOrderId() { return $this->preOrderId; }
+    public function getOrderId() { return $this->orderId; }
+    public function getValidUntil() { return $this->validUntil; }
+    public function getPayCurrencyCode() { return $this->payCurrencyCode; }
+    public function getPayNetworkCode() { return $this->payNetworkCode; }
+    public function getReceiveCurrencyCode() { return $this->receiveCurrencyCode; }
+    public function getPayAmount() { return $this->payAmount; }
+    public function getReceiveAmount() { return $this->receiveAmount; }
+    public function getDepositAddress() { return $this->depositAddress; }
+    public function getMemo() { return $this->memo; }
+    public function getRedirectUrl() { return $this->redirectUrl; }
 }
 ?>
