@@ -10,6 +10,7 @@ use SpectroCoin\SCMerchantClient\Enum\OrderStatusEnum;
 use SpectroCoin\SCMerchantClient\Exception\ApiError;
 use SpectroCoin\SCMerchantClient\Exception\GenericError;
 use SpectroCoin\SCMerchantClient\Http\OrderCallback;
+use SpectroCoin\SCMerchantClient\Utils;
 
 use WC_Payment_Gateway;
 use WC_Logger;
@@ -455,7 +456,7 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 		$order = new WC_Order($order_id);
 
 		$order_data = [
-			'orderId' => (string)$order->get_id(),
+			'orderId' => (string)$order->get_id() . "-" . Utils::generateRandomStr(6),
 			'description' => "Order #{$order_id}",
 			'receiveAmount' => (float)$order->get_total(),
 			'receiveCurrencyCode' => $order->get_currency(),
@@ -479,7 +480,7 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 		$order->update_status('pending', __('Waiting for SpectroCoin payment', 'spectrocoin-accepting-bitcoin'));
 		return array(
 			'result' => 'success',
-			'redirect' => $this->$response->getRedirectUrl()
+			'redirect' => $response->getRedirectUrl()
 		);
 	}
 
@@ -623,4 +624,6 @@ class SpectroCoinGateway extends WC_Payment_Gateway
             <?php
         }
     }
+
+
 }

@@ -129,7 +129,7 @@ class SCMerchantClient
     /**
      * Retrieves the current access token data
      * 
-     * @return array|ApiError|null
+     * @return array|null
      */
     public function getAccessTokenData()
     {
@@ -148,7 +148,7 @@ class SCMerchantClient
      * Refreshes the access token
      * 
      * @param int $current_time
-     * @return array|ApiError|null
+     * @return array|null
      * @throws GuzzleException
      */
     public function refreshAccessToken(int $current_time)
