@@ -9,7 +9,6 @@ use SpectroCoin\SCMerchantClient\Config;
 use SpectroCoin\SCMerchantClient\Enum\OrderStatusEnum;
 use SpectroCoin\SCMerchantClient\Exception\ApiError;
 use SpectroCoin\SCMerchantClient\Exception\GenericError;
-use SpectroCoin\Includes\SpectroCoinLogger;
 use SpectroCoin\SCMerchantClient\Http\OrderCallback;
 
 use WC_Payment_Gateway;
@@ -129,7 +128,7 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 		if (empty($this->client_id)) {
 			if ($display_notice) {
 				$this->displayAdminErrorNotice('Client ID is empty');
-				error_log('SpectroCoin Error: Client ID is empty');
+				$this->wc_logger->log('warning', 'SpectroCoin settings validation warning: Client ID is empty');
 			}
 			$is_valid = false;
 		}
@@ -137,7 +136,7 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 		if (empty($this->project_id)) {
 			if ($display_notice) {
 				$this->displayAdminErrorNotice('Project ID is empty');
-				error_log('SpectroCoin Error: Project ID is empty');
+				$this->wc_logger->log('warning', 'SpectroCoin settings validation warning: Project ID is empty');
 			}
 			$is_valid = false;
 		}
@@ -145,7 +144,7 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 		if (empty($this->client_secret)) {
 			if ($display_notice) {
 				$this->displayAdminErrorNotice('Client Secret is empty');
-				error_log('SpectroCoin Error: Client Secret is empty');
+				$this->wc_logger->log('warning', 'SpectroCoin settings validation warning: Client Secret is empty');
 			}
 			$is_valid = false;
 		}
@@ -154,7 +153,7 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 		if (empty($this->title)) {
 			if ($display_notice) {
 				$this->displayAdminErrorNotice('Title cannot be empty');
-				error_log('SpectroCoin Error: Title cannot be empty');
+				$this->wc_logger->log('warning', 'SpectroCoin settings validation warning: Title cannot be empty');
 			}
 			$is_valid = false;
 		}
@@ -165,7 +164,7 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 		if (!in_array($this->enabled, ['yes', 'no'])) {
 			if ($display_notice) {
 				$this->displayAdminErrorNotice('Invalid value for enabled status');
-				error_log('SpectroCoin Error: Invalid value for enabled status');
+				$this->wc_logger->log('warning', 'SpectroCoin settings validation warning: Invalid value for enabled status');
 			}
 			$is_valid = false;
 		}
@@ -174,7 +173,7 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 		if (!array_key_exists($this->order_status, $this->all_order_statuses)) {
 			if ($display_notice) {
 				$this->displayAdminErrorNotice('Invalid order status');
-				error_log('SpectroCoin Error: Invalid order status');
+				$this->wc_logger->log('warning', 'SpectroCoin settings validation warning: Invalid order status');
 			}
 			$is_valid = false;
 		}
@@ -182,7 +181,7 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 		if (!in_array(sanitize_text_field($this->get_option('display_logo')), ['yes', 'no'])) {
 			if ($display_notice) {
 				$this->displayAdminErrorNotice('Invalid value for display logo status');
-				error_log('SpectroCoin Error: Invalid value for display logo status');
+				$this->wc_logger->log('warning', 'SpectroCoin settings validation warning: Invalid value for display logo status');
 			}
 			$is_valid = false;
 		}
@@ -190,7 +189,7 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 		if (!in_array(sanitize_text_field($this->get_option('test_mode')), ['yes', 'no'])) {
 			if ($display_notice) {
 				$this->displayAdminErrorNotice('Invalid value for test mode');
-				error_log('SpectroCoin Error: Invalid value for test mode');
+				$this->wc_logger->log('warning', 'SpectroCoin settings validation warning: Invalid value for test mode');
 			}
 			$is_valid = false;
 		}

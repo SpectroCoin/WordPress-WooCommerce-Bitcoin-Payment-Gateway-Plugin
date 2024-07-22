@@ -22,6 +22,8 @@ _Added_: _Utils.php_ file has been added to store utility functions.
 
 _Added_: _GenericError.php_ file has been added to handle generic errors.
 
+_Added_: Strict types have been added to all classes.
+
 ### 1.5.0 (02/05/2024):
 
 _Added_: Compatibility with the new block-based checkout functionality introduced in WooCommerce 8.3.
