@@ -1,22 +1,21 @@
 <?php
 
-declare (strict_types = 1);
+declare(strict_types=1);
 
 namespace SpectroCoin\SCMerchantClient\Http;
 
 use SpectroCoin\SCMerchantClient\Utils;
-
 use InvalidArgumentException;
 
 if (!defined('ABSPATH')) {
-	die('Access denied.');
+    die('Access denied.');
 }
 
 class CreateOrderRequest
 {
     private ?string $orderId;
     private ?string $description;
-    private ?float $receiveAmount;
+    private ?string $receiveAmount;
     private ?string $receiveCurrencyCode;
     private ?string $callbackUrl;
     private ?string $successUrl;
@@ -32,7 +31,7 @@ class CreateOrderRequest
     public function __construct(array $data) {
         $this->orderId = isset($data['orderId']) ? sanitize_text_field((string)$data['orderId']) : null;
         $this->description = isset($data['description']) ? sanitize_text_field((string)$data['description']) : null;
-        $this->receiveAmount = isset($data['receiveAmount']) ? Utils::sanitizeFloat($data['receiveAmount']) : null;
+        $this->receiveAmount = isset($data['receiveAmount']) ? sanitize_text_field((string)$data['receiveAmount']) : null;
         $this->receiveCurrencyCode = isset($data['receiveCurrencyCode']) ? sanitize_text_field((string)$data['receiveCurrencyCode']) : null;
         $this->callbackUrl = isset($data['callbackUrl']) ? Utils::sanitizeUrl($data['callbackUrl']) : null;
         $this->successUrl = isset($data['successUrl']) ? Utils::sanitizeUrl($data['successUrl']) : null;
@@ -53,14 +52,14 @@ class CreateOrderRequest
     private function validate(): bool|array
     {
         $errors = [];
-    
+
         if (empty($this->getOrderId())) {
             $errors[] = 'orderId is required';
         }
         if (empty($this->getDescription())) {
             $errors[] = 'description is required';
         }
-        if ($this->getReceiveAmount() === null || $this->getReceiveAmount() <= 0) {
+        if ($this->getReceiveAmount() === null || (float)$this->getReceiveAmount() <= 0) {
             $errors[] = 'receiveAmount must be greater than zero';
         }
         if (empty($this->getReceiveCurrencyCode()) || strlen($this->getReceiveCurrencyCode()) !== 3) {
@@ -75,7 +74,7 @@ class CreateOrderRequest
         if (empty($this->getFailureUrl()) || !filter_var($this->getFailureUrl(), FILTER_VALIDATE_URL)) {
             $errors[] = 'invalid failureUrl';
         }
-    
+
         return empty($errors) ? true : $errors;
     }
 
@@ -107,7 +106,7 @@ class CreateOrderRequest
 
     public function getOrderId() { return $this->orderId; }
     public function getDescription() { return $this->description; }
-    public function getReceiveAmount() { return $this->receiveAmount !== null ? Utils::formatCurrency($this->receiveAmount) : null; }
+    public function getReceiveAmount() { return Utils::formatCurrency((float)$this->receiveAmount); }
     public function getReceiveCurrencyCode() { return $this->receiveCurrencyCode; }
     public function getCallbackUrl() { return $this->callbackUrl; }
     public function getSuccessUrl() { return $this->successUrl; }

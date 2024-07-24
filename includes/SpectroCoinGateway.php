@@ -6,7 +6,7 @@ namespace SpectroCoin\Includes;
 
 use SpectroCoin\SCMerchantClient\SCMerchantClient;
 use SpectroCoin\SCMerchantClient\Config;
-use SpectroCoin\SCMerchantClient\Enum\OrderStatusEnum;
+use SpectroCoin\SCMerchantClient\Enum\OrderStatus;
 use SpectroCoin\SCMerchantClient\Exception\ApiError;
 use SpectroCoin\SCMerchantClient\Exception\GenericError;
 use SpectroCoin\SCMerchantClient\Http\OrderCallback;
@@ -457,7 +457,7 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 
 		$order_data = [
 			'orderId' => (string)$order->get_id() . "-" . Utils::generateRandomStr(6),
-			'description' => "Order #{$order_id}",
+			'description' => "Order #{$order_id} from " . get_site_url(),
 			'receiveAmount' => (float)$order->get_total(),
 			'receiveCurrencyCode' => $order->get_currency(),
 			'callbackUrl' => get_site_url(null, '?wc-api=' . Config::CALLBACK_NAME),
@@ -505,24 +505,23 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 
 			$order_id = explode('-', ($order_callback->getOrderId()))[0];
 			$status = $order_callback->getStatus();
-
 			$order = wc_get_order($order_id);
 			if ($order) {
 				switch ($status) {
-					case OrderStatusEnum::New->value:
-					case OrderStatusEnum::Pending->value:
+					case OrderStatus::New->value:
+					case OrderStatus::Pending->value:
 						$order->update_status('pending');
 						break;
-					case OrderStatusEnum::Paid->value:
+					case OrderStatus::Paid->value:
 						$woocommerce->cart->empty_cart();
 						$order->payment_complete();
 						$order->update_status($this->order_status);
 						break;
-					case OrderStatusEnum::Failed->value:
+					case OrderStatus::Failed->value:
 						$order->update_status('failed');
 						break;
-					case OrderStatusEnum::Expired->value:
-						$order->update_status($this->order_status);
+					case OrderStatus::Expired->value:
+						$order->update_status('failed');
 						break;
 				}
 				http_response_code(200); // OK
@@ -572,7 +571,6 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 			$this->wc_logger->log('error', "No data received in callback");
 			return null;
 		}
-		$this->wc_logger->log('debug', "Callback data: " . json_encode($callback_data));
 		return new OrderCallback($callback_data);
 	}
 

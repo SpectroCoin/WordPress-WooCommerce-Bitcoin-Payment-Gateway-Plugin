@@ -16,10 +16,12 @@ class Utils
      * @param float $amount The amount to format.
      * @return float The formatted currency amount.
      */
-    public static function formatCurrency(float $amount): float
+    public static function formatCurrency(float $amount): string
     {
-        return (float)number_format($amount, 8, '.', '');
-    }
+		$decimals = strlen(substr(strrchr(rtrim(sprintf('%.8f', $amount), '0'), "."), 1));
+		$decimals = $decimals < 1 ? 1 : $decimals;
+		return number_format($amount, $decimals, '.', '');
+	}
 
     /**
      * Encrypts the given data using the given encryption key.

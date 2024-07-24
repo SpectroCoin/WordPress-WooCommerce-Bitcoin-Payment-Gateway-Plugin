@@ -8,7 +8,7 @@ if (!defined('ABSPATH')) {
 	die('Access denied.');
 }
 
-enum OrderStatusEnum: int {
+enum OrderStatus: int {
 	case New = 1;
 	case Pending = 2;
 	case Paid = 3;

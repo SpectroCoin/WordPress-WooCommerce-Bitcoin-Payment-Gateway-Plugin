@@ -152,10 +152,10 @@ class OrderCallback
     public function getApiId() { return $this->apiId; }
     public function getOrderId() { return $this->orderId; }
     public function getPayCurrency() { return $this->payCurrency; }
-    public function getPayAmount() { return Utils::formatCurrency($this->payAmount); }
+    public function getPayAmount() { return Utils::formatCurrency((float)$this->payAmount); }
     public function getReceiveCurrency() { return $this->receiveCurrency; }
-    public function getReceiveAmount() { return Utils::formatCurrency($this->receiveAmount); }
-    public function getReceivedAmount() { return Utils::formatCurrency($this->receivedAmount); }
+    public function getReceiveAmount() { return Utils::formatCurrency((float)$this->receiveAmount); }
+    public function getReceivedAmount() { return Utils::formatCurrency((float)$this->receivedAmount); }
     public function getDescription() { return $this->description; }
     public function getOrderRequestId() { return $this->orderRequestId; }
     public function getStatus() { return $this->status; }
