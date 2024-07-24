@@ -13,14 +13,14 @@ class Utils
     /**
      * Formats currency amount with '0.0#######' format.
      *
-     * @param float $amount The amount to format.
-     * @return float The formatted currency amount.
+     * @param mixed $amount The amount to format.
+     * @return string The formatted currency amount.
      */
-    public static function formatCurrency(float $amount): string
+    public static function formatCurrency($amount): string
     {
 		$decimals = strlen(substr(strrchr(rtrim(sprintf('%.8f', $amount), '0'), "."), 1));
 		$decimals = $decimals < 1 ? 1 : $decimals;
-		return number_format($amount, $decimals, '.', '');
+		return number_format((float)$amount, $decimals, '.', '');
 	}
 
     /**
@@ -59,21 +59,6 @@ class Utils
     {
         $key = openssl_random_pseudo_bytes(32);
         return base64_encode($key);
-    }
-
-    /**
-     * Sanitize float values.
-     *
-     * @param mixed $value The value to sanitize.
-     * @return float|null The sanitized float value or `null` if the sanitization fails.
-     */
-    public static function sanitizeFloat($value): ?float
-    {
-        if ($value === null) {
-            return null;
-        }
-        $sanitized = filter_var($value, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
-        return $sanitized === false ? null : (float) $sanitized;
     }
 
     /**

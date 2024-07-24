@@ -23,10 +23,10 @@ class OrderCallback
     private ?string $apiId;
     private ?string $orderId;
     private ?string $payCurrency;
-    private ?float $payAmount;
+    private ?string $payAmount;
     private ?string $receiveCurrency;
-    private ?float $receiveAmount;
-    private ?float $receivedAmount;
+    private ?string $receiveAmount;
+    private ?string $receivedAmount;
     private ?string $description;
     private ?string $orderRequestId;
     private ?string $status;
@@ -47,10 +47,10 @@ class OrderCallback
         $this->apiId = isset($data['apiId']) ? sanitize_text_field((string)$data['apiId']) : null;
         $this->orderId = isset($data['orderId']) ? sanitize_text_field((string)$data['orderId']) : null;
         $this->payCurrency = isset($data['payCurrency']) ? sanitize_text_field((string)$data['payCurrency']) : null;
-        $this->payAmount = isset($data['payAmount']) ? Utils::sanitizeFloat($data['payAmount']) : null;
+        $this->payAmount = isset($data['payAmount']) ? sanitize_text_field((string)$data['payAmount']) : null; // Changed to string
         $this->receiveCurrency = isset($data['receiveCurrency']) ? sanitize_text_field((string)$data['receiveCurrency']) : null;
-        $this->receiveAmount = isset($data['receiveAmount']) ? Utils::sanitizeFloat($data['receiveAmount']) : null;
-        $this->receivedAmount = isset($data['receivedAmount']) ? Utils::sanitizeFloat($data['receivedAmount']) : null;
+        $this->receiveAmount = isset($data['receiveAmount']) ? sanitize_text_field((string)$data['receiveAmount']) : null; // Changed to string
+        $this->receivedAmount = isset($data['receivedAmount']) ? sanitize_text_field((string)$data['receivedAmount']) : null; // Changed to string
         $this->description = isset($data['description']) ? sanitize_text_field((string)$data['description']) : null;
         $this->orderRequestId = isset($data['orderRequestId']) ? sanitize_text_field((string)$data['orderRequestId']) : null;
         $this->status = isset($data['status']) ? sanitize_text_field((string)$data['status']) : null;
@@ -97,19 +97,19 @@ class OrderCallback
         if (strlen($this->getPayCurrency()) !== 3) {
             $errors[] = 'payCurrency is not 3 characters long';
         }
-        if (!is_numeric($this->getPayAmount()) || $this->getPayAmount() <= 0) {
+        if (!is_numeric($this->getPayAmount()) || (float)$this->getPayAmount() <= 0) {
             $errors[] = 'payAmount is not a valid positive number';
         }
         if (strlen($this->getReceiveCurrency()) !== 3) {
             $errors[] = 'receiveCurrency is not 3 characters long';
         }
-        if (!is_numeric($this->getReceiveAmount()) || $this->getReceiveAmount() <= 0) {
+        if (!is_numeric($this->getReceiveAmount()) || (float)$this->getReceiveAmount() <= 0) {
             $errors[] = 'receiveAmount is not a valid positive number';
         }
         if (!isset($this->receivedAmount)) {
             $errors[] = 'receivedAmount is not set';
         }
-        if (!is_numeric($this->getOrderRequestId()) || $this->getOrderRequestId() <= 0) {
+        if (!is_numeric($this->getOrderRequestId()) || (float)$this->getOrderRequestId() <= 0) {
             $errors[] = 'orderRequestId is not a valid positive number';
         }
         if (empty($this->getSign())) {
@@ -152,10 +152,10 @@ class OrderCallback
     public function getApiId() { return $this->apiId; }
     public function getOrderId() { return $this->orderId; }
     public function getPayCurrency() { return $this->payCurrency; }
-    public function getPayAmount() { return Utils::formatCurrency((float)$this->payAmount); }
+    public function getPayAmount() { return Utils::formatCurrency($this->payAmount); }
     public function getReceiveCurrency() { return $this->receiveCurrency; }
-    public function getReceiveAmount() { return Utils::formatCurrency((float)$this->receiveAmount); }
-    public function getReceivedAmount() { return Utils::formatCurrency((float)$this->receivedAmount); }
+    public function getReceiveAmount() { return Utils::formatCurrency($this->receiveAmount); }
+    public function getReceivedAmount() { return Utils::formatCurrency($this->receivedAmount); }
     public function getDescription() { return $this->description; }
     public function getOrderRequestId() { return $this->orderRequestId; }
     public function getStatus() { return $this->status; }
