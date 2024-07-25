@@ -201,7 +201,7 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 	 * @return bool
 	 */
 	public function is_available(): bool {
-		if (!function_exists('is_plugin_active') || !is_plugin_active(Config::getPluginFolderName() . '/spectrocoin.php') || $this->enabled !== 'yes') {
+		if (!function_exists('is_plugin_active') || !is_plugin_active(Utils::getPluginFolderName() . '/spectrocoin.php') || $this->enabled !== 'yes') {
 			return false;
 		}
 	
