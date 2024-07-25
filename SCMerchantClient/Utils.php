@@ -11,6 +11,16 @@ if (!defined('ABSPATH')) {
 class Utils
 {
     /**
+     * Get the plugin folder name.
+     *
+     * @return string The plugin folder name.
+     */
+    public static function getPluginFolderName(): string
+    {
+        $plugin_folder = explode("/", plugin_basename(__FILE__))[0];
+        return $plugin_folder;
+    }
+    /**
      * Formats currency amount with '0.0#######' format.
      *
      * @param mixed $amount The amount to format.
