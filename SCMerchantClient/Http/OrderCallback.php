@@ -9,8 +9,6 @@ use SpectroCoin\SCMerchantClient\Config;
 use Exception;
 use InvalidArgumentException;
 
-use WC_Logger;
-
 if (!defined('ABSPATH')) {
     die('Access denied.');
 }
