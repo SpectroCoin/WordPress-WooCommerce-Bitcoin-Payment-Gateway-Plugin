@@ -26,6 +26,12 @@ _Added_ Strict types have been added to all classes.
 
 _Added_ php-stubs/woocommerce-stubs as composer.json dependency.
 
+### Version 1.5.1 (07/31/2024):
+
+_Fixed_ dynamic string Internationalization
+
+_Removed_ "Test" order, now when test mode enabled, returned callback status will "PAID" or "EXPIRED", depends which is chosen in merchant project settings
+
 ### 1.5.0 (02/05/2024)
 
 _Added_ Compatibility with the new block-based checkout functionality introduced in WooCommerce 8.3.

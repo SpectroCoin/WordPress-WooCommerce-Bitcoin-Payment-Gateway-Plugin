@@ -19,7 +19,7 @@ use WC_Order;
 use Exception;
 use InvalidArgumentException;
 
-use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\Exception\RequestException;
 
 if (!defined('ABSPATH')) {
 	die('Access denied.');
@@ -368,13 +368,13 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 				</div>
 				<?php
 				printf(
-					'<div class="contact-information">%1$s<br>%2$s <a href="skype:spectrocoin_merchant?chat">%3$s</a> &middot; <a href="mailto:%4$s">%5$s</a></div>',
-					esc_html__('Accept Bitcoin through the SpectroCoin and receive payments in your chosen currency.', 'spectrocoin-accepting-bitcoin'),
-					esc_html__('Still have questions? Contact us via', 'spectrocoin-accepting-bitcoin'),
-					esc_html__('skype: spectrocoin_merchant', 'spectrocoin-accepting-bitcoin'),
-					esc_html__('email: ', 'spectrocoin-accepting-bitcoin'),
-					esc_html__(sanitize_email("merchant@spectrocoin.com"), 'spectrocoin-accepting-bitcoin')
-				);
+						'<div class="contact-information">%1$s<br>%2$s <a href="skype:spectrocoin_merchant?chat">%3$s</a> &middot; <a href="mailto:%4$s">%5$s</a></div>',
+						esc_html__('Accept Bitcoin through the SpectroCoin and receive payments in your chosen currency.', 'spectrocoin-accepting-bitcoin'),
+						esc_html__('Still have questions? Contact us via', 'spectrocoin-accepting-bitcoin'),
+						esc_html__('skype: spectrocoin_merchant', 'spectrocoin-accepting-bitcoin'),
+						esc_url( 'mailto:merchant@spectrocoin.com' ),
+						esc_html( 'merchant@spectrocoin.com' )
+					);
 				?>
 			</div>
 		</div>
@@ -533,7 +533,7 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 				echo esc_html__("Order '{$order_id}' not found!", 'spectrocoin-accepting-bitcoin');
 				exit;
 			}
-		} catch (GuzzleException $e) {
+		} catch (RequestException $e) {
 			$this->wc_logger->log('error', "Callback API error: {$e->getMessage()}");
 			http_response_code(500); // Internal Server Error
 			echo esc_html__('Callback API error', 'spectrocoin-accepting-bitcoin');

@@ -12,7 +12,7 @@ use SpectroCoin\SCMerchantClient\Http\CreateOrderRequest;
 use SpectroCoin\SCMerchantClient\Http\CreateOrderResponse;
 
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\RequestOptions;
 
 use InvalidArgumentException;
@@ -118,7 +118,7 @@ class SCMerchantClient
             return new CreateOrderResponse($responseData);
         } catch (InvalidArgumentException $e) {
             return new GenericError($e->getMessage(), $e->getCode());
-        } catch (GuzzleException $e) {
+        } catch (RequestException $e) {
             return new ApiError($e->getMessage(), $e->getCode());
         } catch (Exception $e) {
             return new GenericError($e->getMessage(), $e->getCode());
@@ -148,7 +148,7 @@ class SCMerchantClient
      * 
      * @param int $current_time
      * @return array|null
-     * @throws GuzzleException
+     * @throws RequestException
      */
     public function refreshAccessToken(int $current_time)
     {
@@ -175,7 +175,7 @@ class SCMerchantClient
 
             return $access_token_data;
 
-        } catch (GuzzleException $e) {
+        } catch (RequestException $e) {
             return new ApiError($e->getMessage(), $e->getCode());
         }
     }

@@ -3,21 +3,22 @@
 declare(strict_types=1);
 
 /*
-Plugin Name: SpectroCoin Bitcoin Payment Gateway
+Plugin Name: SpectroCoin Payment Extension for WooCommerce
 Author:      SpectroCoin
 Author URI:  https://spectrocoin.com
 Text Domain: spectrocoin-accepting-bitcoin
 Plugin URI:  https://github.com/SpectroCoin/WordPress-WooCommerce-Bitcoin-Payment-Gateway-Plugin
-Description: Integrates SpectroCoin crypto payments with WooCommerce.
+Description: SpectroCoin Payments for WooCommerce is a Wordpress plugin that allows to accept cryptocurrencies at WooCommerce-powered online stores.
 Version:     2.0.0
-Requires at least: 6.0.0
-Tested up to: 6.6
-Requires PHP: 8.0
-WC requires at least: 8.0
-WC tested up to: 9.1.2
+Requires at least: 6.2
+Requires PHP: 7.4
+Tested up to: 6.6.1
+WC requires at least: 7.4
+WC tested up to: 9.1.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 */
+
 
 namespace SpectroCoin;
 
