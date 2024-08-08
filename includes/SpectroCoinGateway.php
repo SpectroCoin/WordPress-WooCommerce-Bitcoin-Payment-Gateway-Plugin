@@ -456,9 +456,9 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 		$order = new WC_Order($order_id);
 
 		$order_data = [
-			'orderId' => (string)$order->get_id() . "-" . Utils::generateRandomStr(6),
+			'orderId' => $order->get_id() . "-" . Utils::generateRandomStr(6),
 			'description' => "Order #{$order_id} from " . get_site_url(),
-			'receiveAmount' => (float)$order->get_total(),
+			'receiveAmount' => $order->get_total(),
 			'receiveCurrencyCode' => $order->get_currency(),
 			'callbackUrl' => get_site_url(null, '?wc-api=' . Config::CALLBACK_NAME),
 			'successUrl' => $this->get_return_url($order),
