@@ -245,7 +245,7 @@ class WC_Gateway_Spectrocoin extends WC_Payment_Gateway
 			return false;
 		}
 	
-		if ($this->spectrocoin_is_test_mode_enabled() && !current_user_can('manage_options')) {
+		if ($this->spectrocoin_is_test_mode_enabled() === 'yes' && !current_user_can('manage_options')) {
 			return false;
 		}
 
