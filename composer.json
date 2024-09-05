@@ -1,14 +1,5 @@
 {
-  "require": {
-    "guzzlehttp/guzzle": "^7.8"
-  },
-  "require-dev": {
-    "php-stubs/woocommerce-stubs": "^8.9"
-  },
-  "autoload": {
-    "psr-4": {
-      "SpectroCoin\\SCMerchantClient\\": "SCMerchantClient/",
-      "SpectroCoin\\Includes\\": "includes/"
+    "require": {
+        "guzzlehttp/guzzle": "^7.8"
     }
-  }
 }

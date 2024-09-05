@@ -1,36 +1,14 @@
 ## Changelog
 
-### 2.0.0 ()
+### 1.5.1 (09/05/2024)
 
-_Updated_ SCMerchantClient was reworked to adhere to better coding standards.
+Fixed dynamic string Internationalization.
 
-_Updated_ Order creation API endpoint has been updated for enhanced performance and security.
+Removed "Test" order, now when test mode enabled, returned callback status will "PAID" or "EXPIRED", depends which is chosen in merchant project settings.
 
-_Removed_ Private key functionality and merchant ID requirement have been removed to streamline integration.
+Adjusted string from "test mode" to "hide from checkout" in plugin settings.
 
-_Added_ OAuth functionality introduced for authentication, requiring Client ID and Client Secret for secure API access.
-
-_Fixed_ Changed save button class to prevent conflicts with other buttons.
-
-_Updated_ Class and some method names have been updated based on PSR-12 standards.
-
-_Updated_ Composer class autoloading has been implemented.
-
-_Added_ _Config.php_ file has been added to store plugin configuration.
-
-_Added_ _Utils.php_ file has been added to store utility functions.
-
-_Added_ _GenericError.php_ file has been added to handle generic errors.
-
-_Added_ Strict types have been added to all classes.
-
-_Added_ php-stubs/woocommerce-stubs as composer.json dependency.
-
-### Version 1.5.1 (07/31/2024):
-
-_Fixed_ dynamic string Internationalization
-
-_Removed_ "Test" order, now when test mode enabled, returned callback status will "PAID" or "EXPIRED", depends which is chosen in merchant project settings
+Fixed a bug related with the payment method not displaying in checkout due to "test mode".
 
 ### 1.5.0 (02/05/2024)
 
