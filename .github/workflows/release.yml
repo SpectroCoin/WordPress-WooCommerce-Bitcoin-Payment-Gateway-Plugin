@@ -48,7 +48,7 @@ jobs:
         run: |
           mkdir spectrocoin-accepting-bitcoin  # Create the folder inside the working directory
           # Copy only the necessary files and exclude the folder and unwanted files
-          find . -maxdepth 1 ! -name 'spectrocoin-accepting-bitcoin' ! -name '.' ! -name '.git' ! -name 'README.txt' ! -name 'README.md' ! -name 'changelog.md' ! -name '.gitignore' -exec cp -r {} spectrocoin-accepting-bitcoin/ \;
+          find . -maxdepth 1 ! -name 'spectrocoin-accepting-bitcoin' ! -name '.' ! -name '.git' ! -name '.github' ! -name 'README.txt' ! -name 'README.md' ! -name 'changelog.md' ! -name '.gitignore' -exec cp -r {} spectrocoin-accepting-bitcoin/ \;
           zip -r spectrocoin.zip spectrocoin-accepting-bitcoin  # Zip the folder
         shell: bash
 
