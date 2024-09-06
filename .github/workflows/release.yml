@@ -37,11 +37,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.ORGANIZATION_REPO_TOKEN }}
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            # If manually triggered, use an input for the tag (or you can default to a specific tag)
             TAG_NAME="${{ github.event.inputs.tag_name }}"
           else
-            # Get the pull request title if automatically triggered by PR merge
-            # Sanitize tag name to avoid issues with special characters
             TAG_NAME=$(echo "${{ github.event.pull_request.title }}" | tr -d '[:space:]' | tr -cs '[:alnum:]' '-')
           fi
 
@@ -49,7 +46,9 @@ jobs:
 
           # Create the tag
           git tag "$TAG_NAME"
-          git push origin "$TAG_NAME"
+
+          # Add verbose output for git push to debug the issue
+          GIT_CURL_VERBOSE=1 git push origin "$TAG_NAME"
 
           # Store the tag in the environment
           echo "TAG_NAME=$TAG_NAME" >> $GITHUB_ENV
