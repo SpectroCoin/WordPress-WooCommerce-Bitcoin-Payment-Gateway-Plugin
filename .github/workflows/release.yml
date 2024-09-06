@@ -5,36 +5,41 @@ on:
     types:
       - closed
 
+  workflow_dispatch:
+
 permissions:
-  contents: write # Grant write permissions to create releases
+  contents: write
 
 jobs:
   release:
-    if: github.event.pull_request.merged == true # Only run if the PR was merged
+    if: github.event.pull_request.merged == true || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
         with:
-          fetch-depth: 0 # Fetch full history to include tags
+          fetch-depth: 0
 
       - name: Set up Git
         run: |
           git config --global user.email "actions@github.com"
           git config --global user.name "GitHub Actions"
 
-      - name: Get PR Title and Create Tag
+      - name: Get PR Title or Manual Tag Input
         id: create_tag
         run: |
-          # Get the pull request title
-          PR_TITLE="${{ github.event.pull_request.title }}"
-          echo "Pull Request Title: $PR_TITLE"
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            # If manually triggered, use an input for the tag (or you can default to a specific tag)
+            TAG_NAME="${{ github.event.inputs.tag_name }}"
+          else
+            # Get the pull request title if automatically triggered by PR merge
+            TAG_NAME="${{ github.event.pull_request.title }}"
+          fi
 
-          # Use the PR title as the new tag
-          TAG_NAME=$PR_TITLE
+          echo "Using tag name: $TAG_NAME"
 
-          # Create the tag using the PR title
+          # Create the tag
           git tag "$TAG_NAME"
           git push origin "$TAG_NAME"
 
@@ -42,15 +47,15 @@ jobs:
           echo "TAG_NAME=$TAG_NAME" >> $GITHUB_ENV
 
       - name: Create GitHub Release
-        id: create_release # Add an ID to reference in the next steps
+        id: create_release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ env.TAG_NAME }} # Use the tag created from the PR title
-          release_name: "${{ github.event.pull_request.title }}" # Dynamic title from PR
+          tag_name: ${{ env.TAG_NAME }}
+          release_name: "${{ env.TAG_NAME }}"
           body: |
-            ${{ github.event.pull_request.body }}
+            ${{ github.event.pull_request.body || 'Manual release' }}
           draft: false
           prerelease: false
 
@@ -67,7 +72,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }} # Use the upload URL from the release creation step
-          asset_path: spectrocoin.zip # The path to the zip file
-          asset_name: spectrocoin.zip # Name of the zip file in the release
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: spectrocoin.zip
+          asset_name: spectrocoin.zip
           asset_content_type: application/zip
