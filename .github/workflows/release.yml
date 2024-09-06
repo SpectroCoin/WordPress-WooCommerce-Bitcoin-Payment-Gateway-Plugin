@@ -39,7 +39,6 @@ jobs:
           tag_name: ${{ env.TAG }} # Use the latest tag from the environment
           release_name: "${{ github.event.pull_request.title }}" # Dynamic title from PR
           body: |
-            ## Changelog
             ${{ github.event.pull_request.body }}
           draft: false
           prerelease: false
