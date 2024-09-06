@@ -25,8 +25,6 @@ jobs:
         run: |
           git config --global user.email "actions@github.com"
           git config --global user.name "GitHub Actions"
-          # Set remote URL with ORGANIZATION_REPO_TOKEN
-          git remote set-url origin https://x-access-token:${{ secrets.ORGANIZATION_REPO_TOKEN }}@github.com/SpectroCoin/WordPress-WooCommerce-Bitcoin-Payment-Gateway-Plugin.git
 
       - name: Get PR Title or Manual Tag Input
         id: create_tag
@@ -52,7 +50,7 @@ jobs:
         id: create_release
         uses: actions/create-release@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.ORGANIZATION_REPO_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ env.TAG_NAME }}
           release_name: "${{ env.TAG_NAME }}"
@@ -72,7 +70,7 @@ jobs:
       - name: Upload spectrocoin.zip as release asset
         uses: actions/upload-release-asset@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.ORGANIZATION_REPO_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: spectrocoin.zip
