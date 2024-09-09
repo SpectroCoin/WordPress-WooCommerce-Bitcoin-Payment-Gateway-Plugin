@@ -1,23 +1,19 @@
-name: Create Release on PR Merge
+name: Create tag and release
 
 on:
-  pull_request:
+  workflow_run:
+    workflows: ["Launch release.yml after closed PR"]
     types:
-      - closed
-
+      - completed
   workflow_dispatch:
 
-permissions:
-  contents: write
-
 jobs:
-  release:
-    if: github.event.pull_request.merged == true || github.event_name == 'workflow_dispatch'
+  create_tag_and_release:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -25,48 +21,51 @@ jobs:
         run: |
           git config --global user.email "actions@github.com"
           git config --global user.name "GitHub Actions"
-          # Set remote URL with ORGANIZATION_REPO_TOKEN
-          git remote set-url origin https://x-access-token:${{ secrets.ORGANIZATION_REPO_TOKEN }}@github.com/${{ github.repository }}.git
 
-      - name: Verify Git Remote
-        run: git remote -v
+      - name: Install GitHub CLI
+        run: sudo apt-get install gh
 
-      - name: Get PR Title or Manual Tag Input
-        id: create_tag
+      - name: Fetch Latest PR Info and Check for Existing Tag
+        id: check_tag
         env:
-          GITHUB_TOKEN: ${{ secrets.ORGANIZATION_REPO_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            TAG_NAME="${{ github.event.inputs.tag_name }}"
+          # Fetch the latest merged PR title and body using GitHub CLI
+          PR_TITLE=$(gh pr list --state merged --limit 1 --json title --jq '.[0].title')
+          PR_BODY=$(gh pr list --state merged --limit 1 --json body --jq '.[0].body')
+          TAG_NAME=$(echo "$PR_TITLE" | sed 's/ /_/g') # Replace spaces with underscores in the tag name for consistency
+
+          # Check if the tag already exists
+          if git rev-parse "$TAG_NAME" >/dev/null 2>&1; then
+            echo "Tag '$TAG_NAME' already exists. Exiting workflow."
+            echo "TAG_EXISTS=true" >> $GITHUB_ENV
+            exit 0
           else
-            TAG_NAME=$(echo "${{ github.event.pull_request.title }}" | tr -d '[:space:]' | tr -cs '[:alnum:]' '-')
+            echo "TAG_EXISTS=false" >> $GITHUB_ENV
+            echo "PR_TITLE: $PR_TITLE"
+            echo "PR_BODY: $PR_BODY"
+            echo "TAG_NAME: $TAG_NAME"
+
+            # Create the tag
+            git tag "$TAG_NAME"
+            git push origin "$TAG_NAME"
+
+            # Create a release using GitHub CLI with the tag name and PR body
+            RELEASE_OUTPUT=$(gh release create "$TAG_NAME" --title "$PR_TITLE" --notes "$PR_BODY")
+
+            # Extract the release URL and upload URL
+            RELEASE_URL=$(echo "$RELEASE_OUTPUT" | grep -oP 'https://github.com/[^ ]+/releases/tag/[^ ]+')
+            echo "Release URL: $RELEASE_URL"
+
+            UPLOAD_URL=$(gh release view "$TAG_NAME" --json uploadUrl --jq '.uploadUrl')
+            echo "UPLOAD_URL: $UPLOAD_URL"
+
+            # Store the upload URL in an environment variable for the next step
+            echo "UPLOAD_URL=$UPLOAD_URL" >> $GITHUB_ENV
           fi
 
-          echo "Using tag name: $TAG_NAME"
-
-          # Create the tag
-          git tag "$TAG_NAME"
-
-          # Add verbose output for git push to debug the issue
-          GIT_CURL_VERBOSE=1 git push origin "$TAG_NAME"
-
-          # Store the tag in the environment
-          echo "TAG_NAME=$TAG_NAME" >> $GITHUB_ENV
-
-      - name: Create GitHub Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.ORGANIZATION_REPO_TOKEN }}
-        with:
-          tag_name: ${{ env.TAG_NAME }}
-          release_name: "${{ env.TAG_NAME }}"
-          body: |
-            ${{ github.event.pull_request.body || 'Manual release' }}
-          draft: false
-          prerelease: false
-
       - name: Create spectrocoin.zip
+        if: env.TAG_EXISTS == 'false'
         run: |
           mkdir spectrocoin-accepting-bitcoin  # Create the folder inside the working directory
           # Copy only the necessary files and exclude the folder and unwanted files
@@ -75,11 +74,12 @@ jobs:
         shell: bash
 
       - name: Upload spectrocoin.zip as release asset
+        if: env.TAG_EXISTS == 'false'
         uses: actions/upload-release-asset@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.ORGANIZATION_REPO_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          upload_url: ${{ env.UPLOAD_URL }}
           asset_path: spectrocoin.zip
           asset_name: spectrocoin.zip
           asset_content_type: application/zip
