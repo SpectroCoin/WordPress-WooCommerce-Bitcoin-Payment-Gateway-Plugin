@@ -1,0 +1,19 @@
+name: Launch release.yml after closed PR
+
+on:
+  pull_request:
+    types:
+      - closed
+
+jobs:
+  Launch_tag_creation_workflow:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Trigger tag creation in the base repo
+        run: |
+          echo "Triggering the tag creation workflow in the base repository."
