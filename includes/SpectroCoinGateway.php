@@ -508,9 +508,6 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 				exit;
 			}
 
-			// DEBUG Log the whole callback data
-			$this->wc_logger->log('info', "Received callback data: " . var_export($order_callback, true));
-
 			$order_id = explode('-', ($order_callback->getOrderId()))[0];
 			$status = $order_callback->getStatus();
 			$order = wc_get_order($order_id);
