@@ -19,7 +19,6 @@ License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 */
 
-
 namespace SpectroCoin;
 
 use SpectroCoin\Includes\SpectroCoinGateway;
@@ -33,6 +32,7 @@ if (!defined('ABSPATH')) {
 }
 
 require_once __DIR__ . '/vendor/autoload.php';
+
 
 /**
  * Initialize plugin
@@ -86,9 +86,13 @@ function isRequirementsMet(): bool
     }
 
     if (!$requirements_met) {
-        SpectroCoinGateway::displayAdminErrorNotice($message);
+        // Store the error message in a transient
+        set_transient('spectrocoin_admin_notice', $message, 30);
+    
+        // Deactivate the plugin to prevent further execution
         deactivatePlugin();
     }
+    
 
     return $requirements_met;
 }
@@ -189,3 +193,20 @@ function registerOrderApprovalPaymentMethodType(): void
 
 add_action('plugins_loaded', '\SpectroCoin\spectrocoinInitPlugin');
 add_action('admin_enqueue_scripts', '\SpectroCoin\EnqueueAdminStyles');
+
+/**
+ * Display Admin Notice from Transient
+ */
+add_action('admin_notices', function () {
+    // Retrieve the error notice
+    $notice = get_transient('spectrocoin_admin_notice');
+    
+    if ($notice) {
+        echo '<div class="notice notice-error is-dismissible">';
+        echo '<p>' . esc_html($notice) . '</p>';
+        echo '</div>';
+        
+        // Clear the transient after displaying the notice
+        delete_transient('spectrocoin_admin_notice');
+    }
+});

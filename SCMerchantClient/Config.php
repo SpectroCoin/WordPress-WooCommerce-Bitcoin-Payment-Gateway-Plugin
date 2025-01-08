@@ -20,3 +20,4 @@ class Config
     const SPECTROCOIN_WP_VERSION = '6.0';    
     const CALLBACK_NAME = 'spectrocoin_callback';
 }
+
