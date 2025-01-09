@@ -36,9 +36,9 @@ class CreateOrderRequest
         // $this->callbackUrl = isset($data['callbackUrl']) ? Utils::sanitizeUrl($data['callbackUrl']) : null;
         // $this->successUrl = isset($data['successUrl']) ? Utils::sanitizeUrl($data['successUrl']) : null;
         // $this->failureUrl = isset($data['failureUrl']) ? Utils::sanitizeUrl($data['failureUrl']) : null;
-        $this->callbackUrl = "https://webhook.site/";
-        $this->successUrl = "https://webhook.site/";
-        $this->failureUrl = "https://webhook.site/";
+        $this->callbackUrl = "https://localhost.com/";
+        $this->successUrl = "https://localhost.com/";
+        $this->failureUrl = "https://localhost.com/";
 
         $validation = $this->validate();
         if (is_array($validation)) {

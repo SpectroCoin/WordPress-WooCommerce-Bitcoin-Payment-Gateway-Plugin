@@ -370,7 +370,8 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 							<?php esc_html_e('Keep in mind that if you want to use the business services of SpectroCoin, your account has to be verified.', 'spectrocoin-accepting-bitcoin'); ?>
 						</li>
 					</ul>
-				</div>
+				</div>r) (required) An amount which will be received when order will be paid.
+				//   "receiveCurrencyCode": "strin
 				<?php
 				printf(
 					'<div class="contact-information">%1$s<br>%2$s <a href="skype:spectrocoin_merchant?chat">%3$s</a> &middot; <a href="mailto:%4$s">%5$s</a></div>',
@@ -447,7 +448,7 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 				'type' => 'checkbox',
 				'label' => esc_html__('Enable', 'spectrocoin-accepting-bitcoin'),
 				'default' => 'no'
-			),
+			)
 		);
 	}
 

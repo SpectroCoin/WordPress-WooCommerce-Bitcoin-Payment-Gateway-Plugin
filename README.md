@@ -28,17 +28,17 @@ Integrate cryptocurrency payments seamlessly into your Wordpress store with the 
 
 ## Test order creation on localhost
 
-We gently suggest trying out the plugin in a server environment, as it will not be capable of receiving callbacks from SpectroCoin if it will be hosted on localhost. To successfully create an order on localhost for testing purposes, <b>change these 3 lines in <em>SCMechantClient.php spectrocoinCreateOrder() function</em></b>:
+We gently suggest trying out the plugin in a server environment, as it will not be capable of receiving callbacks from SpectroCoin if it will be hosted on localhost. To successfully create an order on localhost for testing purposes, <b>change these 3 lines in <em>CreateOrderRequest.php</em></b>:
 
-`'callbackUrl' => $request->getCallbackUrl()`, <br>
-`'successUrl' => $request->getSuccessUrl()`, <br>
-`'failureUrl' => $request->getFailureUrl()`
+`$this->callbackUrl = isset($data['callbackUrl']) ? Utils::sanitizeUrl($data['callbackUrl']) : null;`, <br>
+`$this->successUrl = isset($data['successUrl']) ? Utils::sanitizeUrl($data['successUrl']) : null;`, <br>
+`$this->failureUrl = isset($data['failureUrl']) ? Utils::sanitizeUrl($data['failureUrl']) : null;`
 
 <b>To</b>
 
-`'callbackUrl' => 'http://localhost.com'`, <br>
-`'successUrl' => 'http://localhost.com'`, <br>
-`'failureUrl' => 'http://localhost.com'`
+`$this->callbackUrl = "https://localhost.com/";`, <br>
+`$this->successUrl = "https://localhost.com/";`, <br>
+`$this->failureUrl = "https://localhost.com/";`
 
 Don't forget to change it back when migrating website to public.
 
