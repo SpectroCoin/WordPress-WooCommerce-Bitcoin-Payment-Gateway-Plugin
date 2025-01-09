@@ -87,7 +87,7 @@ function isRequirementsMet(): bool
 
     if (!$requirements_met) {
         // Store the error message in a transient
-        set_transient('spectrocoin_admin_notice', $message, 30);
+        set_transient('spectrocoin_requirements_not_met', $message, 30);
     
         // Deactivate the plugin to prevent further execution
         deactivatePlugin();
@@ -199,7 +199,7 @@ add_action('admin_enqueue_scripts', '\SpectroCoin\EnqueueAdminStyles');
  */
 add_action('admin_notices', function () {
     // Retrieve the error notice
-    $notice = get_transient('spectrocoin_admin_notice');
+    $notice = get_transient('spectrocoin_requirements_not_met');
     
     if ($notice) {
         echo '<div class="notice notice-error is-dismissible">';
@@ -207,6 +207,7 @@ add_action('admin_notices', function () {
         echo '</div>';
         
         // Clear the transient after displaying the notice
-        delete_transient('spectrocoin_admin_notice');
+        delete_transient('spectrocoin_requirements_not_met');
     }
 });
+

@@ -49,6 +49,8 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 	private array $all_order_statuses;
 	private WC_Logger $wc_logger;
 
+	private static $renew_notice_displayed = false;
+
 	public function __construct()
 	{
 
@@ -72,6 +74,8 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 		$this->init_settings();
 		$this->wc_logger = new WC_Logger();
 		$this->form_fields = $this->generateFormFields();
+
+        add_action('admin_notices', array($this, 'renew_keys_notice')); // (REMOVE THIS WHEN UPDATE NOTICE IS NOT NEEDED)
 	}
 
 	/**
@@ -631,5 +635,43 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 		}
 	}
 
-
+   /**
+     * Show notice if client_id and client_secret are missing and notice has not been addressed.
+	 * (REMOVE THIS WHEN UPDATE NOTICE IS NOT NEEDED)
+     */
+    public function renew_keys_notice() {
+        // Check if the notice should be displayed
+		if (self::$renew_notice_displayed) {
+            return;
+        }
+		if (empty($this->project_id)){ // this prevents from displaying notice to new installations
+			return;
+		}
+        if (empty($this->client_id) || empty($this->client_secret)) {
+            self::$renew_notice_displayed = true; // prevent double notice display
+            ?>
+            <div class="notice notice-warning is-dismissible" data-notice="spectrocoin_credentials">
+                <p>
+                    <?php _e('Action Required: Your SpectroCoin plugin needs to be configured to function properly.', 'spectrocoin-accepting-bitcoin'); ?>
+                </p>
+                <p>
+                    <?php _e('The new SpectroCoin API requires you to provide a valid Client ID and Client Secret in the plugin settings. Without these credentials, the plugin will not be able to process payments.', 'spectrocoin-accepting-bitcoin'); ?>
+                </p>
+                <p>
+                    <a href="<?php echo esc_url(admin_url('admin.php?page=wc-settings&tab=checkout&section=spectrocoin')); ?>" class="button button-primary">
+                        <?php _e('Go to SpectroCoin Settings', 'spectrocoin-accepting-bitcoin'); ?>
+                    </a>
+                </p>
+                <p>
+                    <?php _e('Need help? Refer to the plugin documentation or contact SpectroCoin support for assistance.', 'spectrocoin-accepting-bitcoin'); ?>
+                </p>
+            </div>
+            <script type="text/javascript">
+                jQuery(document).on('click', '.notice[data-notice="spectrocoin_credentials"] .notice-dismiss', function () {
+                    jQuery.post(ajaxurl, { action: 'spectrocoin_dismiss_notice' });
+                });
+            </script>
+            <?php
+        }
+	}
 }
