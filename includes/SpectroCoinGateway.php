@@ -596,7 +596,7 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 	}
 
 	/**
-	 * Display error message in admin settings
+	 * Display error message in spectrocoin admin settings
 	 * @param string $message Error message
 	 * @param bool $allow_hyperlink Allow hyperlink in error message
 	 */

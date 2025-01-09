@@ -33,12 +33,10 @@ class CreateOrderRequest
         $this->description = isset($data['description']) ? sanitize_text_field((string)$data['description']) : null;
         $this->receiveAmount = isset($data['receiveAmount']) ? sanitize_text_field((string)$data['receiveAmount']) : null;
         $this->receiveCurrencyCode = isset($data['receiveCurrencyCode']) ? sanitize_text_field((string)$data['receiveCurrencyCode']) : null;
-        // $this->callbackUrl = isset($data['callbackUrl']) ? Utils::sanitizeUrl($data['callbackUrl']) : null;
-        // $this->successUrl = isset($data['successUrl']) ? Utils::sanitizeUrl($data['successUrl']) : null;
-        // $this->failureUrl = isset($data['failureUrl']) ? Utils::sanitizeUrl($data['failureUrl']) : null;
-        $this->callbackUrl = "https://localhost.com/";
-        $this->successUrl = "https://localhost.com/";
-        $this->failureUrl = "https://localhost.com/";
+        $this->callbackUrl = isset($data['callbackUrl']) ? Utils::sanitizeUrl($data['callbackUrl']) : null;
+        $this->successUrl = isset($data['successUrl']) ? Utils::sanitizeUrl($data['successUrl']) : null;
+        $this->failureUrl = isset($data['failureUrl']) ? Utils::sanitizeUrl($data['failureUrl']) : null;
+
 
         $validation = $this->validate();
         if (is_array($validation)) {

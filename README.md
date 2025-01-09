@@ -42,9 +42,23 @@ We gently suggest trying out the plugin in a server environment, as it will not 
 
 Don't forget to change it back when migrating website to public.
 
+## Testing Callbacks
+
+Order callbacks in the SpectroCoin plugin allow your WordPress site to automatically process order status changes sent from SpectroCoin. These callbacks notify your server when an order’s status transitions to PAID, EXPIRED, or FAILED. Understanding and testing this functionality ensures your store handles payments accurately and updates order statuses accordingly.
+ 
+1. Go to your SpectroCoin project settings and enable **Test Mode**.
+2. Simulate a payment status:
+   - **PAID**: Sends a callback to mark the order as **Completed** in WordPress.
+   - **EXPIRED**: Sends a callback to mark the order as **Failed** in WordPress.
+3. Ensure your `callbackUrl` is publicly accessible (local servers like `localhost` will not work).
+4. Check the **Order History** in SpectroCoin for callback details. If a callback fails, use the **Retry** button to resend it.
+5. Verify that:
+   - The **order status** in WordPress has been updated accordingly.
+   - The **callback status** in the SpectroCoin dashboard is `200 OK`.
+
 ## Debugging
 
-If you get "Something went wrong. Please contact us to get assistance." message during checkout process, please navigate to **"WooCommerce"** -> **"Status"** -> **"Logs"** and check **"plugin-spectrocoin"** log file for more information. If the logs are not helpful or do not display, please contact us and provide the log file details so that we can assist.
+If you get "Something went wrong. Please contact us to get assistance." message during checkout process, please navigate to **"WooCommerce"** -> **"Status"** -> **"Logs"** and check **"plugin-spectrocoin"** log file for more information. If the logs are not helpful or not displayed, please contact us and provide the log file details so that we can assist.
 
 ## Contact
 

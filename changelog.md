@@ -2,6 +2,10 @@
 
 ### 2.0.0 ()
 
+This major update introduces several improvements, including enhanced security, updated coding standards, and a streamlined integration process. **Important:** Users must generate new API credentials (Client ID and Client Secret) in their SpectroCoin account settings to continue using the plugin. The previous private key and merchant ID functionality have been deprecated.
+
+_Added_ Temporary admin notice (will removed in few months) which tells to update client API credentials.
+
 _Updated_ SCMerchantClient was reworked to adhere to better coding standards.
 
 _Updated_ Order creation API endpoint has been updated for enhanced performance and security.
