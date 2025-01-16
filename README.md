@@ -4,12 +4,12 @@ Integrate cryptocurrency payments seamlessly into your Wordpress store with the 
 
 ## Installation
 
-0. We strongly recommend downloading the plugin from [Wordpress](https://wordpress.org/plugins/spectrocoin-accepting-bitcoin/). In case you are downloading it from github, please follow the installation steps below.</br>
+We strongly recommend downloading the plugin from [Wordpress](https://wordpress.org/plugins/spectrocoin-accepting-bitcoin/). In case you are downloading it from github, please follow the installation steps below.</br>
 1. Download latest release from github.
-2. Extract and upload plugin folder to your Wordpress <em>/wp-content/plugins/</em> directory.<br />
+2. Extract and upload plugin folder to your Wordpress _/wp-content/plugins/_ directory.<br />
    OR<br>
-   From Wordpress admin dashboard navigate tp **"Plugins"** -> **"Add New"** -> **"Upload Plugin"**. -> Upload <em>spectrocoin.zip</em>.</br>
-3. Go to **"Plugins"** -> **"Installed Plugins"** -> Locate installed plugin and click **"Activate"** -> **"Settings"**.
+   From Wordpress admin dashboard navigate tp **Plugins** -> **Add New** -> **Upload Plugin**. -> Upload _spectrocoin.zip<_.</br>
+3. Go to **Plugins** -> **Installed Plugins** -> Locate installed plugin and click **Activate** -> **Settings**.
 
 ## Setting up
 
@@ -29,17 +29,17 @@ Integrate cryptocurrency payments seamlessly into your Wordpress store with the 
 ## Test order creation on localhost
 
 We gently suggest trying out the plugin in a server environment, as it will not be capable of receiving callbacks from SpectroCoin if it will be hosted on localhost. To successfully create an order on localhost for testing purposes, <b>change these 3 lines in <em>CreateOrderRequest.php</em></b>:
-
-`$this->callbackUrl = isset($data['callbackUrl']) ? Utils::sanitizeUrl($data['callbackUrl']) : null;`, <br>
-`$this->successUrl = isset($data['successUrl']) ? Utils::sanitizeUrl($data['successUrl']) : null;`, <br>
-`$this->failureUrl = isset($data['failureUrl']) ? Utils::sanitizeUrl($data['failureUrl']) : null;`
-
-<b>To</b>
-
-`$this->callbackUrl = "https://localhost.com/";`, <br>
-`$this->successUrl = "https://localhost.com/";`, <br>
-`$this->failureUrl = "https://localhost.com/";`
-
+```php
+$this->callbackUrl = isset($data['callbackUrl']) ? Utils::sanitizeUrl($data['callbackUrl']) : null;,
+$this->successUrl = isset($data['successUrl']) ? Utils::sanitizeUrl($data['successUrl']) : null;,
+$this->failureUrl = isset($data['failureUrl']) ? Utils::sanitizeUrl($data['failureUrl']) : null;
+```
+__To__
+```php
+$this->callbackUrl = "https://localhost.com/";,
+$this->successUrl = "https://localhost.com/";,
+$this->failureUrl = "https://localhost.com/";
+```
 Don't forget to change it back when migrating website to public.
 
 ## Testing Callbacks
@@ -64,8 +64,8 @@ If you get "Something went wrong. Please contact us to get assistance." message 
 
 This client has been developed by SpectroCoin.com If you need any further support regarding our services you can contact us via:
 
-E-mail: merchant@spectrocoin.com </br>
-Skype: spectrocoin_merchant </br>
+E-mail: merchant@spectrocoin.com <br/>
+Skype: [spectrocoin_merchant](https://join.skype.com/invite/iyXHU7o08KkW) </br>
 [Web](https://spectrocoin.com) </br>
 [X (formerly Twitter)](https://twitter.com/spectrocoin) </br>
 [Facebook](https://www.facebook.com/spectrocoin/)
