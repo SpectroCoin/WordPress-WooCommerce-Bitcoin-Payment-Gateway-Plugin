@@ -37,7 +37,6 @@ class CreateOrderRequest
         $this->successUrl = isset($data['successUrl']) ? Utils::sanitizeUrl($data['successUrl']) : null;
         $this->failureUrl = isset($data['failureUrl']) ? Utils::sanitizeUrl($data['failureUrl']) : null;
 
-
         $validation = $this->validate();
         if (is_array($validation)) {
             $errorMessage = 'Invalid order creation payload. Failed fields: ' . implode(', ', $validation);
