@@ -55,8 +55,7 @@
   font-family: Red Hat Text, sans-serif;
 }
 
-/* Save button style */
-.wp-core-ui .button-primary {
+.woocommerce-save-button {
   align-items: center;
   background: #4972f4;
   border-radius: 4px;
@@ -73,7 +72,7 @@
   transition: all 0.1s, visibility 0s;
 }
 
-.button-primary:hover {
+.woocommerce-save-button:hover {
   background: #6c8bf5 !important;
   border-color: #6c8bf5 !important;
   color: #fff;

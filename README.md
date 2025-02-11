@@ -4,12 +4,12 @@ Integrate cryptocurrency payments seamlessly into your Wordpress store with the 
 
 ## Installation
 
-0. We strongly recommend downloading the plugin from [Wordpress](https://wordpress.org/plugins/spectrocoin-accepting-bitcoin/). In case you are downloading it from github, please follow the installation steps below.</br>
+We strongly recommend downloading the plugin from [Wordpress](https://wordpress.org/plugins/spectrocoin-accepting-bitcoin/). In case you are downloading it from github, please follow the installation steps below.</br>
 1. Download latest release from github.
-2. Extract and upload plugin folder to your Wordpress <em>/wp-content/plugins/</em> directory.<br />
+2. Extract and upload plugin folder to your Wordpress _/wp-content/plugins/_ directory.<br />
    OR<br>
-   From Wordpress admin dashboard navigate tp **"Plugins"** -> **"Add New"** -> **"Upload Plugin"**. -> Upload <em>spectrocoin.zip</em>.</br>
-3. Go to **"Plugins"** -> **"Installed Plugins"** -> Locate installed plugin and click **"Activate"** -> **"Settings"**.
+   From Wordpress admin dashboard navigate tp **Plugins** -> **Add New** -> **Upload Plugin**. -> Upload _spectrocoin.zip<_.</br>
+3. Go to **Plugins** -> **Installed Plugins** -> Locate installed plugin and click **Activate** -> **Settings**.
 
 ## Setting up
 
@@ -28,30 +28,44 @@ Integrate cryptocurrency payments seamlessly into your Wordpress store with the 
 
 ## Test order creation on localhost
 
-We gently suggest trying out the plugin in a server environment, as it will not be capable of receiving callbacks from SpectroCoin if it will be hosted on localhost. To successfully create an order on localhost for testing purposes, <b>change these 3 lines in <em>SCMechantClient.php spectrocoinCreateOrder() function</em></b>:
-
-`'callbackUrl' => $request->getCallbackUrl()`, <br>
-`'successUrl' => $request->getSuccessUrl()`, <br>
-`'failureUrl' => $request->getFailureUrl()`
-
-<b>To</b>
-
-`'callbackUrl' => 'http://localhost.com'`, <br>
-`'successUrl' => 'http://localhost.com'`, <br>
-`'failureUrl' => 'http://localhost.com'`
-
+We gently suggest trying out the plugin in a server environment, as it will not be capable of receiving callbacks from SpectroCoin if it will be hosted on localhost. To successfully create an order on localhost for testing purposes, <b>change these 3 lines in <em>CreateOrderRequest.php</em></b>:
+```php
+$this->callbackUrl = isset($data['callbackUrl']) ? Utils::sanitizeUrl($data['callbackUrl']) : null;,
+$this->successUrl = isset($data['successUrl']) ? Utils::sanitizeUrl($data['successUrl']) : null;,
+$this->failureUrl = isset($data['failureUrl']) ? Utils::sanitizeUrl($data['failureUrl']) : null;
+```
+__To__
+```php
+$this->callbackUrl = "https://localhost.com/";,
+$this->successUrl = "https://localhost.com/";,
+$this->failureUrl = "https://localhost.com/";
+```
 Don't forget to change it back when migrating website to public.
+
+## Testing Callbacks
+
+Order callbacks in the SpectroCoin plugin allow your WordPress site to automatically process order status changes sent from SpectroCoin. These callbacks notify your server when an order’s status transitions to PAID, EXPIRED, or FAILED. Understanding and testing this functionality ensures your store handles payments accurately and updates order statuses accordingly.
+ 
+1. Go to your SpectroCoin project settings and enable **Test Mode**.
+2. Simulate a payment status:
+   - **PAID**: Sends a callback to mark the order as **Completed** in WordPress.
+   - **EXPIRED**: Sends a callback to mark the order as **Failed** in WordPress.
+3. Ensure your `callbackUrl` is publicly accessible (local servers like `localhost` will not work).
+4. Check the **Order History** in SpectroCoin for callback details. If a callback fails, use the **Retry** button to resend it.
+5. Verify that:
+   - The **order status** in WordPress has been updated accordingly.
+   - The **callback status** in the SpectroCoin dashboard is `200 OK`.
 
 ## Debugging
 
-If you get "Something went wrong. Please contact us to get assistance." message during checkout process, please navigate to **"WooCommerce"** -> **"Status"** -> **"Logs"** and check **"plugin-spectrocoin"** log file for more information. If the logs are not helpful or do not display, please contact us and provide the log file details so that we can assist.
+If you get "Something went wrong. Please contact us to get assistance." message during checkout process, please navigate to **"WooCommerce"** -> **"Status"** -> **"Logs"** and check **"plugin-spectrocoin"** log file for more information. If the logs are not helpful or not displayed, please contact us and provide the log file details so that we can assist.
 
 ## Contact
 
 This client has been developed by SpectroCoin.com If you need any further support regarding our services you can contact us via:
 
-E-mail: merchant@spectrocoin.com </br>
-Skype: spectrocoin_merchant </br>
+E-mail: merchant@spectrocoin.com <br/>
+Skype: [spectrocoin_merchant](https://join.skype.com/invite/iyXHU7o08KkW) </br>
 [Web](https://spectrocoin.com) </br>
 [X (formerly Twitter)](https://twitter.com/spectrocoin) </br>
 [Facebook](https://www.facebook.com/spectrocoin/)
