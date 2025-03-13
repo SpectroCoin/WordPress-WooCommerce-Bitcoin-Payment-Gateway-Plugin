@@ -1,13 +1,11 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace SpectroCoin\SCMerchantClient;
-
+// @codeCoverageIgnoreStart
 if (!defined('ABSPATH')) {
     die('Access denied.');
 }
-
+// @codeCoverageIgnoreEnd
 class Utils
 {
     /**
@@ -15,10 +13,13 @@ class Utils
      *
      * @return string The plugin folder name.
      */
-    public static function getPluginFolderName(): string
+    public static function getPluginFolderName(string $filePath = __FILE__): string
     {
-        $plugin_folder = explode("/", plugin_basename(__FILE__))[0];
-        return $plugin_folder;
+        $dir = dirname($filePath);
+        if ($dir === '/' || $dir === '\\' || $dir === '.' || $dir === '') {
+            return pathinfo($filePath, PATHINFO_FILENAME);
+        }
+        return basename($dir);
     }
     /**
      * Formats currency amount with '0.0#######' format.
@@ -27,7 +28,10 @@ class Utils
      * @return string The formatted currency amount.
      */
     public static function formatCurrency($amount): string
-    {
+    {   
+        if (!is_numeric($amount)) {
+            throw new \InvalidArgumentException('The provided amount must be numeric.');
+        }
 		$decimals = strlen(substr(strrchr(rtrim(sprintf('%.8f', $amount), '0'), "."), 1));
 		$decimals = $decimals < 1 ? 1 : $decimals;
 		return number_format((float)$amount, $decimals, '.', '');
@@ -57,18 +61,11 @@ class Utils
     public static function decryptAuthData(string $encryptedDataWithIv, string $encryptionKey): string
     {
         list($encryptedData, $iv) = explode('::', base64_decode($encryptedDataWithIv), 2);
-        return openssl_decrypt($encryptedData, 'aes-256-cbc', $encryptionKey, 0, $iv);
-    }
-
-    /**
-     * Generates a random 128-bit secret key for AES-128-CBC encryption.
-     *
-     * @return string The generated secret key encoded in base64.
-     */
-    public static function generateEncryptionKey(): string
-    {
-        $key = openssl_random_pseudo_bytes(32);
-        return base64_encode($key);
+        $decrypted = openssl_decrypt($encryptedData, 'aes-256-cbc', $encryptionKey, 0, $iv);
+        if ($decrypted === false){
+            throw new \RuntimeException('Decryption failed: Invalid encryption key or corrupted data.');
+        }
+        return $decrypted;
     }
 
     /**
@@ -82,19 +79,43 @@ class Utils
         if ($value === null) {
             return null;
         }
-        $sanitized = filter_var($value, FILTER_SANITIZE_URL);
-        return $sanitized === false ? null : $sanitized;
+    
+        $value = (string)$value;
+        
+        $value = trim($value);
+        
+        if ($value === '') {
+            return '';
+        }
+        
+        $value = str_replace(' ', '', $value);
+        
+        $value = preg_replace('/[<>^]/', '', $value);
+        
+        return $value;
     }
+    
+    
 
     /**
 	 * Generate random string
 	 * @param int $length
 	 * @return string
 	 */
-	public static function generateRandomStr($length) : string
-	{
+    public static function generateRandomStr($length) : string
+    {
+        if (!is_int($length) || $length < 0) {
+            throw new \InvalidArgumentException("Invalid length parameter. Must be a non-negative integer.");
+        }
+        
+        // If length is 0, return an empty string.
+        if ($length === 0) {
+            return "";
+        }
+        
         $random_str = substr(md5((string)rand(1, pow(2, 16))), 0, $length);
-		return $random_str;
-	}
+        return $random_str;
+    }
+    
 }
 ?>

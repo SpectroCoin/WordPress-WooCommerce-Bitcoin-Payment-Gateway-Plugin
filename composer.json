@@ -3,12 +3,18 @@
     "guzzlehttp/guzzle": "^7.8"
   },
   "require-dev": {
-    "php-stubs/woocommerce-stubs": "^8.9"
+    "php-stubs/woocommerce-stubs": "^8.9",
+    "brain/monkey": "2.*",
+    "phpunit/phpunit": "^12.0"
   },
   "autoload": {
     "psr-4": {
       "SpectroCoin\\SCMerchantClient\\": "SCMerchantClient/",
       "SpectroCoin\\Includes\\": "includes/"
     }
+  },
+  "scripts": {
+    "test": "XDEBUG_MODE=coverage vendor/bin/phpunit --testdox --colors=always --coverage-text",
+    "test-html-report": "XDEBUG_MODE=coverage vendor/bin/phpunit --coverage-html coverage-report"
   }
 }

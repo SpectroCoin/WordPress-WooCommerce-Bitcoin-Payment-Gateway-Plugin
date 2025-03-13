@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+         bootstrap="./tests/bootstrap.php"
+         cacheDirectory=".phpunit.cache"
+         executionOrder="depends,defects"
+         requireCoverageMetadata="true"
+         beStrictAboutCoverageMetadata="true"
+         beStrictAboutOutputDuringTests="true"
+         displayDetailsOnPhpunitDeprecations="true"
+         failOnPhpunitDeprecation="true"
+         failOnRisky="true"
+         failOnWarning="true">
+    <testsuites>
+        <testsuite name="default">
+            <directory>./tests</directory>
+        </testsuite>
+    </testsuites>
+
+    <source ignoreIndirectDeprecations="true" restrictNotices="true" restrictWarnings="true">
+        <include>
+            <file>SCMerchantClient/Utils.php</file>
+        </include>
+    </source>
+
+    <coverage includeUncoveredFiles="true" ignoreDeprecatedCodeUnits="true" disableCodeCoverageIgnore="false">
+    </coverage>
+
+    <php>
+        <const name="ABSPATH" value="/dummy/path"/>
+    </php>
+</phpunit>
