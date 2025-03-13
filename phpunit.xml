@@ -20,6 +20,7 @@
     <source ignoreIndirectDeprecations="true" restrictNotices="true" restrictWarnings="true">
         <include>
             <file>SCMerchantClient/Utils.php</file>
+            <file>SCMerchantClient/Config.php</file>
         </include>
     </source>
 

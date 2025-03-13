@@ -15,12 +15,15 @@ class Utils
      */
     public static function getPluginFolderName(string $filePath = __FILE__): string
     {
+        // Normalize Windows path separators to forward slashes.
+        $filePath = str_replace('\\', '/', $filePath);
         $dir = dirname($filePath);
-        if ($dir === '/' || $dir === '\\' || $dir === '.' || $dir === '') {
+        if ($dir === '/' || $dir === '.' || $dir === '') {
             return pathinfo($filePath, PATHINFO_FILENAME);
         }
         return basename($dir);
     }
+    
     /**
      * Formats currency amount with '0.0#######' format.
      *

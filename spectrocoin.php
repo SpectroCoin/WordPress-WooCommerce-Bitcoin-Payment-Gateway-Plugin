@@ -51,7 +51,6 @@ function spectrocoinInitPlugin(): void
         }
     }
 }
-
 /**
  * Checks if the system requirements are met
  * @return bool True if system requirements are met, false if not
@@ -60,11 +59,12 @@ function isRequirementsMet(): bool
 {
     $requirements_met = true;
     $message = '';
-    if (version_compare(PHP_VERSION, Config::SPECTROCOIN_REQUIRED_PHP_VERSION, '<')) {
+
+    if (version_compare(PHP_VERSION, '8.0', '<')) {
         $requirements_met = false;
         $message .= sprintf(
             esc_html__('Spectrocoin plugin requires PHP version %s or greater.', 'spectrocoin-accepting-bitcoin'),
-            Config::SPECTROCOIN_REQUIRED_PHP_VERSION
+            '8.0'
         );
     }
 
@@ -72,11 +72,11 @@ function isRequirementsMet(): bool
         require_once ABSPATH . '/wp-admin/includes/plugin.php';
     }
 
-    if (version_compare($GLOBALS['wp_version'], Config::SPECTROCOIN_WP_VERSION, '<')) {
+    if (version_compare($GLOBALS['wp_version'], '6.0', '<')) {
         $requirements_met = false;
         $message .= sprintf(
             esc_html__('SpectroCoin plugin requires WordPress version %s or greater.', 'spectrocoin-accepting-bitcoin'),
-            Config::SPECTROCOIN_WP_VERSION
+            '6.0'
         );
     }
 

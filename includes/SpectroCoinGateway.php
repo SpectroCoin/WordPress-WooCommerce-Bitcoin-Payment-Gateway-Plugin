@@ -41,6 +41,7 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 	public $description;
 	public $form_fields = array();
 
+	protected $callback_name = 'spectrocoin_callback';
 	private SCMerchantClient $sc_merchant_client;
 	protected string $client_id;
 	protected string $project_id;
@@ -102,7 +103,7 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 			$this->client_id,
 			$this->client_secret,
 		);
-		add_action('woocommerce_api_' . CONFIG::CALLBACK_NAME, array($this, 'callback'));
+		add_action('woocommerce_api_' . $this->callback_name, array($this, 'callback'));
 
 	}
 
@@ -469,7 +470,7 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 			'description' => "Order #{$order_id} from " . get_site_url(),
 			'receiveAmount' => $order->get_total(),
 			'receiveCurrencyCode' => $order->get_currency(),
-			'callbackUrl' => get_site_url(null, '?wc-api=' . Config::CALLBACK_NAME),
+			'callbackUrl' => get_site_url(null, '?wc-api=' . $this->callback_name),
 			'successUrl' => $this->get_return_url($order),
 			'failureUrl' => $this->get_return_url($order)
 		];
