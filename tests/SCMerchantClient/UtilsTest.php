@@ -4,7 +4,6 @@ use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\CoversClass;
-use Brain\Monkey;
 
 use SpectroCoin\SCMerchantClient\Utils;
 
@@ -14,12 +13,10 @@ class UtilsTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        Monkey\setUp();
     }
 
     protected function tearDown(): void
     {
-        Monkey\tearDown();
         parent::tearDown();
     }
 
