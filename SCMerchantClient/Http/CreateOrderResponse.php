@@ -6,11 +6,11 @@ namespace SpectroCoin\SCMerchantClient\Http;
 
 use InvalidArgumentException;
 use SpectroCoin\SCMerchantClient\Utils;
-
+// @codeCoverageIgnoreStart
 if (!defined('ABSPATH')) {
     die('Access denied.');
 }
-
+// @codeCoverageIgnoreEnd
 class CreateOrderResponse
 {
     private ?string $preOrderId;

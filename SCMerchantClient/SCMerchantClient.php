@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace SpectroCoin\SCMerchantClient;
 
@@ -19,9 +17,11 @@ use InvalidArgumentException;
 use Exception;
 use RuntimeException;
 
+// @codeCoverageIgnoreStart
 if (!defined('ABSPATH')) {
     die('Access denied.');
 }
+// @codeCoverageIgnoreEnd
 
 require_once __DIR__ . '/../vendor/autoload.php';
 

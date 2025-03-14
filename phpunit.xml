@@ -21,6 +21,9 @@
         <include>
             <file>SCMerchantClient/Utils.php</file>
             <file>SCMerchantClient/Config.php</file>
+            <file>SCMerchantClient/Enum/OrderStatus.php</file>
+            <file>SCMerchantClient/Exception/ApiError.php</file>
+            <file>SCMerchantClient/Exception/GenericError.php</file>
         </include>
     </source>
 

@@ -8,11 +8,11 @@ use SpectroCoin\SCMerchantClient\Utils;
 use SpectroCoin\SCMerchantClient\Config;
 use Exception;
 use InvalidArgumentException;
-
+// @codeCoverageIgnoreStart
 if (!defined('ABSPATH')) {
     die('Access denied.');
 }
-
+// @codeCoverageIgnoreEnd
 class OrderCallback
 {
     private ?string $userId;
