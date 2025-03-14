@@ -29,10 +29,10 @@ class CreateOrderRequest
      * @throws InvalidArgumentException
      */
     public function __construct(array $data) {
-        $this->orderId = isset($data['orderId']) ? sanitize_text_field((string)$data['orderId']) : null;
-        $this->description = isset($data['description']) ? sanitize_text_field((string)$data['description']) : null;
-        $this->receiveAmount = isset($data['receiveAmount']) ? sanitize_text_field((string)$data['receiveAmount']) : null;
-        $this->receiveCurrencyCode = isset($data['receiveCurrencyCode']) ? sanitize_text_field((string)$data['receiveCurrencyCode']) : null;
+        $this->orderId = isset($data['orderId']) ? Utils::sanitize_text_field((string)$data['orderId']) : null;
+        $this->description = isset($data['description']) ? Utils::sanitize_text_field((string)$data['description']) : null;
+        $this->receiveAmount = isset($data['receiveAmount']) ? Utils::sanitize_text_field((string)$data['receiveAmount']) : null;
+        $this->receiveCurrencyCode = isset($data['receiveCurrencyCode']) ? Utils::sanitize_text_field((string)$data['receiveCurrencyCode']) : null;
         $this->callbackUrl = isset($data['callbackUrl']) ? Utils::sanitizeUrl($data['callbackUrl']) : null;
         $this->successUrl = isset($data['successUrl']) ? Utils::sanitizeUrl($data['successUrl']) : null;
         $this->failureUrl = isset($data['failureUrl']) ? Utils::sanitizeUrl($data['failureUrl']) : null;

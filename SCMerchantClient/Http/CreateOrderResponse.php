@@ -32,16 +32,16 @@ class CreateOrderResponse
      */
     public function __construct(array $data)
     {
-        $this->preOrderId = isset($data['preOrderId']) ? sanitize_text_field((string)$data['preOrderId']) : null;
-        $this->orderId = isset($data['orderId']) ? sanitize_text_field((string)$data['orderId']) : null;
-        $this->validUntil = isset($data['validUntil']) ? sanitize_text_field((string)$data['validUntil']) : null;
-        $this->payCurrencyCode = isset($data['payCurrencyCode']) ? sanitize_text_field((string)$data['payCurrencyCode']) : null;
-        $this->payNetworkCode = isset($data['payNetworkCode']) ? sanitize_text_field((string)$data['payNetworkCode']) : null;
-        $this->receiveCurrencyCode = isset($data['receiveCurrencyCode']) ? sanitize_text_field((string)$data['receiveCurrencyCode']) : null;
-        $this->payAmount = isset($data['payAmount']) ? sanitize_text_field((string)$data['payAmount']) : null;
-        $this->receiveAmount = isset($data['receiveAmount']) ? sanitize_text_field((string)$data['receiveAmount']) : null;
-        $this->depositAddress = isset($data['depositAddress']) ? sanitize_text_field((string)$data['depositAddress']) : null;
-        $this->memo = isset($data['memo']) ? sanitize_text_field((string)$data['memo']) : null;
+        $this->preOrderId = isset($data['preOrderId']) ? Utils::sanitize_text_field((string)$data['preOrderId']) : null;
+        $this->orderId = isset($data['orderId']) ? Utils::sanitize_text_field((string)$data['orderId']) : null;
+        $this->validUntil = isset($data['validUntil']) ? Utils::sanitize_text_field((string)$data['validUntil']) : null;
+        $this->payCurrencyCode = isset($data['payCurrencyCode']) ? Utils::sanitize_text_field((string)$data['payCurrencyCode']) : null;
+        $this->payNetworkCode = isset($data['payNetworkCode']) ? Utils::sanitize_text_field((string)$data['payNetworkCode']) : null;
+        $this->receiveCurrencyCode = isset($data['receiveCurrencyCode']) ? Utils::sanitize_text_field((string)$data['receiveCurrencyCode']) : null;
+        $this->payAmount = isset($data['payAmount']) ? Utils::sanitize_text_field((string)$data['payAmount']) : null;
+        $this->receiveAmount = isset($data['receiveAmount']) ? Utils::sanitize_text_field((string)$data['receiveAmount']) : null;
+        $this->depositAddress = isset($data['depositAddress']) ? Utils::sanitize_text_field((string)$data['depositAddress']) : null;
+        $this->memo = isset($data['memo']) ? Utils::sanitize_text_field((string)$data['memo']) : null;
         $this->redirectUrl = isset($data['redirectUrl']) ? Utils::sanitizeUrl($data['redirectUrl']) : null;
 
         $validation = $this->validate();

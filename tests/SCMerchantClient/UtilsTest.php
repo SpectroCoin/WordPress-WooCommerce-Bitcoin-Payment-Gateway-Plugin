@@ -206,5 +206,35 @@ class UtilsTest extends TestCase
             'Null input' => [null],
         ];
     }
-    
-}
+
+    // sanitize_text_field()
+
+    #[DataProvider('textFieldDataProvider')]
+    #[TestDox('sanitize_text_field() - Sanitizes text input')]
+    public function testSanitizeTextField($inputString, $expected): void {
+        $this->assertSame($expected, Utils::sanitize_text_field($inputString));
+    }
+
+    public static function textFieldDataProvider(): array{
+        return [
+            'Simple valid text' => ['Hello world from SpectroCoin!','Hello world from SpectroCoin!'],
+            'Invalid UTF-8 sequence' => ["\xC0\xAF",""],
+            'HTML <span> tag removal' => ['<span>testing html tags</span>','testing html tags'],
+            'HTML <a> tag removal' => ['<a>testing html tags</a>','testing html tags'],
+            'HTML <h2> tag removal' => ['<h2>testing html tags</h2>','testing html tags'],
+            'PHP tags removal' => ['<?php> testing html tags ?>',''],
+            'Conversion of a single less-than character' => ['I < 3 coding','I &lt; 3 coding'],
+            'Removal of line breaks' => ["Line1\nLine2",'Line1 Line2'],
+            'Removal of tab characters' => ["Hello\tWorld",'Hello World'],
+            'Removal of percent-encoded characters' => ['Hello%20World','HelloWorld'],
+            'Combination of multiple sanitizations' => ["<b>Hello</b> %20World!\nI < 3 coding ",'Hello World! I &lt; 3 coding'],
+            'Non-valid percent-encoded sequence remains' => ['Test%ZZing','Test%ZZing'],
+            'Removal of non-ASCII characters' => ['Café','Caf'],
+            'Input with only whitespace' => [' ',''],
+            'HTML comment removal' => ['Hello <!-- comment --> World','Hello World'],
+            'Multiple consecutive percent-encoded sequences' => ['100%20%30%20%40','100'],
+            'Partial percent-encoded sequence remains' => ['Test%2','Test%2'],
+            'Mixed-case percent-encoded sequence removal' => ['Data%2FTest','DataTest'],
+        ];
+    }
+}   

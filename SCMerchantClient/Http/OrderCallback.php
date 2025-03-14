@@ -39,20 +39,20 @@ class OrderCallback
      */
     public function __construct(array $data)
     {
-        $this->userId = isset($data['userId']) ? sanitize_text_field((string)$data['userId']) : null;
-        $this->merchantApiId = isset($data['merchantApiId']) ? sanitize_text_field((string)$data['merchantApiId']) : null;
-        $this->merchantId = isset($data['merchantId']) ? sanitize_text_field((string)$data['merchantId']) : null;
-        $this->apiId = isset($data['apiId']) ? sanitize_text_field((string)$data['apiId']) : null;
-        $this->orderId = isset($data['orderId']) ? sanitize_text_field((string)$data['orderId']) : null;
-        $this->payCurrency = isset($data['payCurrency']) ? sanitize_text_field((string)$data['payCurrency']) : null;
-        $this->payAmount = isset($data['payAmount']) ? sanitize_text_field((string)$data['payAmount']) : null; // Changed to string
-        $this->receiveCurrency = isset($data['receiveCurrency']) ? sanitize_text_field((string)$data['receiveCurrency']) : null;
-        $this->receiveAmount = isset($data['receiveAmount']) ? sanitize_text_field((string)$data['receiveAmount']) : null; // Changed to string
-        $this->receivedAmount = isset($data['receivedAmount']) ? sanitize_text_field((string)$data['receivedAmount']) : null; // Changed to string
-        $this->description = isset($data['description']) ? sanitize_text_field((string)$data['description']) : null;
-        $this->orderRequestId = isset($data['orderRequestId']) ? sanitize_text_field((string)$data['orderRequestId']) : null;
-        $this->status = isset($data['status']) ? sanitize_text_field((string)$data['status']) : null;
-        $this->sign = isset($data['sign']) ? sanitize_text_field((string)$data['sign']) : null;
+        $this->userId = isset($data['userId']) ? Utils::sanitize_text_field((string)$data['userId']) : null;
+        $this->merchantApiId = isset($data['merchantApiId']) ? Utils::sanitize_text_field((string)$data['merchantApiId']) : null;
+        $this->merchantId = isset($data['merchantId']) ? Utils::sanitize_text_field((string)$data['merchantId']) : null;
+        $this->apiId = isset($data['apiId']) ? Utils::sanitize_text_field((string)$data['apiId']) : null;
+        $this->orderId = isset($data['orderId']) ? Utils::sanitize_text_field((string)$data['orderId']) : null;
+        $this->payCurrency = isset($data['payCurrency']) ? Utils::sanitize_text_field((string)$data['payCurrency']) : null;
+        $this->payAmount = isset($data['payAmount']) ? Utils::sanitize_text_field((string)$data['payAmount']) : null; // Changed to string
+        $this->receiveCurrency = isset($data['receiveCurrency']) ? Utils::sanitize_text_field((string)$data['receiveCurrency']) : null;
+        $this->receiveAmount = isset($data['receiveAmount']) ? Utils::sanitize_text_field((string)$data['receiveAmount']) : null; // Changed to string
+        $this->receivedAmount = isset($data['receivedAmount']) ? Utils::sanitize_text_field((string)$data['receivedAmount']) : null; // Changed to string
+        $this->description = isset($data['description']) ? Utils::sanitize_text_field((string)$data['description']) : null;
+        $this->orderRequestId = isset($data['orderRequestId']) ? Utils::sanitize_text_field((string)$data['orderRequestId']) : null;
+        $this->status = isset($data['status']) ? Utils::sanitize_text_field((string)$data['status']) : null;
+        $this->sign = isset($data['sign']) ? Utils::sanitize_text_field((string)$data['sign']) : null;
 
         $validation_result = $this->validate();
         if (is_array($validation_result)) {

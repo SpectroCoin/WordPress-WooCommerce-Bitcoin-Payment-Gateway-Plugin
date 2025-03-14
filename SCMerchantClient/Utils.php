@@ -119,6 +119,28 @@ class Utils
         $random_str = substr(md5((string)rand(1, pow(2, 16))), 0, $length);
         return $random_str;
     }
+
+    /**
+     * 1. Checks for invalid UTF-8 characters.
+     * 2. Converts single less-than characters (<) to entities.
+     * 3. Strips all HTML and PHP tags.
+     * 4. Removes line breaks, tabs, and extra whitespace.
+     * 5. Strips percent-encoded characters.
+     * 6. Removes any remaining invalid UTF-8 characters.
+     *
+     * @param string $str The text to be sanitized.
+     * @return string The sanitized text.
+     */
+    public static function sanitize_text_field(string $str): string {
+        $str = mb_check_encoding($str, 'UTF-8') ? $str : '';
+        $str = preg_replace('/<(?=[^a-zA-Z\/\?\!\%])/u', '&lt;', $str);
+        $str = strip_tags($str);
+        $str = preg_replace('/[\r\n\t ]+/', ' ', $str);
+        $str = trim($str);
+        $str = preg_replace('/%[a-f0-9]{2}/i', '', $str);
+        $str = preg_replace('/[^\x20-\x7E]/', '', $str);
+        return $str;
+    }
     
 }
 ?>
