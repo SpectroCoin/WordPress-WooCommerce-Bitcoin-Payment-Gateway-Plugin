@@ -25,6 +25,7 @@
             <file>SCMerchantClient/Exception/ApiError.php</file>
             <file>SCMerchantClient/Exception/GenericError.php</file>
             <file>SCMerchantClient/Http/CreateOrderRequest.php</file>
+            <file>SCMerchantClient/Http/CreateOrderResponse.php</file>
         </include>
     </source>
 

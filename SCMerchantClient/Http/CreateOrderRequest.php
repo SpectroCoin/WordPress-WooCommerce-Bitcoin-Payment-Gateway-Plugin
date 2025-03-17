@@ -67,7 +67,6 @@ class CreateOrderRequest
             $errors[] = 'receiveCurrencyCode must be 3 characters long';
         }
 
-        // Validate URL fields with an extra check for a valid TLD
         $urlFields = [
             'callbackUrl' => $this->getCallbackUrl(),
             'successUrl'  => $this->getSuccessUrl(),
@@ -82,7 +81,6 @@ class CreateOrderRequest
                 if ($host === false || strpos($host, '.') === false) {
                     $errors[] = "invalid $fieldName";
                 } else {
-                    // Split the host to get the TLD and check its length
                     $hostParts = explode('.', $host);
                     $tld = array_pop($hostParts);
                     if (strlen($tld) < 2) {

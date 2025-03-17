@@ -72,23 +72,66 @@ class CreateOrderResponse
         if ($this->getReceiveAmount() === null || (float)$this->getReceiveAmount() <= 0) {
             $errors[] = 'receiveAmount is not a valid positive number';
         }
-        if (!filter_var($this->getRedirectUrl(), FILTER_VALIDATE_URL)) {
-            $errors[] = 'redirectUrl is not a valid URL';
+        if (empty($this->getRedirectUrl()) || !filter_var($this->getRedirectUrl(), FILTER_VALIDATE_URL)) {
+            $errors[] = "invalid redirectUrl";
+        } else {
+            $host = parse_url($this->getRedirectUrl(), PHP_URL_HOST);
+            if ($host === false || strpos($host, '.') === false) {
+                $errors[] = "invalid redirectUrl";
+            } else {
+                $hostParts = explode('.', $host);
+                $tld = array_pop($hostParts);
+                if (strlen($tld) < 2) {
+                    $errors[] = "invalid redirectUrl";
+                }
+            }
         }
 
         return empty($errors) ? true : $errors;
     }
 
-    public function getPreOrderId() { return $this->preOrderId; }
-    public function getOrderId() { return $this->orderId; }
-    public function getValidUntil() { return $this->validUntil; }
-    public function getPayCurrencyCode() { return $this->payCurrencyCode; }
-    public function getPayNetworkCode() { return $this->payNetworkCode; }
-    public function getReceiveCurrencyCode() { return $this->receiveCurrencyCode; }
-    public function getPayAmount() { return $this->payAmount; }
-    public function getReceiveAmount() { return $this->receiveAmount; }
-    public function getDepositAddress() { return $this->depositAddress; }
-    public function getMemo() { return $this->memo; }
-    public function getRedirectUrl() { return $this->redirectUrl; }
+    public function getPreOrderId()
+    {
+        return $this->preOrderId;
+    }
+    public function getOrderId()
+    {
+        return $this->orderId;
+    }
+    public function getValidUntil()
+    {
+        return $this->validUntil;
+    }
+    public function getPayCurrencyCode()
+    {
+        return $this->payCurrencyCode;
+    }
+    public function getPayNetworkCode()
+    {
+        return $this->payNetworkCode;
+    }
+    public function getReceiveCurrencyCode()
+    {
+        return $this->receiveCurrencyCode;
+    }
+    public function getPayAmount()
+    {
+        return $this->payAmount;
+    }
+    public function getReceiveAmount()
+    {
+        return $this->receiveAmount;
+    }
+    public function getDepositAddress()
+    {
+        return $this->depositAddress;
+    }
+    public function getMemo()
+    {
+        return $this->memo;
+    }
+    public function getRedirectUrl()
+    {
+        return $this->redirectUrl;
+    }
 }
-?>

@@ -154,67 +154,67 @@ class CreateOrderRequestTest extends TestCase
                 'failureUrl' => 'https://example.com/failure'
             ]],
             'Invalid callbackUrl with missing TLD' => [[
-                'orderId'             => 'ORD123',
-                'description'         => 'Test order',
-                'receiveAmount'       => '500.23',
+                'orderId' => 'ORD123',
+                'description' => 'Test order',
+                'receiveAmount' => '500.23',
                 'receiveCurrencyCode' => 'EUR',
-                'callbackUrl'         => 'http://example',
-                'successUrl'          => 'https://example.com/success',
-                'failureUrl'          => 'https://example.com/failure'
+                'callbackUrl' => 'http://example',
+                'successUrl' => 'https://example.com/success',
+                'failureUrl' => 'https://example.com/failure'
             ]],
             'Invalid callbackUrl with dot' => [[
-                'orderId'             => 'ORD123',
-                'description'         => 'Test order',
-                'receiveAmount'       => '500.23',
+                'orderId' => 'ORD123',
+                'description' => 'Test order',
+                'receiveAmount' => '500.23',
                 'receiveCurrencyCode' => 'EUR',
-                'callbackUrl'         => 'http://example.',
-                'successUrl'          => 'https://example.com/success',
-                'failureUrl'          => 'https://example.com/failure'
+                'callbackUrl' => 'http://example.',
+                'successUrl' => 'https://example.com/success',
+                'failureUrl' => 'https://example.com/failure'
             ]],
             'Invalid successUrl with double dot in domain' => [[
-                'orderId'             => 'ORD123',
-                'description'         => 'Test order',
-                'receiveAmount'       => '500.23',
+                'orderId' => 'ORD123',
+                'description' => 'Test order',
+                'receiveAmount' => '500.23',
                 'receiveCurrencyCode' => 'EUR',
-                'callbackUrl'         => 'https://example.com/callback',
-                'successUrl'          => 'https://example..com',
-                'failureUrl'          => 'https://example.com/failure'
+                'callbackUrl' => 'https://example.com/callback',
+                'successUrl' => 'https://example..com',
+                'failureUrl' => 'https://example.com/failure'
             ]],
             'Invalid failureUrl with invalid domain label' => [[
-                'orderId'             => 'ORD123',
-                'description'         => 'Test order',
-                'receiveAmount'       => '500.23',
+                'orderId' => 'ORD123',
+                'description' => 'Test order',
+                'receiveAmount' => '500.23',
                 'receiveCurrencyCode' => 'EUR',
-                'callbackUrl'         => 'https://example.com/callback',
-                'successUrl'          => 'https://example.com/success',
-                'failureUrl'          => 'https://-example.com'
+                'callbackUrl' => 'https://example.com/callback',
+                'successUrl' => 'https://example.com/success',
+                'failureUrl' => 'https://-example.com'
             ]],
             'Empty callbackUrl' => [[
-                'orderId'             => 'ORD123',
-                'description'         => 'Test order',
-                'receiveAmount'       => '500.23',
+                'orderId' => 'ORD123',
+                'description' => 'Test order',
+                'receiveAmount' => '500.23',
                 'receiveCurrencyCode' => 'EUR',
-                'callbackUrl'         => '',
-                'successUrl'          => 'https://example.com/success',
-                'failureUrl'          => 'https://example.com/failure'
+                'callbackUrl' => '',
+                'successUrl' => 'https://example.com/success',
+                'failureUrl' => 'https://example.com/failure'
             ]],
             'Empty successUrl' => [[
-                'orderId'             => 'ORD123',
-                'description'         => 'Test order',
-                'receiveAmount'       => '500.23',
+                'orderId' => 'ORD123',
+                'description' => 'Test order',
+                'receiveAmount' => '500.23',
                 'receiveCurrencyCode' => 'EUR',
-                'callbackUrl'         => 'https://example.com/callback',
-                'successUrl'          => '',
-                'failureUrl'          => 'https://example.com/failure'
+                'callbackUrl' => 'https://example.com/callback',
+                'successUrl' => '',
+                'failureUrl' => 'https://example.com/failure'
             ]],
             'Empty failureUrl' => [[
-                'orderId'             => 'ORD123',
-                'description'         => 'Test order',
-                'receiveAmount'       => '500.23',
+                'orderId' => 'ORD123',
+                'description' => 'Test order',
+                'receiveAmount' => '500.23',
                 'receiveCurrencyCode' => 'EUR',
-                'callbackUrl'         => 'https://example.com/callback',
-                'successUrl'          => 'https://example.com/success',
-                'failureUrl'          => ''
+                'callbackUrl' => 'https://example.com/callback',
+                'successUrl' => 'https://example.com/success',
+                'failureUrl' => ''
             ]],
         ];
     }
