@@ -28,8 +28,8 @@ class CreateOrderRequestTest extends TestCase
     #[TestDox('Test CreateOrderRequest initialization with valid data')]
     public function testCreateOrderRequestWithValidData(array $order_data, $expected): void
     {
-        $create_order_request = new CreateOrderRequest($order_data);
-        $this->assertSame($expected, $create_order_request->toArray());
+        $createOrderRequest = new CreateOrderRequest($order_data);
+        $this->assertSame($expected, $createOrderRequest->toArray());
     }
 
 

@@ -19,19 +19,19 @@ class CreateOrderResponseTest extends TestCase
     #[TestDox('Test CreateOrderResponse initialization with valid data')]
     public function testCreateOrderResponseWithValidData(array $order_data, $expected): void
     {
-        $create_order_response = new CreateOrderResponse($order_data);
+        $createOrderResponse = new CreateOrderResponse($order_data);
         $proccesed_order_response_array = [
-            'preOrderId' => $create_order_response->getPreOrderId(),
-            'orderId' => $create_order_response->getOrderId(),
-            'validUntil' => $create_order_response->getValidUntil(),
-            'payCurrencyCode' => $create_order_response->getPayCurrencyCode(),
-            'payNetworkCode' => $create_order_response->getPayNetworkCode(),
-            'receiveCurrencyCode' => $create_order_response->getreceiveCurrencyCode(),
-            'payAmount' => $create_order_response->getPayAmount(),
-            'receiveAmount' => $create_order_response->getReceiveAmount(),
-            'depositAddress' => $create_order_response->getDepositAddress(),
-            'memo' => $create_order_response->getMemo(),
-            'redirectUrl' => $create_order_response->getRedirectUrl(),
+            'preOrderId' => $createOrderResponse->getPreOrderId(),
+            'orderId' => $createOrderResponse->getOrderId(),
+            'validUntil' => $createOrderResponse->getValidUntil(),
+            'payCurrencyCode' => $createOrderResponse->getPayCurrencyCode(),
+            'payNetworkCode' => $createOrderResponse->getPayNetworkCode(),
+            'receiveCurrencyCode' => $createOrderResponse->getreceiveCurrencyCode(),
+            'payAmount' => $createOrderResponse->getPayAmount(),
+            'receiveAmount' => $createOrderResponse->getReceiveAmount(),
+            'depositAddress' => $createOrderResponse->getDepositAddress(),
+            'memo' => $createOrderResponse->getMemo(),
+            'redirectUrl' => $createOrderResponse->getRedirectUrl(),
         ];
         $this->assertSame($expected, $proccesed_order_response_array);
     }
