@@ -27,6 +27,7 @@
             <file>SCMerchantClient/Http/CreateOrderRequest.php</file>
             <file>SCMerchantClient/Http/CreateOrderResponse.php</file>
             <file>SCMerchantClient/Http/OrderCallback.php</file>
+            <file>SCMerchantClient/SCMerchantClient.php</file>
         </include>
     </source>
 
