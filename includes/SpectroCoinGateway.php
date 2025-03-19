@@ -11,6 +11,7 @@ use SpectroCoin\SCMerchantClient\Exception\ApiError;
 use SpectroCoin\SCMerchantClient\Exception\GenericError;
 use SpectroCoin\SCMerchantClient\Http\OrderCallback;
 use SpectroCoin\SCMerchantClient\Utils;
+use SpectroCoin\Includes\SpectroCoinAuthHandler;
 
 use WC_Payment_Gateway;
 use WC_Logger;
@@ -20,11 +21,11 @@ use Exception;
 use InvalidArgumentException;
 
 use GuzzleHttp\Exception\RequestException;
-
+// @codeCoverageIgnoreStart
 if (!defined('ABSPATH')) {
 	die('Access denied.');
 }
-
+// @codeCoverageIgnoreEnd
 if (!in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_option('active_plugins')))) {
 	return;
 }
@@ -49,6 +50,7 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 	protected string $order_status;
 	private array $all_order_statuses;
 	private WC_Logger $wc_logger;
+	private SpectroCoinAuthHandler $authHandler;
 
 	private static $renew_notice_displayed = false;
 
@@ -69,6 +71,8 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 		$this->client_secret = $this->get_option('client_secret');
 		$this->order_status = $this->get_option('order_status');
 		$this->all_order_statuses = wc_get_order_statuses();
+
+		$this->authHandler = new SpectroCoinAuthHandler();
 
 		add_action('woocommerce_update_options_payment_gateways_' . $this->id, array($this, 'process_admin_options'));
 		$this->initializeSCClient();
@@ -474,6 +478,8 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 			'successUrl' => $this->get_return_url($order),
 			'failureUrl' => $this->get_return_url($order)
 		];
+
+		// Reikia handlinti auth token gavima ir refreshinima prie kuriant orderi.
 
 		$response = $this->sc_merchant_client->createOrder($order_data);
 

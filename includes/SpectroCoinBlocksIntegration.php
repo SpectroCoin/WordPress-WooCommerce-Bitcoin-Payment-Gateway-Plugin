@@ -6,11 +6,11 @@ namespace SpectroCoin\Includes;
 
 use SpectroCoin\Includes\SpectroCoinGateway;
 use Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodType;
-
+// @codeCoverageIgnoreStart
 if (!defined('ABSPATH')) {
     die('Access denied.');
 }
-
+// @codeCoverageIgnoreEnd
 final class SpectroCoinBlocksIntegration extends AbstractPaymentMethodType {
     private SpectroCoinGateway $gateway;
     protected $name = 'spectrocoin';

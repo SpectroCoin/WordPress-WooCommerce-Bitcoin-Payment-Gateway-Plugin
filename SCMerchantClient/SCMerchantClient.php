@@ -46,9 +46,6 @@ class SCMerchantClient
         $this->project_id = $project_id;
         $this->client_id = $client_id;
         $this->client_secret = $client_secret;
-
-        $this->encryption_key = hash('sha256', AUTH_KEY . SECURE_AUTH_KEY . LOGGED_IN_KEY . NONCE_KEY);
-        $this->access_token_transient_key = "spectrocoin_transient_key";
         $this->http_client = new Client();
     }
 
@@ -132,26 +129,6 @@ class SCMerchantClient
      */
     public function getAccessTokenData()
     {
-        $current_time = time();
-        $encrypted_access_token_data = get_transient($this->access_token_transient_key);
-        if ($encrypted_access_token_data) {
-            $access_token_data = json_decode(Utils::DecryptAuthData($encrypted_access_token_data, $this->encryption_key), true);
-            if ($this->isTokenValid($access_token_data, $current_time)) {
-                return $access_token_data;
-            }
-        }
-        return $this->refreshAccessToken($current_time);
-    }
-
-    /**
-     * Refreshes the access token
-     * 
-     * @param int $current_time
-     * @return array|null
-     * @throws RequestException
-     */
-    public function refreshAccessToken(int $current_time)
-    {
         try {
             $response = $this->http_client->post(Config::AUTH_URL, [
                 'form_params' => [
@@ -166,18 +143,23 @@ class SCMerchantClient
                 return new ApiError('Invalid access token response');
             }
 
-            delete_transient($this->access_token_transient_key);
-
-            $access_token_data['expires_at'] = $current_time + $access_token_data['expires_in'];
-            $encrypted_access_token_data = Utils::EncryptAuthData(json_encode($access_token_data), $this->encryption_key);
-
-            set_transient($this->access_token_transient_key, $encrypted_access_token_data, $access_token_data['expires_in']);
-
             return $access_token_data;
 
         } catch (RequestException $e) {
             return new ApiError($e->getMessage(), $e->getCode());
         }
+    }
+
+    /**
+     * Refreshes the access token
+     * 
+     * @param int $current_time
+     * @return array|null
+     * @throws RequestException
+     */
+    public function refreshAccessToken(int $current_time)
+    {
+
     }
 
     /**
@@ -187,7 +169,7 @@ class SCMerchantClient
      * @param int $current_time
      * @return bool
      */
-    private function isTokenValid(array $access_token_data, int $current_time): bool
+    public function isTokenValid(array $access_token_data, int $current_time): bool
     {
         return isset($access_token_data['expires_at']) && $current_time < $access_token_data['expires_at'];
     }
