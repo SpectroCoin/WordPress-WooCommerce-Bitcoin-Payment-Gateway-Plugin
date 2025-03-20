@@ -2,7 +2,6 @@
 
 namespace SpectroCoin\Includes;
 
-use SpectroCoin\SCMerchantClient\Auth\AuthHandlerInterface;
 use SpectroCoin\SCMerchantClient\Utils;
 
 // @codeCoverageIgnoreStart
@@ -11,7 +10,7 @@ if (!defined('ABSPATH')) {
 }
 // @codeCoverageIgnoreEnd
 
-class SpectroCoinAuthHandler implements AuthHandlerInterface
+class SpectroCoinAuthHandler
 {
     private string $encryptionKey;
     private string $accessTokenTransientKey;
