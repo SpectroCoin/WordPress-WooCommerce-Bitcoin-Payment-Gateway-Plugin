@@ -30,8 +30,7 @@ class SCMerchantClient
     private string $project_id;
     private string $client_id;
     private string $client_secret;
-    private string $encryption_key;
-    private string $access_token_transient_key;
+    private string $access_token;
     protected Client $http_client;
 
     /**
@@ -55,14 +54,8 @@ class SCMerchantClient
      * @param array $order_data
      * @return CreateOrderResponse|ApiError|GenericError|null
      */
-    public function createOrder(array $order_data)
+    public function createOrder(array $order_data, array $access_token_data)
     {
-        $access_token_data = $this->getAccessTokenData();
-
-        if (!$access_token_data || $access_token_data instanceof ApiError) {
-            return $access_token_data;
-        }
-
         try {
             $create_order_request = new CreateOrderRequest($order_data);
         } catch (InvalidArgumentException $e) {
@@ -72,21 +65,10 @@ class SCMerchantClient
         $order_payload = $create_order_request->toArray();
         $order_payload['projectId'] = $this->project_id;
 
-        return $this->sendCreateOrderRequest(json_encode($order_payload));
-    }
-
-    /**
-     * Send create order request
-     * 
-     * @param string $order_payload
-     * @return CreateOrderResponse|ApiError|GenericError
-     */
-    private function sendCreateOrderRequest(string $order_payload)
-    {
         try {
             $response = $this->http_client->request('POST', Config::MERCHANT_API_URL . '/merchants/orders/create', [
                 RequestOptions::HEADERS => [
-                    'Authorization' => 'Bearer ' . $this->getAccessTokenData()['access_token'],
+                    'Authorization' => 'Bearer ' . $access_token_data['access_token'],
                     'Content-Type' => 'application/json'
                 ],
                 RequestOptions::BODY => $order_payload
@@ -127,7 +109,7 @@ class SCMerchantClient
      * 
      * @return array|null
      */
-    public function getAccessTokenData()
+    public function getAccessToken()
     {
         try {
             $response = $this->http_client->post(Config::AUTH_URL, [
@@ -150,17 +132,6 @@ class SCMerchantClient
         }
     }
 
-    /**
-     * Refreshes the access token
-     * 
-     * @param int $current_time
-     * @return array|null
-     * @throws RequestException
-     */
-    public function refreshAccessToken(int $current_time)
-    {
-
-    }
 
     /**
      * Checks if the current access token is valid

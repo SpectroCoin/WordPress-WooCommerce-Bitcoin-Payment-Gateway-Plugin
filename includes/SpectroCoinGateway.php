@@ -21,6 +21,8 @@ use Exception;
 use InvalidArgumentException;
 
 use GuzzleHttp\Exception\RequestException;
+use PhpParser\Node\Expr\Instanceof_;
+
 // @codeCoverageIgnoreStart
 if (!defined('ABSPATH')) {
 	die('Access denied.');
@@ -50,7 +52,7 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 	protected string $order_status;
 	private array $all_order_statuses;
 	private WC_Logger $wc_logger;
-	private SpectroCoinAuthHandler $authHandler;
+	private SpectroCoinAuthHandler $auth_handler;
 
 	private static $renew_notice_displayed = false;
 
@@ -72,7 +74,7 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 		$this->order_status = $this->get_option('order_status');
 		$this->all_order_statuses = wc_get_order_statuses();
 
-		$this->authHandler = new SpectroCoinAuthHandler();
+		$this->auth_handler = new SpectroCoinAuthHandler();
 
 		add_action('woocommerce_update_options_payment_gateways_' . $this->id, array($this, 'process_admin_options'));
 		$this->initializeSCClient();
@@ -460,6 +462,51 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 		);
 	}
 
+
+	/**
+	 * Retrieves or refreshes the access token.
+	 *
+	 * This method attempts to retrieve the saved access token and checks its validity.
+	 * If the token is valid, it returns the token. If the token is invalid or not present,
+	 * it requests a new token from the SpectroCoin merchant client, saves it, and returns the new token.
+	 *
+	 * @return array|string The access token array, or an empty string if the token could not be retrieved.
+	 */
+	public function getOrRefreshAccessToken() : mixed
+	{
+		$encryption_key = $this->auth_handler->getEncryptionKey();
+		$encrypted_access_token_data = $this->auth_handler->getSavedAuthToken();
+		$current_time = time();
+		$token_data = null;
+	
+		if ($encrypted_access_token_data) {
+			$decrypted_access_token_data = json_decode(
+				Utils::DecryptAuthData($encrypted_access_token_data, $encryption_key),
+				true
+			);
+			if ($this->sc_merchant_client->isTokenValid($decrypted_access_token_data, $current_time)) {
+				$token_data = $decrypted_access_token_data;
+			}
+		}
+	
+		if (!$token_data) {
+			$new_token = $this->sc_merchant_client->getAccessToken();
+			if ($new_token instanceof ApiError || $new_token instanceof GenericError) {
+				$this->wc_logger->log(
+					'error',
+					"SpectroCoin error: Failed to get access token. Response message: {$new_token->getMessage()}"
+				);
+				return '';
+			}
+			$token_data = $new_token;
+		}
+	
+		$this->auth_handler->saveAuthToken($token_data);
+		$saved_token_data = $this->auth_handler->getSavedAuthToken();
+		return $saved_token_data ?? '';
+	}
+
+	
 	/**
 	 * Process the payment and return the result.
 	 * @param  int $order_id
@@ -468,6 +515,16 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 	public function process_payment($order_id): array
 	{
 		$order = new WC_Order($order_id);
+		$access_token_data = $this->getOrRefreshAccessToken();
+		if ($access_token_data === '') {
+			$error_message = "SpectroCoin error: Failed to get access token";
+			$order->update_status('failed', __($error_message, 'spectrocoin-accepting-bitcoin'));
+			$this->wc_logger->log('error', $error_message);
+			return array(
+				'result' => 'failed',
+				'redirect' => ''
+			);
+		}
 
 		$order_data = [
 			'orderId' => $order->get_id() . "-" . Utils::generateRandomStr(6),
@@ -479,9 +536,7 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 			'failureUrl' => $this->get_return_url($order)
 		];
 
-		// Reikia handlinti auth token gavima ir refreshinima prie kuriant orderi.
-
-		$response = $this->sc_merchant_client->createOrder($order_data);
+		$response = $this->sc_merchant_client->createOrder($order_data, $access_token_data);
 
 		if ($response instanceof ApiError || $response instanceof GenericError) {
 			$error_message = "SpectroCoin error: Failed to create payment for order {$order_id}. Response message: {$response->getMessage()}";
