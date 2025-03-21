@@ -9,22 +9,6 @@ if (!defined('ABSPATH')) {
 class Utils
 {
     /**
-     * Get the plugin folder name.
-     *
-     * @return string The plugin folder name.
-     */
-    public static function getPluginFolderName(string $filePath = __FILE__): string
-    {
-        // Normalize Windows path separators to forward slashes.
-        $filePath = str_replace('\\', '/', $filePath);
-        $dir = dirname($filePath);
-        if ($dir === '/' || $dir === '.' || $dir === '') {
-            return pathinfo($filePath, PATHINFO_FILENAME);
-        }
-        return basename($dir);
-    }
-    
-    /**
      * Formats currency amount with '0.0#######' format.
      *
      * @param mixed $amount The amount to format.

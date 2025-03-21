@@ -217,7 +217,15 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 	 */
 	public function is_available(): bool
 	{
-		if (!function_exists('is_plugin_active') || !is_plugin_active(Utils::getPluginFolderName() . '/spectrocoin.php') || $this->enabled !== 'yes') {
+		if (!function_exists('is_plugin_active')) {
+			return false;
+		}
+
+		if (!is_plugin_active(explode("/", plugin_basename(__FILE__))[0] . '/spectrocoin.php')) {
+			return false;
+		}
+
+		if ($this->enabled !== 'yes') {
 			return false;
 		}
 
@@ -472,7 +480,7 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 	 *
 	 * @return array|string The access token array, or an empty string if the token could not be retrieved.
 	 */
-	public function getOrRefreshAccessToken() : mixed
+	public function getOrRefreshAccessToken() : array|string 
 	{
 		$encryption_key = $this->auth_handler->getEncryptionKey();
 		$encrypted_access_token_data = $this->auth_handler->getSavedAuthToken();
@@ -502,8 +510,7 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 		}
 	
 		$this->auth_handler->saveAuthToken($token_data);
-		$saved_token_data = $this->auth_handler->getSavedAuthToken();
-		return $saved_token_data ?? '';
+		return $token_data ?? '';
 	}
 
 	

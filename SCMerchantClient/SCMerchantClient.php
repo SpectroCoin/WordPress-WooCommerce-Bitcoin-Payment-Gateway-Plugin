@@ -71,7 +71,7 @@ class SCMerchantClient
                     'Authorization' => 'Bearer ' . $access_token_data['access_token'],
                     'Content-Type' => 'application/json'
                 ],
-                RequestOptions::BODY => $order_payload
+                RequestOptions::BODY => json_encode($order_payload)
             ]);
 
             $body = json_decode($response->getBody()->getContents(), true);

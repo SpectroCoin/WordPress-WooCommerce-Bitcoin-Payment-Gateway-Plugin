@@ -23,7 +23,6 @@ namespace SpectroCoin;
 
 use SpectroCoin\Includes\SpectroCoinGateway;
 use SpectroCoin\Includes\SpectroCoinBlocksIntegration;
-use SpectroCoin\SCMerchantClient\Config;
 use Automattic\WooCommerce\Blocks\Payments\PaymentMethodRegistry;
 use Automattic\WooCommerce\Utilities\FeaturesUtil;
 

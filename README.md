@@ -30,14 +30,14 @@ We strongly recommend downloading the plugin from [Wordpress](https://wordpress.
 
 We gently suggest trying out the plugin in a server environment, as it will not be capable of receiving callbacks from SpectroCoin if it will be hosted on localhost. To successfully create an order on localhost for testing purposes, <b>change these 3 lines in <em>CreateOrderRequest.php</em></b>:
 ```php
-$this->callbackUrl = isset($data['callbackUrl']) ? Utils::sanitizeUrl($data['callbackUrl']) : null;,
-$this->successUrl = isset($data['successUrl']) ? Utils::sanitizeUrl($data['successUrl']) : null;,
+$this->callbackUrl = isset($data['callbackUrl']) ? Utils::sanitizeUrl($data['callbackUrl']) : null;
+$this->successUrl = isset($data['successUrl']) ? Utils::sanitizeUrl($data['successUrl']) : null;
 $this->failureUrl = isset($data['failureUrl']) ? Utils::sanitizeUrl($data['failureUrl']) : null;
 ```
 __To__
 ```php
-$this->callbackUrl = "https://localhost.com/";,
-$this->successUrl = "https://localhost.com/";,
+$this->callbackUrl = "https://localhost.com/";
+$this->successUrl = "https://localhost.com/";
 $this->failureUrl = "https://localhost.com/";
 ```
 Don't forget to change it back when migrating website to public.

@@ -10,44 +10,7 @@ use SpectroCoin\SCMerchantClient\Utils;
 #[CoversClass(Utils::class)]
 class UtilsTest extends TestCase
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-    }
-
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-    }
-
-    // getPluginFolderName() 
-
-    #[DataProvider('getPluginFolderNameProvider')]
-    #[TestDox('getPluginFolderName() - for file path "{0}" returns "{1}"')]
-    public function testgetPluginFolderName(string $filePath, string $expected): void
-    {
-        $this->assertSame($expected, Utils::getPluginFolderName($filePath));
-    }
-
-    public static function getPluginFolderNameProvider(): array
-    {
-        return [
-            'Standard Unix path' =>
-                ['/var/www/wp-content/plugins/SCMerchantClient/Utils.php', 'SCMerchantClient'],
-
-            'Windows path' =>
-                ['C:\\wp-content\\plugins\\SCMerchantClient\\Utils.php', 'SCMerchantClient'],
-
-            'Current directory' =>
-                ['./SCMerchantClient.php', 'SCMerchantClient'],
-
-            'Empty directory' =>
-                ['SCMerchantClient.php', 'SCMerchantClient'],
-        ];
-    }
-
-
-    // formatCurrency() 
+     // formatCurrency() 
     
     #[DataProvider('ValidformatCurrencyProvider')]
     #[TestDox('formatCurrency() - Test currency formatting with valid input')]

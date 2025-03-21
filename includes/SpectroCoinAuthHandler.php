@@ -32,8 +32,10 @@ class SpectroCoinAuthHandler
 
     /**
      * Get saved auth token from Wordpress transient
+     * 
+     * @return string|bool Encrypted auth token or false if not found
      */
-    public function getSavedAuthToken(): string{
+    public function getSavedAuthToken(): string|bool{
         return get_transient($this->accessTokenTransientKey);
     }
 
