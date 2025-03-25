@@ -10,24 +10,18 @@
          displayDetailsOnPhpunitDeprecations="true"
          failOnPhpunitDeprecation="true"
          failOnRisky="true"
-         failOnWarning="true">
+         failOnWarning="true"
+         colors="true"
+         columns="max">
     <testsuites>
-        <testsuite name="default">
+        <testsuite name="merchant-client-unit">
             <directory>./tests</directory>
         </testsuite>
     </testsuites>
 
     <source ignoreIndirectDeprecations="true" restrictNotices="true" restrictWarnings="true">
         <include>
-            <file>SCMerchantClient/Utils.php</file>
-            <file>SCMerchantClient/Config.php</file>
-            <file>SCMerchantClient/Enum/OrderStatus.php</file>
-            <file>SCMerchantClient/Exception/ApiError.php</file>
-            <file>SCMerchantClient/Exception/GenericError.php</file>
-            <file>SCMerchantClient/Http/CreateOrderRequest.php</file>
-            <file>SCMerchantClient/Http/CreateOrderResponse.php</file>
-            <file>SCMerchantClient/Http/OrderCallback.php</file>
-            <file>SCMerchantClient/SCMerchantClient.php</file>
+            <directory suffix=".php">SCMerchantClient</directory>
         </include>
     </source>
 

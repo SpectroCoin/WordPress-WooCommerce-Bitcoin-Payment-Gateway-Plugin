@@ -1,6 +1,7 @@
 {
   "require": {
-    "guzzlehttp/guzzle": "^7.8"
+    "guzzlehttp/guzzle": "^7.8",
+    "dotenv-org/phpdotenv-vault": "^0.2.4"
   },
   "require-dev": {
     "php-stubs/woocommerce-stubs": "^8.9",
@@ -14,7 +15,7 @@
     }
   },
   "scripts": {
-    "test": "XDEBUG_MODE=coverage vendor/bin/phpunit --testdox --colors=always --coverage-text",
+    "test": "XDEBUG_MODE=coverage vendor/bin/phpunit --testdox --coverage-text",
     "test-html-report": "XDEBUG_MODE=coverage vendor/bin/phpunit --coverage-html coverage-report"
   }
 }

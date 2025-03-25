@@ -14,16 +14,6 @@ use SpectroCoin\SCMerchantClient\Utils;
 #[UsesClass(Utils::class)]
 class CreateOrderRequestTest extends TestCase
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-    }
-
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-    }
-
     #[DataProvider('validCreateOrderRequestProvider')]
     #[TestDox('Test CreateOrderRequest initialization with valid data')]
     public function testCreateOrderRequestWithValidData(array $order_data, $expected): void

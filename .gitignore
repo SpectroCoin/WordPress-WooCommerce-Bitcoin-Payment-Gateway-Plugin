@@ -4,3 +4,4 @@
 /.phpunit.cache
 /coverage-html
 /coverage-report
+.env

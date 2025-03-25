@@ -15,44 +15,55 @@ use GuzzleHttp\RequestOptions;
 
 use InvalidArgumentException;
 use Exception;
+use GuzzleHttp\Exception\ClientException;
 use RuntimeException;
 
 // @codeCoverageIgnoreStart
 if (!defined('ABSPATH')) {
     die('Access denied.');
 }
-// @codeCoverageIgnoreEnd
 
 require_once __DIR__ . '/../vendor/autoload.php';
-
+// @codeCoverageIgnoreEnd
 class SCMerchantClient
 {
     private string $project_id;
     private string $client_id;
     private string $client_secret;
-    private string $access_token;
+
     protected Client $http_client;
 
+
     /**
-     * Constructor
-     * 
-     * @param string $project_id
-     * @param string $client_id
-     * @param string $client_secret
+     * SCMerchantClient constructor.
+     *
+     * Initializes the merchant client with the necessary project identifier and client credentials.
+     *
+     * @param string $project_id    The unique identifier for the project.
+     * @param string $client_id     The client identifier used for authentication.
+     * @param string $client_secret The secret key associated with the client.
      */
     public function __construct(string $project_id, string $client_id, string $client_secret)
     {
         $this->project_id = $project_id;
         $this->client_id = $client_id;
         $this->client_secret = $client_secret;
+
         $this->http_client = new Client();
     }
 
     /**
-     * Create an order
+     * Creates a new order.
+     *
+     * This method builds an order payload using the provided order data and the project identifier,
+     * then sends a POST request to the merchant API to create the order. It handles JSON encoding,
+     * response decoding, and error handling. Depending on the outcome, it returns a CreateOrderResponse,
+     * an ApiError, or a GenericError.
+     *
+     * @param array $order_data         The data required for creating the order.
+     * @param array $access_token_data  The access token data (must include the 'access_token' key) used for authorization.
      * 
-     * @param array $order_data
-     * @return CreateOrderResponse|ApiError|GenericError|null
+     * @return CreateOrderResponse|ApiError|GenericError|null The response object containing order details or an error object if an error occurs.
      */
     public function createOrder(array $order_data, array $access_token_data)
     {
@@ -105,9 +116,14 @@ class SCMerchantClient
     }
 
     /**
-     * Retrieves the current access token data
-     * 
-     * @return array|null
+     * Retrieves the current access token data.
+     *
+     * This method performs a POST request to the authentication endpoint using the client credentials.
+     * It decodes the JSON response to extract the access token and expiration information. If the response
+     * is invalid or an error occurs, an ApiError is returned.
+     *
+     * @return array|ApiError|null An associative array containing the access token and expiration info if successful,
+     *                             or an ApiError object if the request fails.
      */
     public function getAccessToken()
     {
@@ -121,24 +137,27 @@ class SCMerchantClient
             ]);
 
             $access_token_data = json_decode((string) $response->getBody(), true);
+
             if (!isset($access_token_data['access_token'], $access_token_data['expires_in'])) {
                 return new ApiError('Invalid access token response');
             }
-
             return $access_token_data;
-
-        } catch (RequestException $e) {
+        }
+        catch (RequestException $e) {
             return new ApiError($e->getMessage(), $e->getCode());
         }
     }
 
-
     /**
-     * Checks if the current access token is valid
+     * Checks if the current access token is valid.
+     *
+     * This method determines whether the provided access token has expired by checking if an 'expires_at'
+     * timestamp exists and comparing it with the current time.
+     *
+     * @param array $access_token_data An associative array containing access token details, including 'expires_at'.
+     * @param int   $current_time      The current time as a Unix timestamp.
      * 
-     * @param array $access_token_data
-     * @param int $current_time
-     * @return bool
+     * @return bool True if the token is valid (i.e., the current time is less than the 'expires_at' timestamp), false otherwise.
      */
     public function isTokenValid(array $access_token_data, int $current_time): bool
     {
