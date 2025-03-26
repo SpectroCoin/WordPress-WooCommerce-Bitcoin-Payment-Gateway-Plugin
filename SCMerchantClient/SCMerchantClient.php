@@ -15,7 +15,7 @@ use GuzzleHttp\RequestOptions;
 
 use InvalidArgumentException;
 use Exception;
-use GuzzleHttp\Exception\ClientException;
+
 use RuntimeException;
 
 // @codeCoverageIgnoreStart
@@ -24,7 +24,7 @@ if (!defined('ABSPATH')) {
 }
 
 require_once __DIR__ . '/../vendor/autoload.php';
-// @codeCoverageIgnoreEnd
+
 class SCMerchantClient
 {
     private string $project_id;
