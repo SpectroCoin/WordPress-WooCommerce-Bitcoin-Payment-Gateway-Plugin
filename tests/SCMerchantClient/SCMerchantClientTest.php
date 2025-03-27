@@ -314,6 +314,23 @@ class SCMerchantClientTest extends TestCase
         $property->setValue($client, $httpClient);
     }
 
+    #[TestDox('Test createOrder() handles an InvalidArgumentException by returning a GenericError')]
+    public function testCreateOrderHandlesInvalidArgumentException(): void
+    {
+        $client = new SCMerchantClient('dummy_project', 'dummy_client', 'dummy_secret');
+        
+        $order_data = [];
+        $token_data = ['access_token' => 'dummy_token', 'expires_at' => time() + 100];
+
+        $response = $client->createOrder($order_data, $token_data);
+        $this->assertInstanceOf(
+            \SpectroCoin\SCMerchantClient\Exception\GenericError::class,
+            $response,
+            'Expected GenericError on InvalidArgumentException'
+        );
+        $this->assertStringContainsString("Invalid order creation payload", $response->getMessage());
+    }
+
     #[TestDox('Test createOrder() handles a RequestException by returning an ApiError')]
     public function testCreateOrderHandlesRequestException(): void
     {

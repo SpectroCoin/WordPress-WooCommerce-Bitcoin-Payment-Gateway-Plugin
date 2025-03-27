@@ -22,9 +22,8 @@ use RuntimeException;
 if (!defined('ABSPATH')) {
     die('Access denied.');
 }
-
 require_once __DIR__ . '/../vendor/autoload.php';
-
+// @codeCoverageIgnoreEnd
 class SCMerchantClient
 {
     private string $project_id;

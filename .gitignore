@@ -1,5 +1,5 @@
 .vscode/launch.json
-/vendor/
+/vendor
 .phpunit.result.cache
 /.phpunit.cache
 /coverage-html
