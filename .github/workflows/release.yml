@@ -87,6 +87,7 @@ jobs:
             ! -name 'README.txt' \
             ! -name 'README.md' \
             ! -name 'changelog.md' \
+            ! -name 'phpunit.xml' \
             ! -name '.gitignore' \
             ! -name 'tests' \
             -exec cp -r {} spectrocoin-accepting-bitcoin/ \;
