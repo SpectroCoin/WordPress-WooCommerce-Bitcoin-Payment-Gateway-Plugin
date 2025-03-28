@@ -9,12 +9,12 @@ Author URI:  https://spectrocoin.com
 Text Domain: spectrocoin-accepting-bitcoin
 Plugin URI:  https://github.com/SpectroCoin/WordPress-WooCommerce-Bitcoin-Payment-Gateway-Plugin
 Description: SpectroCoin Payments for WooCommerce is a Wordpress plugin that allows to accept cryptocurrencies at WooCommerce-powered online stores.
-Version:     2.0.0
+Version:     2.0.1
 Requires at least: 6.2
 Requires PHP: 7.4
-Tested up to: 6.7.1
+Tested up to: 6.7.2
 WC requires at least: 7.4
-WC tested up to: 9.6.1
+WC tested up to: 9.7.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 */
@@ -23,7 +23,6 @@ namespace SpectroCoin;
 
 use SpectroCoin\Includes\SpectroCoinGateway;
 use SpectroCoin\Includes\SpectroCoinBlocksIntegration;
-use SpectroCoin\SCMerchantClient\Config;
 use Automattic\WooCommerce\Blocks\Payments\PaymentMethodRegistry;
 use Automattic\WooCommerce\Utilities\FeaturesUtil;
 
@@ -51,7 +50,6 @@ function spectrocoinInitPlugin(): void
         }
     }
 }
-
 /**
  * Checks if the system requirements are met
  * @return bool True if system requirements are met, false if not
@@ -60,11 +58,12 @@ function isRequirementsMet(): bool
 {
     $requirements_met = true;
     $message = '';
-    if (version_compare(PHP_VERSION, Config::SPECTROCOIN_REQUIRED_PHP_VERSION, '<')) {
+
+    if (version_compare(PHP_VERSION, '8.0', '<')) {
         $requirements_met = false;
         $message .= sprintf(
             esc_html__('Spectrocoin plugin requires PHP version %s or greater.', 'spectrocoin-accepting-bitcoin'),
-            Config::SPECTROCOIN_REQUIRED_PHP_VERSION
+            '8.0'
         );
     }
 
@@ -72,11 +71,11 @@ function isRequirementsMet(): bool
         require_once ABSPATH . '/wp-admin/includes/plugin.php';
     }
 
-    if (version_compare($GLOBALS['wp_version'], Config::SPECTROCOIN_WP_VERSION, '<')) {
+    if (version_compare($GLOBALS['wp_version'], '6.0', '<')) {
         $requirements_met = false;
         $message .= sprintf(
             esc_html__('SpectroCoin plugin requires WordPress version %s or greater.', 'spectrocoin-accepting-bitcoin'),
-            Config::SPECTROCOIN_WP_VERSION
+            '6.0'
         );
     }
 

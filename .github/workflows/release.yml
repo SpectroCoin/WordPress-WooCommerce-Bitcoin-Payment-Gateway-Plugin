@@ -1,5 +1,8 @@
 name: Create tag and release
 
+permissions:
+  contents: write
+
 on:
   workflow_run:
     workflows: ["Launch release.yml after closed PR"]
@@ -33,8 +36,8 @@ jobs:
           # Fetch the latest merged PR title and body using GitHub CLI
           PR_TITLE=$(gh pr list --state merged --limit 1 --json title --jq '.[0].title')
           PR_BODY=$(gh pr list --state merged --limit 1 --json body --jq '.[0].body')
-          TAG_NAME=$(echo "$PR_TITLE" | sed 's/ /_/g') # Replace spaces with underscores in the tag name for consistency
-
+          TAG_NAME=$(echo "$PR_TITLE" | sed 's/ /_/g') # Replace spaces with underscores
+          
           # Check if the tag already exists
           if git rev-parse "$TAG_NAME" >/dev/null 2>&1; then
             echo "Tag '$TAG_NAME' already exists. Exiting workflow."
@@ -46,35 +49,53 @@ jobs:
             echo "PR_BODY: $PR_BODY"
             echo "TAG_NAME: $TAG_NAME"
 
-            # Create the tag
+            # Create the tag and push it
             git tag "$TAG_NAME"
             git push origin "$TAG_NAME"
 
-            # Create a release using GitHub CLI with the tag name and PR body
+            # Create a release using GitHub CLI with the tag name and PR details
             RELEASE_OUTPUT=$(gh release create "$TAG_NAME" --title "$PR_TITLE" --notes "$PR_BODY")
-
-            # Extract the release URL and upload URL
             RELEASE_URL=$(echo "$RELEASE_OUTPUT" | grep -oP 'https://github.com/[^ ]+/releases/tag/[^ ]+')
             echo "Release URL: $RELEASE_URL"
-
             UPLOAD_URL=$(gh release view "$TAG_NAME" --json uploadUrl --jq '.uploadUrl')
             echo "UPLOAD_URL: $UPLOAD_URL"
-
-            # Store the upload URL in an environment variable for the next step
             echo "UPLOAD_URL=$UPLOAD_URL" >> $GITHUB_ENV
           fi
 
-      - name: Create spectrocoin.zip
-        if: env.TAG_EXISTS == 'false'
+      - name: Install PHP dependencies
+        run: composer install --prefer-dist
+
+      - name: Generate .env file in tests directory from GitHub secrets
         run: |
-          mkdir spectrocoin-accepting-bitcoin  # Create the folder inside the working directory
-          # Copy only the necessary files and exclude the folder and unwanted files
-          find . -maxdepth 1 ! -name 'spectrocoin-accepting-bitcoin' ! -name '.' ! -name '.git' ! -name '.github' ! -name 'README.txt' ! -name 'README.md' ! -name 'changelog.md' ! -name '.gitignore' -exec cp -r {} spectrocoin-accepting-bitcoin/ \;
-          zip -r spectrocoin.zip spectrocoin-accepting-bitcoin  # Zip the folder
+          echo "PROJECT_ID=${{ secrets.PROJECT_ID }}" > tests/.env
+          echo "CLIENT_ID=${{ secrets.CLIENT_ID }}" >> tests/.env
+          echo "CLIENT_SECRET=${{ secrets.CLIENT_SECRET }}" >> tests/.env
+
+      - name: Run unit tests
+        run: XDEBUG_MODE=coverage vendor/bin/phpunit --testdox --coverage-text
+
+      - name: Create spectrocoin.zip (excluding tests directory and phpunit.xml)
+        if: ${{ env.TAG_EXISTS == 'false' }}
+        run: |
+          mkdir spectrocoin-accepting-bitcoin  # Create folder for release package
+          # Copy only necessary files, excluding unwanted ones
+          find . -maxdepth 1 \
+            -not -path './spectrocoin-accepting-bitcoin' \
+            -not -path '.' \
+            -not -path './.git' \
+            -not -path './.github' \
+            -not -path './README.txt' \
+            -not -path './README.md' \
+            -not -path './changelog.md' \
+            -not -path './phpunit.xml' \
+            -not -path './.gitignore' \
+            -not -path './tests' \
+            -exec cp -r {} spectrocoin-accepting-bitcoin/ \;
+          zip -r spectrocoin.zip spectrocoin-accepting-bitcoin  # Create zip file
         shell: bash
 
       - name: Upload spectrocoin.zip as release asset
-        if: env.TAG_EXISTS == 'false'
+        if: ${{ env.TAG_EXISTS == 'false' }}
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

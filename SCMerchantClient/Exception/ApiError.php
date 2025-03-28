@@ -1,11 +1,11 @@
 <?php
 
 namespace SpectroCoin\SCMerchantClient\Exception;
-
+// @codeCoverageIgnoreStart
 if (!defined('ABSPATH')) {
 	die('Access denied.');
 }
-
+// @codeCoverageIgnoreEnd
 class ApiError extends GenericError
 {
     /**
