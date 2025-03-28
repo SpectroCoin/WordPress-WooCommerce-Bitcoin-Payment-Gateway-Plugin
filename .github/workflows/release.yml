@@ -74,24 +74,24 @@ jobs:
       - name: Run unit tests
         run: XDEBUG_MODE=coverage vendor/bin/phpunit --testdox --coverage-text
 
-      - name: Create spectrocoin.zip (excluding tests directory)
+      - name: Create spectrocoin.zip (excluding tests directory and phpunit.xml)
         if: ${{ env.TAG_EXISTS == 'false' }}
         run: |
-          mkdir spectrocoin-accepting-bitcoin  # Create the folder inside the working directory
-          # Copy only the necessary files, excluding unwanted directories/files (including tests)
+          mkdir spectrocoin-accepting-bitcoin  # Create folder for release package
+          # Copy only necessary files, excluding unwanted ones
           find . -maxdepth 1 \
-            ! -name 'spectrocoin-accepting-bitcoin' \
-            ! -name '.' \
-            ! -name '.git' \
-            ! -name '.github' \
-            ! -name 'README.txt' \
-            ! -name 'README.md' \
-            ! -name 'changelog.md' \
-            ! -name 'phpunit.xml' \
-            ! -name '.gitignore' \
-            ! -name 'tests' \
+            -not -path './spectrocoin-accepting-bitcoin' \
+            -not -path '.' \
+            -not -path './.git' \
+            -not -path './.github' \
+            -not -path './README.txt' \
+            -not -path './README.md' \
+            -not -path './changelog.md' \
+            -not -path './phpunit.xml' \
+            -not -path './.gitignore' \
+            -not -path './tests' \
             -exec cp -r {} spectrocoin-accepting-bitcoin/ \;
-          zip -r spectrocoin.zip spectrocoin-accepting-bitcoin  # Zip the folder
+          zip -r spectrocoin.zip spectrocoin-accepting-bitcoin  # Create zip file
         shell: bash
 
       - name: Upload spectrocoin.zip as release asset
