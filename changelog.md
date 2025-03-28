@@ -4,6 +4,10 @@
 
 _Added_ Minor code improvements to the main SCMerchantClient
 
+_Added_ PHPUnit tests with 100% coverage of only SCMerchantClient directory files
+
+_Tested_ Compatibility with latest WooCommerce(9.6.2) and Wordpress(6.7.2) versions.
+
 ### 2.0.0 (11/02/2025)
 
 This major update introduces several improvements, including enhanced security, updated coding standards, and a streamlined integration process. **Important:** Users must generate new API credentials (Client ID and Client Secret) in their SpectroCoin account settings to continue using the plugin. The previous private key and merchant ID functionality have been deprecated.
