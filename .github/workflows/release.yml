@@ -69,9 +69,9 @@ jobs:
 
       - name: Generate .env file from GitHub secrets
         run: |
-          echo "PROJECT_ID=${{ secrets.PROJECT_ID }}" > .env
-          echo "CLIENT_ID=${{ secrets.CLIENT_ID }}" >> .env
-          echo "CLIENT_SECRET=${{ secrets.CLIENT_SECRET }}" >> .env
+          echo "PROJECT_ID=${{ secrets.PROJECT_ID }}" > tests/.env
+          echo "CLIENT_ID=${{ secrets.CLIENT_ID }}" >> tests/.env
+          echo "CLIENT_SECRET=${{ secrets.CLIENT_SECRET }}" >> tests/.env
 
       - name: Create spectrocoin.zip
         if: env.TAG_EXISTS == 'false'
