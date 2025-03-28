@@ -331,6 +331,41 @@ class SCMerchantClientTest extends TestCase
         $this->assertStringContainsString("Invalid order creation payload", $response->getMessage());
     }
 
+    #[TestDox('Test createOrder() handles an InvalidArgumentException in HTTP request by returning a GenericError')]
+public function testCreateOrderHandlesInvalidArgumentExceptionInHttpRequest(): void
+{
+    $client = new SCMerchantClient('dummy_project', 'dummy_client', 'dummy_secret');
+
+    $mockHttpClient = $this->createMock(\GuzzleHttp\Client::class);
+    $mockHttpClient->expects($this->once())
+        ->method('request')
+        ->will($this->throwException(new \InvalidArgumentException("Invalid argument in HTTP request", 123)));
+
+    $this->setHttpClient($client, $mockHttpClient);
+
+    $order_data = [
+        'orderId'             => 'order' . rand(1, 1000),
+        'description'         => 'Test order',
+        'receiveAmount'       => '1.00',
+        'receiveCurrencyCode' => 'EUR',
+        'callbackUrl'         => 'https://example.com/callback',
+        'successUrl'          => 'https://example.com/success',
+        'failureUrl'          => 'https://example.com/failure',
+    ];
+    $token_data = ['access_token' => 'dummy_token', 'expires_at' => time() + 100];
+
+    $response = $client->createOrder($order_data, $token_data);
+
+    $this->assertInstanceOf(
+        \SpectroCoin\SCMerchantClient\Exception\GenericError::class,
+        $response,
+        'Expected GenericError when an InvalidArgumentException is thrown during the HTTP request'
+    );
+    $this->assertStringContainsString("Invalid argument in HTTP request", $response->getMessage());
+    $this->assertSame(123, $response->getCode());
+}
+
+
     #[TestDox('Test createOrder() handles a RequestException by returning an ApiError')]
     public function testCreateOrderHandlesRequestException(): void
     {

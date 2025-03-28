@@ -64,6 +64,15 @@ jobs:
             echo "UPLOAD_URL=$UPLOAD_URL" >> $GITHUB_ENV
           fi
 
+      - name: Install PHP dependencies
+        run: composer install --no-dev --prefer-dist
+
+      - name: Generate .env file from GitHub secrets
+        run: |
+          echo "PROJECT_ID=${{ secrets.PROJECT_ID }}" > .env
+          echo "CLIENT_ID=${{ secrets.CLIENT_ID }}" >> .env
+          echo "CLIENT_SECRET=${{ secrets.CLIENT_SECRET }}" >> .env
+
       - name: Create spectrocoin.zip
         if: env.TAG_EXISTS == 'false'
         run: |
@@ -72,6 +81,9 @@ jobs:
           find . -maxdepth 1 ! -name 'spectrocoin-accepting-bitcoin' ! -name '.' ! -name '.git' ! -name '.github' ! -name 'README.txt' ! -name 'README.md' ! -name 'changelog.md' ! -name '.gitignore' -exec cp -r {} spectrocoin-accepting-bitcoin/ \;
           zip -r spectrocoin.zip spectrocoin-accepting-bitcoin  # Zip the folder
         shell: bash
+
+      - name: Run unit tests
+        run: XDEBUG_MODE=coverage vendor/bin/phpunit --testdox --coverage-text
 
       - name: Upload spectrocoin.zip as release asset
         if: env.TAG_EXISTS == 'false'
