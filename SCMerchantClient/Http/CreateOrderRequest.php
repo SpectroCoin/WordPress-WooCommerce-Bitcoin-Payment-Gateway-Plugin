@@ -6,11 +6,11 @@ namespace SpectroCoin\SCMerchantClient\Http;
 
 use SpectroCoin\SCMerchantClient\Utils;
 use InvalidArgumentException;
-
+// @codeCoverageIgnoreStart
 if (!defined('ABSPATH')) {
     die('Access denied.');
 }
-
+// @codeCoverageIgnoreEnd
 class CreateOrderRequest
 {
     private ?string $orderId;
@@ -28,11 +28,12 @@ class CreateOrderRequest
      *
      * @throws InvalidArgumentException
      */
-    public function __construct(array $data) {
-        $this->orderId = isset($data['orderId']) ? sanitize_text_field((string)$data['orderId']) : null;
-        $this->description = isset($data['description']) ? sanitize_text_field((string)$data['description']) : null;
-        $this->receiveAmount = isset($data['receiveAmount']) ? sanitize_text_field((string)$data['receiveAmount']) : null;
-        $this->receiveCurrencyCode = isset($data['receiveCurrencyCode']) ? sanitize_text_field((string)$data['receiveCurrencyCode']) : null;
+    public function __construct(array $data)
+    {
+        $this->orderId = isset($data['orderId']) ? Utils::sanitize_text_field((string)$data['orderId']) : null;
+        $this->description = isset($data['description']) ? Utils::sanitize_text_field((string)$data['description']) : null;
+        $this->receiveAmount = isset($data['receiveAmount']) ? Utils::sanitize_text_field((string)$data['receiveAmount']) : null;
+        $this->receiveCurrencyCode = isset($data['receiveCurrencyCode']) ? Utils::sanitize_text_field((string)$data['receiveCurrencyCode']) : null;
         $this->callbackUrl = isset($data['callbackUrl']) ? Utils::sanitizeUrl($data['callbackUrl']) : null;
         $this->successUrl = isset($data['successUrl']) ? Utils::sanitizeUrl($data['successUrl']) : null;
         $this->failureUrl = isset($data['failureUrl']) ? Utils::sanitizeUrl($data['failureUrl']) : null;
@@ -65,14 +66,28 @@ class CreateOrderRequest
         if (empty($this->getReceiveCurrencyCode()) || strlen($this->getReceiveCurrencyCode()) !== 3) {
             $errors[] = 'receiveCurrencyCode must be 3 characters long';
         }
-        if (empty($this->getCallbackUrl()) || !filter_var($this->getCallbackUrl(), FILTER_VALIDATE_URL)) {
-            $errors[] = 'invalid callbackUrl';
-        }
-        if (empty($this->getSuccessUrl()) || !filter_var($this->getSuccessUrl(), FILTER_VALIDATE_URL)) {
-            $errors[] = 'invalid successUrl';
-        }
-        if (empty($this->getFailureUrl()) || !filter_var($this->getFailureUrl(), FILTER_VALIDATE_URL)) {
-            $errors[] = 'invalid failureUrl';
+
+        $urlFields = [
+            'callbackUrl' => $this->getCallbackUrl(),
+            'successUrl'  => $this->getSuccessUrl(),
+            'failureUrl'  => $this->getFailureUrl(),
+        ];
+
+        foreach ($urlFields as $fieldName => $url) {
+            if (empty($url) || !filter_var($url, FILTER_VALIDATE_URL)) {
+                $errors[] = "invalid $fieldName";
+            } else {
+                $host = parse_url($url, PHP_URL_HOST);
+                if ($host === false || strpos($host, '.') === false) {
+                    $errors[] = "invalid $fieldName";
+                } else {
+                    $hostParts = explode('.', $host);
+                    $tld = array_pop($hostParts);
+                    if (strlen($tld) < 2) {
+                        $errors[] = "invalid $fieldName";
+                    }
+                }
+            }
         }
 
         return empty($errors) ? true : $errors;
@@ -83,7 +98,8 @@ class CreateOrderRequest
      *
      * @return array
      */
-    public function toArray(): array {
+    public function toArray(): array
+    {
         return [
             'orderId' => $this->getOrderId(),
             'description' => $this->getDescription(),
@@ -95,21 +111,32 @@ class CreateOrderRequest
         ];
     }
 
-    /**
-     * Convert CreateOrderRequest array to JSON.
-     *
-     * @return string|false
-     */
-    public function toJson(): string|false {
-        return json_encode($this->toArray());
+    public function getOrderId()
+    {
+        return $this->orderId;
     }
-
-    public function getOrderId() { return $this->orderId; }
-    public function getDescription() { return $this->description; }
-    public function getReceiveAmount() { return Utils::formatCurrency((float)$this->receiveAmount); }
-    public function getReceiveCurrencyCode() { return $this->receiveCurrencyCode; }
-    public function getCallbackUrl() { return $this->callbackUrl; }
-    public function getSuccessUrl() { return $this->successUrl; }
-    public function getFailureUrl() { return $this->failureUrl; }
+    public function getDescription()
+    {
+        return $this->description;
+    }
+    public function getReceiveAmount()
+    {
+        return Utils::formatCurrency((float)$this->receiveAmount);
+    }
+    public function getReceiveCurrencyCode()
+    {
+        return $this->receiveCurrencyCode;
+    }
+    public function getCallbackUrl()
+    {
+        return $this->callbackUrl;
+    }
+    public function getSuccessUrl()
+    {
+        return $this->successUrl;
+    }
+    public function getFailureUrl()
+    {
+        return $this->failureUrl;
+    }
 }
-?>

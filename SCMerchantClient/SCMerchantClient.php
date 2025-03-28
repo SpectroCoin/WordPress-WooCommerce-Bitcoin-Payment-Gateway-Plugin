@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace SpectroCoin\SCMerchantClient;
 
@@ -17,29 +15,32 @@ use GuzzleHttp\RequestOptions;
 
 use InvalidArgumentException;
 use Exception;
+
 use RuntimeException;
 
+// @codeCoverageIgnoreStart
 if (!defined('ABSPATH')) {
     die('Access denied.');
 }
-
 require_once __DIR__ . '/../vendor/autoload.php';
-
+// @codeCoverageIgnoreEnd
 class SCMerchantClient
 {
     private string $project_id;
     private string $client_id;
     private string $client_secret;
-    private string $encryption_key;
-    private string $access_token_transient_key;
+
     protected Client $http_client;
 
+
     /**
-     * Constructor
-     * 
-     * @param string $project_id
-     * @param string $client_id
-     * @param string $client_secret
+     * SCMerchantClient constructor.
+     *
+     * Initializes the merchant client with the necessary project identifier and client credentials.
+     *
+     * @param string $project_id    The unique identifier for the project.
+     * @param string $client_id     The client identifier used for authentication.
+     * @param string $client_secret The secret key associated with the client.
      */
     public function __construct(string $project_id, string $client_id, string $client_secret)
     {
@@ -47,25 +48,24 @@ class SCMerchantClient
         $this->client_id = $client_id;
         $this->client_secret = $client_secret;
 
-        $this->encryption_key = hash('sha256', AUTH_KEY . SECURE_AUTH_KEY . LOGGED_IN_KEY . NONCE_KEY);
-        $this->access_token_transient_key = "spectrocoin_transient_key";
         $this->http_client = new Client();
     }
 
     /**
-     * Create an order
+     * Creates a new order.
+     *
+     * This method builds an order payload using the provided order data and the project identifier,
+     * then sends a POST request to the merchant API to create the order. It handles JSON encoding,
+     * response decoding, and error handling. Depending on the outcome, it returns a CreateOrderResponse,
+     * an ApiError, or a GenericError.
+     *
+     * @param array $order_data         The data required for creating the order.
+     * @param array $access_token_data  The access token data (must include the 'access_token' key) used for authorization.
      * 
-     * @param array $order_data
-     * @return CreateOrderResponse|ApiError|GenericError|null
+     * @return CreateOrderResponse|ApiError|GenericError|null The response object containing order details or an error object if an error occurs.
      */
-    public function createOrder(array $order_data)
+    public function createOrder(array $order_data, array $access_token_data)
     {
-        $access_token_data = $this->getAccessTokenData();
-
-        if (!$access_token_data || $access_token_data instanceof ApiError) {
-            return $access_token_data;
-        }
-
         try {
             $create_order_request = new CreateOrderRequest($order_data);
         } catch (InvalidArgumentException $e) {
@@ -75,24 +75,13 @@ class SCMerchantClient
         $order_payload = $create_order_request->toArray();
         $order_payload['projectId'] = $this->project_id;
 
-        return $this->sendCreateOrderRequest(json_encode($order_payload));
-    }
-
-    /**
-     * Send create order request
-     * 
-     * @param string $order_payload
-     * @return CreateOrderResponse|ApiError|GenericError
-     */
-    private function sendCreateOrderRequest(string $order_payload)
-    {
         try {
             $response = $this->http_client->request('POST', Config::MERCHANT_API_URL . '/merchants/orders/create', [
                 RequestOptions::HEADERS => [
-                    'Authorization' => 'Bearer ' . $this->getAccessTokenData()['access_token'],
+                    'Authorization' => 'Bearer ' . $access_token_data['access_token'],
                     'Content-Type' => 'application/json'
                 ],
-                RequestOptions::BODY => $order_payload
+                RequestOptions::BODY => json_encode($order_payload)
             ]);
 
             $body = json_decode($response->getBody()->getContents(), true);
@@ -126,31 +115,16 @@ class SCMerchantClient
     }
 
     /**
-     * Retrieves the current access token data
-     * 
-     * @return array|null
+     * Retrieves the current access token data.
+     *
+     * This method performs a POST request to the authentication endpoint using the client credentials.
+     * It decodes the JSON response to extract the access token and expiration information. If the response
+     * is invalid or an error occurs, an ApiError is returned.
+     *
+     * @return array|ApiError|null An associative array containing the access token and expiration info if successful,
+     *                             or an ApiError object if the request fails.
      */
-    public function getAccessTokenData()
-    {
-        $current_time = time();
-        $encrypted_access_token_data = get_transient($this->access_token_transient_key);
-        if ($encrypted_access_token_data) {
-            $access_token_data = json_decode(Utils::DecryptAuthData($encrypted_access_token_data, $this->encryption_key), true);
-            if ($this->isTokenValid($access_token_data, $current_time)) {
-                return $access_token_data;
-            }
-        }
-        return $this->refreshAccessToken($current_time);
-    }
-
-    /**
-     * Refreshes the access token
-     * 
-     * @param int $current_time
-     * @return array|null
-     * @throws RequestException
-     */
-    public function refreshAccessToken(int $current_time)
+    public function getAccessToken()
     {
         try {
             $response = $this->http_client->post(Config::AUTH_URL, [
@@ -162,32 +136,29 @@ class SCMerchantClient
             ]);
 
             $access_token_data = json_decode((string) $response->getBody(), true);
+
             if (!isset($access_token_data['access_token'], $access_token_data['expires_in'])) {
                 return new ApiError('Invalid access token response');
             }
-
-            delete_transient($this->access_token_transient_key);
-
-            $access_token_data['expires_at'] = $current_time + $access_token_data['expires_in'];
-            $encrypted_access_token_data = Utils::EncryptAuthData(json_encode($access_token_data), $this->encryption_key);
-
-            set_transient($this->access_token_transient_key, $encrypted_access_token_data, $access_token_data['expires_in']);
-
             return $access_token_data;
-
-        } catch (RequestException $e) {
+        }
+        catch (RequestException $e) {
             return new ApiError($e->getMessage(), $e->getCode());
         }
     }
 
     /**
-     * Checks if the current access token is valid
+     * Checks if the current access token is valid.
+     *
+     * This method determines whether the provided access token has expired by checking if an 'expires_at'
+     * timestamp exists and comparing it with the current time.
+     *
+     * @param array $access_token_data An associative array containing access token details, including 'expires_at'.
+     * @param int   $current_time      The current time as a Unix timestamp.
      * 
-     * @param array $access_token_data
-     * @param int $current_time
-     * @return bool
+     * @return bool True if the token is valid (i.e., the current time is less than the 'expires_at' timestamp), false otherwise.
      */
-    private function isTokenValid(array $access_token_data, int $current_time): bool
+    public function isTokenValid(array $access_token_data, int $current_time): bool
     {
         return isset($access_token_data['expires_at']) && $current_time < $access_token_data['expires_at'];
     }
