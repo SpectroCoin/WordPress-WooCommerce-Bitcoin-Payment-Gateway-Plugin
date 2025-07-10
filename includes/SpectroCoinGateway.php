@@ -572,11 +572,23 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 	{
 		try {
 			global $woocommerce;
-			$content_type = $_SERVER['CONTENT_TYPE'] ?? '';
-			if (str_contains($content_type, 'application/json')) {
+			if (stripos($_SERVER['CONTENT_TYPE'] ?? '', 'application/json') !== false) {
 				$order_callback = $this->initCallbackFromJson();
+				if (! $order_callback) {
+					throw new InvalidArgumentException('Invalid JSON callback payload');
+				}
+				$order_data = $this->sc_merchant_client->getOrderById($order_callback->getUuid(), $this->getOrRefreshAccessToken());
+
+				if (! is_array($order_data) || empty($order_data['orderId']) || empty($order_data['status'])) {
+					throw new InvalidArgumentException('Malformed order data from API');
+				}
+
+				$order_id = explode('-', ($order_data['orderId']))[0];
+				$status = $order_data['status'];
 			} else {
 				$order_callback = $this->initCallbackFromPost();
+				$order_id = explode('-', ($order_callback->getOrderId()))[0];
+				$status = $order_callback->getStatus();
 			}
 
 			if (!$order_callback) {
@@ -586,8 +598,6 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 				exit;
 			}
 
-			$order_id = explode('-', ($order_callback->getOrderId()))[0];
-			$status = $order_callback->getStatus();
 			$order = wc_get_order($order_id);
 			if ($order) {
 				switch ($status) {

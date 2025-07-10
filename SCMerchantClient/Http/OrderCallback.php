@@ -16,12 +16,12 @@ if (!defined('ABSPATH')) {
 
 class OrderCallback
 {
-    private ?string $id;
+    private ?string $uuid;
     private ?string $merchantApiId;
 
-    public function __construct(?string $id, ?string $merchantApiId)
+    public function __construct(?string $uuid, ?string $merchantApiId)
     {
-        $this->id = isset($id) ? Utils::sanitize_text_field((string)$id) : null;
+        $this->uuid = isset($uuid) ? Utils::sanitize_text_field((string)$uuid) : null;
         $this->merchantApiId = isset($merchantApiId) ? Utils::sanitize_text_field((string)$merchantApiId) : null;
 
         $validation_result = $this->validate();
@@ -41,8 +41,8 @@ class OrderCallback
     {
         $errors = [];
 
-        if (empty($this->getId())) {
-            $errors[] = 'Id is empty';
+        if (empty($this->getUuid())) {
+            $errors[] = 'Uuid is empty';
         }
 
         if (empty($this->getmerchantApiId())) {
@@ -52,9 +52,9 @@ class OrderCallback
         return empty($errors) ? true : $errors;
     }
 
-    public function getId()
+    public function getUuid()
     {
-        return $this->id;
+        return $this->uuid;
     }
     public function getmerchantApiId()
     {
