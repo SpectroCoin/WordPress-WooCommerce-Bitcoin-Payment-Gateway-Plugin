@@ -13,7 +13,7 @@ if (!defined('ABSPATH')) {
     die('Access denied.');
 }
 // @codeCoverageIgnoreEnd
-class OrderCallback
+class OldOrderCallback
 {
     private ?string $userId;
     private ?string $merchantApiId;

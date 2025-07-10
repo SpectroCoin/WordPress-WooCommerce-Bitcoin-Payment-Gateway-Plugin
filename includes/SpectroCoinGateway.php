@@ -9,7 +9,7 @@ use SpectroCoin\SCMerchantClient\Config;
 use SpectroCoin\SCMerchantClient\Enum\OrderStatus;
 use SpectroCoin\SCMerchantClient\Exception\ApiError;
 use SpectroCoin\SCMerchantClient\Exception\GenericError;
-use SpectroCoin\SCMerchantClient\Http\OrderCallback;
+use SpectroCoin\SCMerchantClient\Http\OldOrderCallback;
 use SpectroCoin\SCMerchantClient\Utils;
 use SpectroCoin\Includes\SpectroCoinAuthHandler;
 
@@ -632,9 +632,9 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 	/**
 	 * Initializes the callback data from POST request.
 	 * 
-	 * @return OrderCallback|null Returns an OrderCallback object if data is valid, null otherwise.
+	 * @return OldOrderCallback|null Returns an OldOrderCallback object if data is valid, null otherwise.
 	 */
-	private function initCallbackFromPost(): ?OrderCallback
+	private function initCallbackFromPost(): ?OldOrderCallback
 	{
 		$expected_keys = ['userId', 'merchantApiId', 'merchantId', 'apiId', 'orderId', 'payCurrency', 'payAmount', 'receiveCurrency', 'receiveAmount', 'receivedAmount', 'description', 'orderRequestId', 'status', 'sign'];
 
@@ -649,7 +649,7 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 			$this->wc_logger->log('error', "No data received in callback");
 			return null;
 		}
-		return new OrderCallback($callback_data);
+		return new OldOrderCallback($callback_data);
 	}
 
 	/**
