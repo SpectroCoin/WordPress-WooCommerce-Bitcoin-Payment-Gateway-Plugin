@@ -62,7 +62,7 @@ class OldOrderCallback
             throw new InvalidArgumentException($errorMessage);
         }
 
-        if (!$this->validatePayloadSignature()) { // IŠTESTUOJAMUMAS SUNKĖJA, REIKIA KEISTI
+        if (!$this->validatePayloadSignature()) {
             throw new Exception('Invalid payload signature.');
         }
     }
