@@ -4,10 +4,10 @@ Contributors: spectrocoin
 Donate link: https://spectrocoin.com/en/
 Tags: woocommerce bitcoin plugin, crypto payments, accept cryptocurrencies, bitcoin payment gateway, spectrocoin payment gateway
 Requires at least: 6.2
-Tested up to: 6.7.2
-Stable tag: 2.0.1
+Tested up to: 6.8.1
+Stable tag: 2.1.0
 WC requires at least: 7.4
-WC tested up to: 9.6.2
+WC tested up to: 9.9.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 

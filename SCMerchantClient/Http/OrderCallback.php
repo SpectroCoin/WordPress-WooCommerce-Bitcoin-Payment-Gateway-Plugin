@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace SpectroCoin\SCMerchantClient\Http;
 
 use SpectroCoin\SCMerchantClient\Utils;
-use SpectroCoin\SCMerchantClient\Config;
-use Exception;
 use InvalidArgumentException;
 // @codeCoverageIgnoreStart
 if (!defined('ABSPATH')) {
@@ -30,7 +28,6 @@ class OrderCallback
             throw new InvalidArgumentException($errorMessage);
         }
     }
-
 
     /**
      * Validate the input data.
