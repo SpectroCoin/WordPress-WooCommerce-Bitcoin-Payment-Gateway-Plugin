@@ -97,14 +97,6 @@ For troubleshooting, navigate to **WooCommerce** -> **Status** -> **Logs** and c
 2. Search for SpectroCoin plugin and click "Deactivate".
 3. Click "Delete".
 
-== Changelog ==
-
-### 2.0.0 (11/02/2025)
-- Major update with new OAuth authentication using Client ID and Client Secret.
-- Deprecated private key and merchant ID methods.
-- Improved API endpoints for performance and security.
-- Adherence to PSR-12 coding standards and enhanced plugin stability.
-
 == Contact ==
 
 For support, contact us via:  
