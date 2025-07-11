@@ -584,11 +584,11 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 				}
 
 				$order_id = explode('-', ($order_data['orderId']))[0];
-				$status = $order_data['status'];
+				$raw_status = $order_data['status'];
 			} else {
 				$order_callback = $this->initCallbackFromPost();
 				$order_id = explode('-', ($order_callback->getOrderId()))[0];
-				$status = $order_callback->getStatus();
+				$raw_status = $order_callback->getStatus();
 			}
 
 			if (!$order_callback) {
@@ -598,22 +598,24 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 				exit;
 			}
 
+			$status_enum = OrderStatus::normalize($raw_status);
+
 			$order = wc_get_order($order_id);
 			if ($order) {
-				switch ($status) {
-					case OrderStatus::New->value:
-					case OrderStatus::Pending->value:
+				switch ($status_enum) {
+					case OrderStatus::NEW:
+					case OrderStatus::PENDING:
 						$order->update_status('pending');
 						break;
-					case OrderStatus::Paid->value:
+					case OrderStatus::PAID->value:
 						$woocommerce->cart->empty_cart();
 						$order->payment_complete();
 						$order->update_status($this->order_status);
 						break;
-					case OrderStatus::Failed->value:
+					case OrderStatus::FAILED->value:
 						$order->update_status('failed');
 						break;
-					case OrderStatus::Expired->value:
+					case OrderStatus::EXPIRED->value:
 						$order->update_status('failed');
 						break;
 				}
