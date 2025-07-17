@@ -9,6 +9,7 @@ use SpectroCoin\SCMerchantClient\Config;
 use SpectroCoin\SCMerchantClient\Enum\OrderStatus;
 use SpectroCoin\SCMerchantClient\Exception\ApiError;
 use SpectroCoin\SCMerchantClient\Exception\GenericError;
+use SpectroCoin\SCMerchantClient\Http\OldOrderCallback;
 use SpectroCoin\SCMerchantClient\Http\OrderCallback;
 use SpectroCoin\SCMerchantClient\Utils;
 use SpectroCoin\Includes\SpectroCoinAuthHandler;
@@ -82,7 +83,7 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 		$this->wc_logger = new WC_Logger();
 		$this->form_fields = $this->generateFormFields();
 
-        add_action('admin_notices', array($this, 'renew_keys_notice')); // (REMOVE THIS WHEN UPDATE NOTICE IS NOT NEEDED)
+		add_action('admin_notices', array($this, 'renew_keys_notice')); // (REMOVE THIS WHEN UPDATE NOTICE IS NOT NEEDED)
 	}
 
 	/**
@@ -110,7 +111,6 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 			$this->client_secret,
 		);
 		add_action('woocommerce_api_' . $this->callback_name, array($this, 'callback'));
-
 	}
 
 	/**
@@ -287,7 +287,7 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 	 */
 	public function admin_options(): void
 	{
-		?>
+?>
 		<div class="header">
 			<div class="header-flex header-flex-1">
 				<?php
@@ -480,13 +480,13 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 	 *
 	 * @return array|string The access token array, or an empty string if the token could not be retrieved.
 	 */
-	public function getOrRefreshAccessToken() : array|string 
+	public function getOrRefreshAccessToken(): array|string
 	{
 		$encryption_key = $this->auth_handler->getEncryptionKey();
 		$encrypted_access_token_data = $this->auth_handler->getSavedAuthToken();
 		$current_time = time();
 		$token_data = null;
-	
+
 		if ($encrypted_access_token_data) {
 			$decrypted_access_token_data = json_decode(
 				Utils::DecryptAuthData($encrypted_access_token_data, $encryption_key),
@@ -496,7 +496,7 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 				$token_data = $decrypted_access_token_data;
 			}
 		}
-	
+
 		if (!$token_data) {
 			$new_token = $this->sc_merchant_client->getAccessToken();
 			if ($new_token instanceof ApiError || $new_token instanceof GenericError) {
@@ -508,12 +508,12 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 			}
 			$token_data = $new_token;
 		}
-	
+
 		$this->auth_handler->saveAuthToken($token_data);
 		return $token_data ?? '';
 	}
 
-	
+
 	/**
 	 * Process the payment and return the result.
 	 * @param  int $order_id
@@ -572,7 +572,24 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 	{
 		try {
 			global $woocommerce;
-			$order_callback = $this->initCallbackFromPost();
+			if (stripos($_SERVER['CONTENT_TYPE'] ?? '', 'application/json') !== false) {
+				$order_callback = $this->initCallbackFromJson();
+				if (! $order_callback) {
+					throw new InvalidArgumentException('Invalid JSON callback payload');
+				}
+				$order_data = $this->sc_merchant_client->getOrderById($order_callback->getUuid(), $this->getOrRefreshAccessToken());
+
+				if (! is_array($order_data) || empty($order_data['orderId']) || empty($order_data['status'])) {
+					throw new InvalidArgumentException('Malformed order data from API');
+				}
+
+				$order_id = explode('-', ($order_data['orderId']))[0];
+				$raw_status = $order_data['status'];
+			} else {
+				$order_callback = $this->initCallbackFromPost();
+				$order_id = explode('-', ($order_callback->getOrderId()))[0];
+				$raw_status = $order_callback->getStatus();
+			}
 
 			if (!$order_callback) {
 				$this->wc_logger->log('error', "Sent callback is invalid");
@@ -581,24 +598,24 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 				exit;
 			}
 
-			$order_id = explode('-', ($order_callback->getOrderId()))[0];
-			$status = $order_callback->getStatus();
+			$status_enum = OrderStatus::normalize($raw_status);
+
 			$order = wc_get_order($order_id);
 			if ($order) {
-				switch ($status) {
-					case OrderStatus::New ->value:
-					case OrderStatus::Pending->value:
+				switch ($status_enum) {
+					case OrderStatus::NEW:
+					case OrderStatus::PENDING:
 						$order->update_status('pending');
 						break;
-					case OrderStatus::Paid->value:
+					case OrderStatus::PAID:
 						$woocommerce->cart->empty_cart();
 						$order->payment_complete();
 						$order->update_status($this->order_status);
 						break;
-					case OrderStatus::Failed->value:
+					case OrderStatus::FAILED:
 						$order->update_status('failed');
 						break;
-					case OrderStatus::Expired->value:
+					case OrderStatus::EXPIRED:
 						$order->update_status('failed');
 						break;
 				}
@@ -630,11 +647,22 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 	}
 
 	/**
-	 * Initializes the callback data from POST request.
+	 * Initializes the callback data from POST (form-encoded) request.
 	 * 
-	 * @return OrderCallback|null Returns an OrderCallback object if data is valid, null otherwise.
+	 * Callback format processed by this method is URL-encoded form data.
+	 * Example: merchantId=1387551&apiId=105548&userId=…&sign=…
+	 * Content-Type: application/x-www-form-urlencoded
+	 * These callbacks are being sent by old merchant projects.
+	 *
+	 * Extracts the expected fields from `$_POST`, validates the signature,
+	 * and returns an `OldOrderCallback` instance wrapping that data.
+	 *
+	 * @deprecated since v2.1.0
+	 *
+	 * @return OldOrderCallback|null  An `OldOrderCallback` if the POST body
+	 *                                contained valid data; `null` otherwise.
 	 */
-	private function initCallbackFromPost(): ?OrderCallback
+	private function initCallbackFromPost(): ?OldOrderCallback
 	{
 		$expected_keys = ['userId', 'merchantApiId', 'merchantId', 'apiId', 'orderId', 'payCurrency', 'payAmount', 'receiveCurrency', 'receiveAmount', 'receivedAmount', 'description', 'orderRequestId', 'status', 'sign'];
 
@@ -649,8 +677,45 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 			$this->wc_logger->log('error', "No data received in callback");
 			return null;
 		}
-		return new OrderCallback($callback_data);
+		return new OldOrderCallback($callback_data);
 	}
+
+	/**
+	 * Initializes the callback data from JSON request body.
+	 *
+	 * Reads the raw HTTP request body, decodes it as JSON, and returns
+	 * an OrderCallback instance if the payload is valid.
+	 *
+	 * @return OrderCallback|null  An OrderCallback if the JSON payload
+	 *                             contained valid data; null if the body
+	 *                             was empty.
+	 *
+	 * @throws \JsonException           If the request body is not valid JSON.
+	 * @throws \InvalidArgumentException If required fields are missing
+	 *                                   or validation fails in OrderCallback.
+	 *
+	 */
+	private function initCallbackFromJson(): ?OrderCallback
+	{
+		$body = (string) \file_get_contents('php://input');
+		if ($body === '') {
+			$this->wc_logger->log('error', 'Empty JSON callback payload');
+			return null;
+		}
+
+		$data = \json_decode($body, true, 512, JSON_THROW_ON_ERROR);
+
+		if (!\is_array($data)) {
+			$this->wc_logger->log('error', 'JSON callback payload is not an object');
+			return null;
+		}
+
+		return new OrderCallback(
+			$data['id'] ?? null,
+			$data['merchantApiId'] ?? null
+		);
+	}
+
 
 	/**
 	 * Check if currency is accepted by SpectroCoin
@@ -686,60 +751,64 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 
 		if (!empty($processed_message) && !in_array($processed_message, $displayed_messages) && $current_page == "spectrocoin") {
 			array_push($displayed_messages, $processed_message);
-			?>
+		?>
 			<div class="notice notice-error">
-				<p><?php echo __("SpectroCoin Error: ", 'spectrocoin-accepting-bitcoin') . $processed_message; // Using $processed_message directly ?>
+				<p><?php echo __("SpectroCoin Error: ", 'spectrocoin-accepting-bitcoin') . $processed_message; // Using $processed_message directly 
+					?>
 				</p>
 			</div>
 			<script type="text/javascript">
-				document.addEventListener("DOMContentLoaded", function () {
+				document.addEventListener("DOMContentLoaded", function() {
 					var notices = document.querySelectorAll('.notice-error');
-					notices.forEach(function (notice) {
+					notices.forEach(function(notice) {
 						notice.style.display = 'block';
 					});
 				});
 			</script>
-			<?php
+		<?php
 		}
 	}
 
-   /**
-     * Show notice if client_id and client_secret are missing and notice has not been addressed.
+	/**
+	 * Show notice if client_id and client_secret are missing and notice has not been addressed.
 	 * (REMOVE THIS WHEN UPDATE NOTICE IS NOT NEEDED)
-     */
-    public function renew_keys_notice() {
-        // Check if the notice should be displayed
+	 */
+	public function renew_keys_notice()
+	{
+		// Check if the notice should be displayed
 		if (self::$renew_notice_displayed) {
-            return;
-        }
-		if (empty($this->project_id)){ // this prevents from displaying notice to new installations
 			return;
 		}
-        if (empty($this->client_id) || empty($this->client_secret)) {
-            self::$renew_notice_displayed = true; // prevent double notice display
-            ?>
-            <div class="notice notice-warning is-dismissible" data-notice="spectrocoin_credentials">
-                <p>
-                    <?php _e('Action Required: Your SpectroCoin plugin needs to be configured to function properly.', 'spectrocoin-accepting-bitcoin'); ?>
-                </p>
-                <p>
-                    <?php _e('The new SpectroCoin API requires you to provide a valid Client ID and Client Secret in the plugin settings. Without these credentials, the plugin will not be able to process payments.', 'spectrocoin-accepting-bitcoin'); ?>
-                </p>
-                <p>
-                    <a href="<?php echo esc_url(admin_url('admin.php?page=wc-settings&tab=checkout&section=spectrocoin')); ?>" class="button button-primary">
-                        <?php _e('Go to SpectroCoin Settings', 'spectrocoin-accepting-bitcoin'); ?>
-                    </a>
-                </p>
-                <p>
-                    <?php _e('Need help? Refer to the plugin documentation or contact SpectroCoin support for assistance.', 'spectrocoin-accepting-bitcoin'); ?>
-                </p>
-            </div>
-            <script type="text/javascript">
-                jQuery(document).on('click', '.notice[data-notice="spectrocoin_credentials"] .notice-dismiss', function () {
-                    jQuery.post(ajaxurl, { action: 'spectrocoin_dismiss_notice' });
-                });
-            </script>
-            <?php
-        }
+		if (empty($this->project_id)) { // this prevents from displaying notice to new installations
+			return;
+		}
+		if (empty($this->client_id) || empty($this->client_secret)) {
+			self::$renew_notice_displayed = true; // prevent double notice display
+		?>
+			<div class="notice notice-warning is-dismissible" data-notice="spectrocoin_credentials">
+				<p>
+					<?php _e('Action Required: Your SpectroCoin plugin needs to be configured to function properly.', 'spectrocoin-accepting-bitcoin'); ?>
+				</p>
+				<p>
+					<?php _e('The new SpectroCoin API requires you to provide a valid Client ID and Client Secret in the plugin settings. Without these credentials, the plugin will not be able to process payments.', 'spectrocoin-accepting-bitcoin'); ?>
+				</p>
+				<p>
+					<a href="<?php echo esc_url(admin_url('admin.php?page=wc-settings&tab=checkout&section=spectrocoin')); ?>" class="button button-primary">
+						<?php _e('Go to SpectroCoin Settings', 'spectrocoin-accepting-bitcoin'); ?>
+					</a>
+				</p>
+				<p>
+					<?php _e('Need help? Refer to the plugin documentation or contact SpectroCoin support for assistance.', 'spectrocoin-accepting-bitcoin'); ?>
+				</p>
+			</div>
+			<script type="text/javascript">
+				jQuery(document).on('click', '.notice[data-notice="spectrocoin_credentials"] .notice-dismiss', function() {
+					jQuery.post(ajaxurl, {
+						action: 'spectrocoin_dismiss_notice'
+					});
+				});
+			</script>
+<?php
+		}
 	}
 }

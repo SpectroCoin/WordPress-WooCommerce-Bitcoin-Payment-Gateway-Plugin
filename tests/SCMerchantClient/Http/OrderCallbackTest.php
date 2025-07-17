@@ -6,13 +6,13 @@ use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
-use SpectroCoin\SCMerchantClient\Http\OrderCallback;
+use SpectroCoin\SCMerchantClient\Http\OldOrderCallback;
 use SpectroCoin\SCMerchantClient\Utils;
 use SpectroCoin\SCMerchantClient\Config;
 
-#[CoversClass(OrderCallback::class)]
+#[CoversClass(OldOrderCallback::class)]
 #[UsesClass(Utils::class)]
-class OrderCallbackTest extends TestCase
+class OldOrderCallbackTest extends TestCase
 {
     private static string $testPrivateKey = <<<EOD
 -----BEGIN PRIVATE KEY-----
@@ -79,8 +79,8 @@ EOD;
         $payload = $this->getValidPayload();
         $payload['sign'] = $this->signPayload($payload);
 
-        $orderCallback = new OrderCallback($payload, self::$tempPublicKeyFile);
-        $this->assertInstanceOf(OrderCallback::class, $orderCallback);
+        $orderCallback = new OldOrderCallback($payload, self::$tempPublicKeyFile);
+        $this->assertInstanceOf(OldOrderCallback::class, $orderCallback);
 
         $this->assertEquals($payload['userId'], $orderCallback->getUserId());
         $this->assertEquals($payload['merchantApiId'], $orderCallback->getMerchantApiId());
@@ -144,7 +144,7 @@ EOD;
         $payload['sign'] = 'invalidsignature';
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('Invalid payload signature.');
-        new OrderCallback($payload, self::$tempPublicKeyFile);
+        new OldOrderCallback($payload, self::$tempPublicKeyFile);
     }
 
 
@@ -173,7 +173,7 @@ EOD;
     
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage($expectedError);
-        new OrderCallback($payload, self::$tempPublicKeyFile);
+        new OldOrderCallback($payload, self::$tempPublicKeyFile);
     }
     
     public static function invalidPayloadProvider(): array
@@ -275,7 +275,7 @@ EOD;
         $payload['sign'] = $this->signPayload($payload);
         $this->expectException(\InvalidArgumentException::class);
         try {
-            new OrderCallback($payload, self::$tempPublicKeyFile);
+            new OldOrderCallback($payload, self::$tempPublicKeyFile);
         } catch (\InvalidArgumentException $ex) {
             $message = $ex->getMessage();
             $this->assertStringContainsString('userId is empty', $message);

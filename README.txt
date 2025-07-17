@@ -4,10 +4,10 @@ Contributors: spectrocoin
 Donate link: https://spectrocoin.com/en/
 Tags: woocommerce bitcoin plugin, crypto payments, accept cryptocurrencies, bitcoin payment gateway, spectrocoin payment gateway
 Requires at least: 6.2
-Tested up to: 6.7.2
-Stable tag: 2.0.1
+Tested up to: 6.8.1
+Stable tag: 2.1.0
 WC requires at least: 7.4
-WC tested up to: 9.6.2
+WC tested up to: 9.9.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -96,14 +96,6 @@ For troubleshooting, navigate to **WooCommerce** -> **Status** -> **Logs** and c
 1. Navigate to WordPress dashboard -> Plugins -> Installed Plugins.
 2. Search for SpectroCoin plugin and click "Deactivate".
 3. Click "Delete".
-
-== Changelog ==
-
-### 2.0.0 (11/02/2025)
-- Major update with new OAuth authentication using Client ID and Client Secret.
-- Deprecated private key and merchant ID methods.
-- Improved API endpoints for performance and security.
-- Adherence to PSR-12 coding standards and enhanced plugin stability.
 
 == Contact ==
 

@@ -1,5 +1,9 @@
 ## Changelog
 
+### 2.1.0 (17/03/2025)
+
+_Added_ support for new JSON and old URL-encoded form data callbacks format. New callbacks will be automatically enabled with new SpectroCoin merchant projects created. With old projects, old callback format will be used. In the future versions old callback format will be removed.
+
 ### 2.0.1 (28/03/2025)
 
 _Added_ Minor code improvements to the main SCMerchantClient
