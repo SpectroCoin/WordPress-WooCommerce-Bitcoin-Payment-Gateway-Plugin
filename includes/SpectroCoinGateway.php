@@ -607,15 +607,15 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 					case OrderStatus::PENDING:
 						$order->update_status('pending');
 						break;
-					case OrderStatus::PAID->value:
+					case OrderStatus::PAID:
 						$woocommerce->cart->empty_cart();
 						$order->payment_complete();
 						$order->update_status($this->order_status);
 						break;
-					case OrderStatus::FAILED->value:
+					case OrderStatus::FAILED:
 						$order->update_status('failed');
 						break;
-					case OrderStatus::EXPIRED->value:
+					case OrderStatus::EXPIRED:
 						$order->update_status('failed');
 						break;
 				}
