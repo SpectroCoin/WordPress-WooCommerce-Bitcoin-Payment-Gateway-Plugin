@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace SpectroCoin\SCMerchantClient;
 
@@ -141,8 +143,7 @@ class SCMerchantClient
                 return new ApiError('Invalid access token response');
             }
             return $access_token_data;
-        }
-        catch (RequestException $e) {
+        } catch (RequestException $e) {
             return new ApiError($e->getMessage(), $e->getCode());
         }
     }
@@ -161,5 +162,38 @@ class SCMerchantClient
     public function isTokenValid(array $access_token_data, int $current_time): bool
     {
         return isset($access_token_data['expires_at']) && $current_time < $access_token_data['expires_at'];
+    }
+
+    /**
+     * Uses unique order's UUID and access token data to request GET /merchants/orders/{$id} and retrieve the data of the order in array format.
+     * @param string $order_id
+     * @param array $access_token_data
+     * 
+     * @return array|ApiError|GenericError The response array containing order details or an error object if an error occurs.
+     */
+    public function getOrderById(string $order_id, array $access_token_data)
+    {
+        try {
+            $response = $this->http_client->request(
+                'GET',
+                Config::MERCHANT_API_URL . '/merchants/orders/' . $order_id,
+                [
+                    RequestOptions::HEADERS => [
+                        'Authorization' => 'Bearer ' . $access_token_data['access_token'],
+                        'Content-Type'  => 'application/json',
+                    ],
+                ]
+            );
+
+            $order = json_decode($response->getBody()->getContents(), true);
+
+            return $order;
+        } catch (InvalidArgumentException $e) {
+            return new GenericError($e->getMessage(), $e->getCode());
+        } catch (RequestException $e) {
+            return new ApiError($e->getMessage(), $e->getCode());
+        } catch (Exception $e) {
+            return new GenericError($e->getMessage(), $e->getCode());
+        }
     }
 }
