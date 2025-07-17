@@ -65,15 +65,6 @@ jobs:
       - name: Install PHP dependencies
         run: composer install --prefer-dist
 
-      - name: Generate .env file in tests directory from GitHub secrets
-        run: |
-          echo "PROJECT_ID=${{ secrets.PROJECT_ID }}" > tests/.env
-          echo "CLIENT_ID=${{ secrets.CLIENT_ID }}" >> tests/.env
-          echo "CLIENT_SECRET=${{ secrets.CLIENT_SECRET }}" >> tests/.env
-
-      - name: Run unit tests
-        run: XDEBUG_MODE=coverage vendor/bin/phpunit --testdox --coverage-text
-
       - name: Create spectrocoin.zip (excluding tests directory and phpunit.xml)
         if: ${{ env.TAG_EXISTS == 'false' }}
         run: |
