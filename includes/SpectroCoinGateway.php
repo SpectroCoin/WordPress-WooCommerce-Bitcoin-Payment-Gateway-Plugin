@@ -570,6 +570,15 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 	 */
 	public function callback(): void
 	{
+		// The callback is a server-to-server webhook and must not be reachable
+		// with anything other than POST.
+		if (strtoupper($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
+			$this->wc_logger->log('error', 'Invalid callback request method');
+			http_response_code(405); // Method Not Allowed
+			echo esc_html__('Invalid request method', 'spectrocoin-accepting-bitcoin');
+			exit;
+		}
+
 		try {
 			global $woocommerce;
 			if (stripos($_SERVER['CONTENT_TYPE'] ?? '', 'application/json') !== false) {
@@ -585,10 +594,16 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 
 				$order_id = explode('-', ($order_data['orderId']))[0];
 				$raw_status = $order_data['status'];
+				// MerchantOrderDTO reports the settlement side as
+				// receiveAmount / receiveCurrencyCode.
+				$receive_amount = $order_data['receiveAmount'] ?? null;
+				$receive_currency = $order_data['receiveCurrencyCode'] ?? null;
 			} else {
 				$order_callback = $this->initCallbackFromPost();
 				$order_id = explode('-', ($order_callback->getOrderId()))[0];
 				$raw_status = $order_callback->getStatus();
+				$receive_amount = $order_callback->getReceiveAmount();
+				$receive_currency = $order_callback->getReceiveCurrency();
 			}
 
 			if (!$order_callback) {
@@ -602,6 +617,37 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 
 			$order = wc_get_order($order_id);
 			if ($order) {
+				// The order must actually have been placed through this gateway,
+				// so a callback for one order cannot settle an unrelated one.
+				if ($order->get_payment_method() !== $this->id) {
+					$this->wc_logger->log('error', "Order '{$order_id}' was not paid with this payment method");
+					http_response_code(400); // Bad Request
+					echo esc_html__('Order was not paid with this payment method', 'spectrocoin-accepting-bitcoin');
+					exit;
+				}
+
+				// The order was created with receiveAmount / receiveCurrencyCode
+				// taken straight from the order total, so they must still match.
+				// A missing field means an unexpected payload shape rather than a
+				// mismatch, so it is logged and the comparison is skipped.
+				if ($receive_currency === null || $receive_amount === null) {
+					$this->wc_logger->log('warning', "Callback for order '{$order_id}' carried no settlement amount to compare");
+				} else {
+					if (strtoupper((string) $receive_currency) !== strtoupper($order->get_currency())) {
+						$this->wc_logger->log('error', "Callback currency does not match order '{$order_id}'");
+						http_response_code(400); // Bad Request
+						echo esc_html__('Currency does not match the order', 'spectrocoin-accepting-bitcoin');
+						exit;
+					}
+					// Reported for now rather than rejected: it is not yet confirmed
+					// whether the settled amount is gross or net of fees, and
+					// rejecting a legitimate settlement would leave the order
+					// unpaid. Promote to a rejection once confirmed.
+					if ((float) $receive_amount + 0.00000001 < (float) $order->get_total()) {
+						$this->wc_logger->log('warning', "Callback amount {$receive_amount} does not cover order '{$order_id}' total " . $order->get_total());
+					}
+				}
+
 				switch ($status_enum) {
 					case OrderStatus::NEW:
 					case OrderStatus::PENDING:
