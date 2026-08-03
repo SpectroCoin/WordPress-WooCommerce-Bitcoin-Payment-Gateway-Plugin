@@ -63,7 +63,11 @@ jobs:
           fi
 
       - name: Install PHP dependencies
-        run: composer install --prefer-dist
+        # --no-dev: this install only feeds the release zip, which must not carry
+        # the test toolchain into merchant installs. Plugin directories are served
+        # over HTTP, so shipped dev packages are needless attack surface as well
+        # as roughly 10x the download size.
+        run: composer install --prefer-dist --no-dev --optimize-autoloader
 
       - name: Create spectrocoin.zip (excluding tests directory and phpunit.xml)
         if: ${{ env.TAG_EXISTS == 'false' }}
