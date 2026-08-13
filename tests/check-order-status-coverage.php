@@ -18,7 +18,7 @@
  * Standalone by design: this plugin ships no PHPUnit setup, and a WooCommerce
  * bootstrap is not needed to check a status table.
  *
- * Run:  php tests/OrderStatusCoverageTest.php
+ * Run:  php tests/check-order-status-coverage.php
  */
 
 define('ABSPATH', true);
