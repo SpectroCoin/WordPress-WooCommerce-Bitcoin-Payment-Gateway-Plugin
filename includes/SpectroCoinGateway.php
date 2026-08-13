@@ -648,6 +648,13 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 					}
 				}
 
+				if ($status_enum->isInformational()) {
+					$this->wc_logger->log('warning', "SpectroCoin reported '{$status_enum->value}' for order '{$order_id}'; no status change applied.");
+					http_response_code(200);
+					echo esc_html__('*ok*', 'spectrocoin-accepting-bitcoin');
+					exit;
+				}
+
 				switch ($status_enum) {
 					case OrderStatus::NEW:
 					case OrderStatus::PENDING:
@@ -659,6 +666,9 @@ class SpectroCoinGateway extends WC_Payment_Gateway
 						$order->update_status($this->order_status);
 						break;
 					case OrderStatus::FAILED:
+					case OrderStatus::CANCELLED:
+					case OrderStatus::REJECTED:
+					case OrderStatus::INVALID_PAYMENT:
 						$order->update_status('failed');
 						break;
 					case OrderStatus::EXPIRED:
