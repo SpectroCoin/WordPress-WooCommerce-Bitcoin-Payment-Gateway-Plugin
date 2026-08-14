@@ -4,4 +4,4 @@
 /.phpunit.cache
 /coverage-html
 /coverage-report
-.env
+.env/tests/e2e/tier2/.certs

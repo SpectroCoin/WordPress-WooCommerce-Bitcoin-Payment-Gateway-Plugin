@@ -1,0 +1,86 @@
+# Tier 2: a real WordPress + WooCommerce, and a stand-in SpectroCoin API that
+# answers as spectrocoin.com inside this network.
+#
+# That network alias is the point of the design: the plugin reaches the stub
+# through its own shipped Config URLs, over real TLS, with no test-only edit to
+# the code under test.
+services:
+  db:
+    image: mariadb:11
+    environment:
+      MARIADB_ROOT_PASSWORD: root
+      MARIADB_DATABASE: wordpress
+      MARIADB_USER: wordpress
+      MARIADB_PASSWORD: wordpress
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  spectrocoin:
+    build:
+      context: ./stub
+    networks:
+      default:
+        aliases:
+          - spectrocoin.com
+    volumes:
+      - ./.certs:/certs:ro
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "-o", "/dev/null", "http://localhost/__test/requests"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  wordpress:
+    image: wordpress:php8.2-apache
+    depends_on:
+      db:
+        condition: service_healthy
+      spectrocoin:
+        condition: service_healthy
+    networks:
+      default:
+        # The plugin rejects a callbackUrl whose host has no dot, so the shop
+        # cannot be reachable as plain "localhost" or "wordpress".
+        aliases:
+          - shop.test
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+      WORDPRESS_DB_NAME: wordpress
+      WORDPRESS_DEBUG: 1
+      WORDPRESS_CONFIG_EXTRA: |
+        define('WP_DEBUG_LOG', '/var/www/html/wp-content/debug.log');
+        define('WP_DEBUG_DISPLAY', false);
+    volumes:
+      - wp:/var/www/html
+      - ./.certs:/certs:ro
+    ports:
+      - "8086:80"
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost/wp-admin/install.php"]
+      interval: 5s
+      timeout: 5s
+      retries: 40
+
+  cli:
+    image: wordpress:cli-php8.2
+    depends_on:
+      wordpress:
+        condition: service_healthy
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+      WORDPRESS_DB_NAME: wordpress
+    volumes:
+      - wp:/var/www/html
+      - ./.certs:/certs:ro
+    user: "33:33"
+    entrypoint: ["tail", "-f", "/dev/null"]
+
+volumes:
+  wp:
