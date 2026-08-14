@@ -1,0 +1,45 @@
+name: Checks
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          coverage: none
+
+      - name: Lint first-party PHP
+        run: |
+          find . -name vendor -prune -o -name '*.php' -print0 \
+            | xargs -0 -n1 -P4 php -l > /dev/null
+
+      - name: Run checks
+        run: |
+          set -euo pipefail
+          found=0
+          while IFS= read -r script; do
+            echo "::group::$script"
+            php "$script"
+            echo "::endgroup::"
+            found=$((found + 1))
+          done < <(find . -name vendor -prune -o -name 'check-*.php' -print | sort)
+
+          # Without this, moving or renaming the scripts would leave the job
+          # green while it ran nothing at all.
+          if [ "$found" -eq 0 ]; then
+            echo "No check scripts found - refusing to report success."
+            exit 1
+          fi
+          echo "$found check script(s) passed."
