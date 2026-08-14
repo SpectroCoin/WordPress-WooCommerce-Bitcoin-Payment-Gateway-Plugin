@@ -1,0 +1,46 @@
+name: Smoke
+
+# Installs the packaged plugin into a real WordPress + WooCommerce and checks it
+# runs. Deliberately separate from checks.yml: this one starts containers and
+# takes minutes, so it runs on release-bound changes rather than every push.
+on:
+  pull_request:
+    branches:
+      - master
+  workflow_dispatch:
+    inputs:
+      released:
+        description: "Test a published wordpress.org version instead of the working tree (e.g. 2.1.6)"
+        required: false
+        type: string
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          tools: composer
+          coverage: none
+
+      - name: Run the smoke test
+        run: |
+          if [ -n "${{ inputs.released }}" ]; then
+            ./tests/e2e/smoke.sh --released "${{ inputs.released }}"
+          else
+            ./tests/e2e/smoke.sh
+          fi
+
+      - name: Container logs on failure
+        if: failure()
+        run: |
+          cd tests/e2e
+          docker compose logs --tail=100 || true
+          docker compose exec -T cli sh -c 'cat /var/www/html/wp-content/debug.log' || true
