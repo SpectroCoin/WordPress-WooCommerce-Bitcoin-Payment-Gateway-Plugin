@@ -71,7 +71,7 @@ echo "SpectroCoin WooCommerce — plugin identification header\n\n";
 
 $t->run('the client declares its platform and version', function ($t) use ($source) {
     $t->assertSame('WooCommerce', constant_in($source, 'PLUGIN_PLATFORM'), 'PLUGIN_PLATFORM');
-    $t->assertSame('2.1.5', constant_in($source, 'PLUGIN_VERSION'), 'PLUGIN_VERSION');
+    $t->assertSame('2.1.6', constant_in($source, 'PLUGIN_VERSION'), 'PLUGIN_VERSION');
 });
 
 $t->run('the header is wired into the HTTP client', function ($t) use ($source) {
@@ -100,7 +100,7 @@ $t->run('the header carries no merchant or site identity', function ($t) use ($s
 
 $t->run('the advertised version matches the plugin version', function ($t) use ($root) {
     preg_match('/^Version:\s*(\S+)/m', file_get_contents($root . 'spectrocoin.php'), $m);
-    $t->assertSame(trim($m[1]), '2.1.5',
+    $t->assertSame(trim($m[1]), '2.1.6',
         'spectrocoin.php and the advertised version must not drift');
 });
 

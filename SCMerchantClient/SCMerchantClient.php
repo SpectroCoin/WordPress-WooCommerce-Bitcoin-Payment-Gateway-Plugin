@@ -205,7 +205,7 @@ class SCMerchantClient
     private const PLUGIN_PLATFORM = 'WooCommerce';
 
     /** Bump with the release: this is what identifies the build server-side. */
-    private const PLUGIN_VERSION = '2.1.5';
+    private const PLUGIN_VERSION = '2.1.6';
 
     /**
      * Identifies the plugin and its version on every API call, so the version
