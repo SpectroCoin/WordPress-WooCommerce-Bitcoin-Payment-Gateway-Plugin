@@ -1,0 +1,38 @@
+name: Checkout journey
+
+# Buys a product in a real browser: add to cart, fill the form, pick
+# SpectroCoin, place the order, follow the redirect.
+#
+# This is the layer tiers 1 and 2 cannot reach. Tier 2 calls process_payment()
+# directly, so it proves the gateway works but not that a shopper can ever
+# reach it - and WooCommerce's default checkout is block-based, which the
+# plugin registers for through a separate integration class.
+on:
+  pull_request:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  tier3:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run the checkout journey
+        run: ./tests/e2e/tier3/tier3.sh
+
+      - name: Screenshots of any failing step
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: tier3-screenshots
+          path: tests/e2e/tier3/artifacts/
+          if-no-files-found: ignore
+
+      - name: Container logs on failure
+        if: failure()
+        run: cd tests/e2e/tier3 && docker compose logs --tail=150 || true

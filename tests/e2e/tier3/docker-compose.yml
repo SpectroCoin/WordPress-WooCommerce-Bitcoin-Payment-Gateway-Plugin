@@ -1,0 +1,96 @@
+# Tier 3: a real shopper journey in a real browser.
+#
+# Tier 2 called process_payment() directly, which proves the gateway works but
+# not that a shopper can ever reach it. WooCommerce's default checkout is now
+# block-based and this plugin registers for it through a separate integration
+# class, so "does it appear at checkout" is a genuinely different question from
+# "does the gateway function".
+services:
+  db:
+    image: mariadb:11
+    environment:
+      MARIADB_ROOT_PASSWORD: root
+      MARIADB_DATABASE: wordpress
+      MARIADB_USER: wordpress
+      MARIADB_PASSWORD: wordpress
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  spectrocoin:
+    build:
+      context: ./stub
+    networks:
+      default:
+        aliases:
+          - spectrocoin.com
+    volumes:
+      - ./.certs:/certs:ro
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "-o", "/dev/null", "http://localhost/__test/requests"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  wordpress:
+    image: wordpress:php8.2-apache
+    depends_on:
+      db:
+        condition: service_healthy
+      spectrocoin:
+        condition: service_healthy
+    networks:
+      default:
+        # The plugin rejects a callbackUrl whose host has no dot.
+        aliases:
+          - shop.test
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+      WORDPRESS_DB_NAME: wordpress
+      WORDPRESS_DEBUG: 1
+      WORDPRESS_CONFIG_EXTRA: |
+        define('WP_DEBUG_LOG', '/var/www/html/wp-content/debug.log');
+        define('WP_DEBUG_DISPLAY', false);
+    volumes:
+      - wp:/var/www/html
+      - ./.certs:/certs:ro
+    ports:
+      - "8093:80"
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost/wp-admin/install.php"]
+      interval: 5s
+      timeout: 5s
+      retries: 40
+
+  cli:
+    image: wordpress:cli-php8.2
+    depends_on:
+      wordpress:
+        condition: service_healthy
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+      WORDPRESS_DB_NAME: wordpress
+    volumes:
+      - wp:/var/www/html
+    user: "33:33"
+    entrypoint: ["tail", "-f", "/dev/null"]
+
+  # Carries its own browsers; nothing is downloaded at run time.
+  playwright:
+    image: mcr.microsoft.com/playwright:v1.50.0-noble
+    depends_on:
+      wordpress:
+        condition: service_healthy
+    volumes:
+      - ./:/work
+    working_dir: /work
+    entrypoint: ["tail", "-f", "/dev/null"]
+
+volumes:
+  wp:
