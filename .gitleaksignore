@@ -1,0 +1,9 @@
+# Triaged 2026-08-17. Each entry is a finding that has been reviewed; a new
+# finding will still fail the build.
+
+# A key generated for the callback unit tests, used to sign the test fixtures.
+19acedb1f09cf49023724943ce9f9491acddfeea:tests/SCMerchantClient/Http/OrderCallbackTest.php:private-key:18
+
+# Carries a PEM header but the body is not valid base64 and openssl cannot load
+# it, so it is not usable key material. Removed from the tree in any case.
+12c3fec1c2255418c4fcd55e2ee6cc567a327c5d:spectrocoin/keys/ptivate_key:private-key:1
