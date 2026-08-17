@@ -36,7 +36,22 @@ jobs:
           # Fetch the latest merged PR title and body using GitHub CLI
           PR_TITLE=$(gh pr list --state merged --limit 1 --json title --jq '.[0].title')
           PR_BODY=$(gh pr list --state merged --limit 1 --json body --jq '.[0].body')
-          TAG_NAME=$(echo "$PR_TITLE" | sed 's/ /_/g') # Replace spaces with underscores
+
+          # A release is cut only when the pull request title is the version
+          # being released. Without this, any merged title becomes a tag: a
+          # pull request called "Add a tier 3 test" would publish a release by
+          # that name, and only the exists-check below has been stopping it.
+          #
+          # TAG_EXISTS is the gate every later step already reads, so setting
+          # it here means "do not release" - whether because the tag exists or
+          # because this merge is not a release at all.
+          if ! printf '%s' "$PR_TITLE" | grep -qE '^v?[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "'$PR_TITLE' is not a version number, so nothing is released."
+            echo "TAG_EXISTS=true" >> $GITHUB_ENV
+            exit 0
+          fi
+
+          TAG_NAME="$PR_TITLE"
           
           # Check if the tag already exists
           if git rev-parse "$TAG_NAME" >/dev/null 2>&1; then

@@ -1,3 +1,9 @@
+# Pinned so concurrent runs in sibling plugin repositories do not share
+# one Compose project. Without this the name defaults to the directory
+# basename - "tier3" in every repository - and an unrelated "docker compose
+# down -v" tears down this stack mid-run.
+name: woocommerce-spectrocoin-tier3
+
 # Tier 3: a real shopper journey in a real browser.
 #
 # Tier 2 called process_payment() directly, which proves the gateway works but

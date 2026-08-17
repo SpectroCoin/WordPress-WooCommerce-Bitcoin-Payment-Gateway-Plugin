@@ -1,3 +1,9 @@
+# Pinned so concurrent runs in sibling plugin repositories do not share
+# one Compose project. Without this the name defaults to the directory
+# basename - "tier2" in every repository - and an unrelated "docker compose
+# down -v" tears down this stack mid-run.
+name: woocommerce-spectrocoin-tier2
+
 # Tier 2: a real WordPress + WooCommerce, and a stand-in SpectroCoin API that
 # answers as spectrocoin.com inside this network.
 #
